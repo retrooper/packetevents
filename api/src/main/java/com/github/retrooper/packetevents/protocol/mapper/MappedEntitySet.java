@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
@@ -66,6 +68,20 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
 
     public static <Z extends MappedEntity> MappedEntitySet<Z> createEmpty() {
         return new MappedEntitySet<>(new ArrayList<>(0));
+    }
+
+    public static <Z extends MappedEntity> NbtCodec<MappedEntitySet<Z>> codec(IRegistry<Z> registry) {
+        return new NbtCodec<MappedEntitySet<Z>>() {
+            @Override
+            public MappedEntitySet<Z> decode(NBT tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+                return MappedEntitySet.decode(tag, wrapper, registry);
+            }
+
+            @Override
+            public NBT encode(PacketWrapper<?> wrapper, MappedEntitySet<Z> value) throws NbtCodecException {
+                return MappedEntitySet.encode(wrapper, value);
+            }
+        };
     }
 
     public static <Z extends MappedEntity> MappedEntityRefSet<Z> readRefSet(PacketWrapper<?> wrapper) {
@@ -129,6 +145,7 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
 
     public static <Z extends MappedEntity> MappedEntitySet<Z> decode(
             NBT nbt, PacketWrapper<?> wrapper, IRegistry<Z> registry) {
+        IRegistry<Z> replacedRegistry = wrapper.replaceRegistry(registry);
         ClientVersion version = wrapper.getServerVersion().toClientVersion();
         List<Z> list;
         if (nbt instanceof NBTString) {
@@ -142,14 +159,14 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
             // single entry list
             list = new ArrayList<>(1);
             ResourceLocation key = new ResourceLocation(singleEntry);
-            list.add(registry.getByNameOrThrow(version, key));
+            list.add(replacedRegistry.getByNameOrThrow(version, key));
         } else {
             // assume it's a list
             NBTList<?> listTag = (NBTList<?>) nbt;
             list = new ArrayList<>(listTag.size());
             for (NBT tag : listTag.getTags()) {
                 ResourceLocation key = new ResourceLocation(((NBTString) tag).getValue());
-                list.add(registry.getByNameOrThrow(version, key));
+                list.add(replacedRegistry.getByNameOrThrow(version, key));
             }
         }
         return new MappedEntitySet<>(list);

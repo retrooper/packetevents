@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.nbt;
 
 import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public abstract class NBT {
@@ -27,7 +28,7 @@ public abstract class NBT {
     public abstract NBTType<?> getType();
 
     @Override
-    public abstract boolean equals(Object other);
+    public abstract boolean equals(@Nullable Object other);
 
     @Override
     public abstract int hashCode();

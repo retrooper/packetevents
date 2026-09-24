@@ -360,14 +360,21 @@ public final class NbtCodecs {
         return new NbtCodec<T>() {
             @Override
             public T decode(NBT nbt, PacketWrapper<?> wrapper) {
+                ClientVersion version = wrapper.getServerVersion().toClientVersion();
                 IRegistry<T> replacedRegistry = wrapper.replaceRegistry(registry);
                 T entry = null;
                 if (nbt instanceof NBTNumber) {
-                    ClientVersion version = wrapper.getServerVersion().toClientVersion();
                     int id = ((NBTNumber) nbt).getAsInt();
                     entry = replacedRegistry.getById(version, id);
+                    if (entry == null) {
+                        throw new NbtCodecException("Can't find #" + id + " in " + registry.getRegistryKey());
+                    }
                 } else if (nbt instanceof NBTString) {
-                    entry = replacedRegistry.getByName(((NBTString) nbt).getValue());
+                    String name = ((NBTString) nbt).getValue();
+                    entry = replacedRegistry.getByName(version, name);
+                    if (entry == null) {
+                        throw new NbtCodecException("Can't find " + name + " in " + registry.getRegistryKey());
+                    }
                 }
                 if (entry == null) {
                     throw new NbtCodecException("Can't decode registry " + registry.getRegistryKey());

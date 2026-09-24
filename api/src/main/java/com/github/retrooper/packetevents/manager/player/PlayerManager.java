@@ -26,15 +26,16 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface PlayerManager {
     int getPing(@NotNull Object player);
 
     @NotNull ClientVersion getClientVersion(@NotNull Object player);
 
-    Object getChannel(@NotNull Object player);
+    @Nullable Object getChannel(@NotNull Object player);
 
-    User getUser(@NotNull Object player);
+    @Nullable User getUser(@NotNull Object player);
 
     /**
      * <strong>WARNING</strong>: Usage of this method should be avoided. Please use either

@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -55,7 +56,7 @@ public interface ProtocolManager {
     void writePacketSilently(Object channel, Object byteBuf);
     void receivePacket(Object channel, Object byteBuf);
     void receivePacketSilently(Object channel, Object byteBuf);
-    ClientVersion getClientVersion(Object channel);
+    @Nullable ClientVersion getClientVersion(Object channel);
     //TODO Define method that accepts an array of channels/set/list of channels.
 
     default void sendPackets(Object channel, Object... byteBuf) {
@@ -147,13 +148,13 @@ public interface ProtocolManager {
         receivePacketsSilently(channel, transformed);
     }
 
-    default User getUser(Object channel) {
+    default @Nullable User getUser(Object channel) {
         Object pipeline = ChannelHelper.getPipeline(channel);
         return USERS.get(pipeline);
     }
 
     @ApiStatus.Internal
-    default User removeUser(Object channel) {
+    default @Nullable User removeUser(Object channel) {
         Object pipeline = ChannelHelper.getPipeline(channel);
         return USERS.remove(pipeline);
     }
@@ -167,7 +168,7 @@ public interface ProtocolManager {
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
 
-    default Object getChannel(UUID uuid) {
+    default @Nullable Object getChannel(UUID uuid) {
         return CHANNELS.get(uuid);
     }
 

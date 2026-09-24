@@ -136,6 +136,11 @@ public final class DamageTypes {
     public static final DamageType SPEAR = define("spear", "spear", 0.1f);
 
     /**
+     * @versions 26.2+
+     */
+    public static final DamageType SULFUR_CUBE_HOT = define("sulfur_cube_hot", "sulfurCubeHot", 0.1f);
+
+    /**
      * Returns an immutable view of the damagetypes.
      *
      * @return DamageTypes

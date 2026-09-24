@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityBuilder;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRef;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRefSet;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
@@ -36,7 +38,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class DimensionTypeBuilder {
+public final class DimensionTypeBuilder implements MappedEntityBuilder<DimensionType> {
 
     /**
      * @versions 1.21.11+
@@ -112,7 +114,7 @@ public final class DimensionTypeBuilder {
     /**
      * @versions 26.1+
      */
-    private @Nullable WorldClock defaultClock;
+    private @Nullable MappedEntityRef<WorldClock> defaultClock;
     /**
      * @versions 26.1+
      */
@@ -125,10 +127,8 @@ public final class DimensionTypeBuilder {
         return new DimensionTypeBuilder();
     }
 
-    public DimensionType build() {
-        return this.build(null);
-    }
-
+    @ApiStatus.Internal
+    @Override
     public DimensionType build(@Nullable TypesBuilderData data) {
         return new StaticDimensionType(
                 data, this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes.copyImmutable(), this.timelines,
@@ -332,10 +332,18 @@ public final class DimensionTypeBuilder {
     }
 
     public @Nullable WorldClock getDefaultClock() {
+        return this.defaultClock != null ? this.defaultClock.get() : null;
+    }
+
+    public @Nullable MappedEntityRef<WorldClock> getDefaultClockRef() {
         return this.defaultClock;
     }
 
     public DimensionTypeBuilder setDefaultClock(@Nullable WorldClock defaultClock) {
+        return this.setDefaultClock(defaultClock != null ? new MappedEntityRef.Static<>(defaultClock) : null);
+    }
+
+    public DimensionTypeBuilder setDefaultClock(@Nullable MappedEntityRef<WorldClock> defaultClock) {
         this.defaultClock = defaultClock;
         return this;
     }

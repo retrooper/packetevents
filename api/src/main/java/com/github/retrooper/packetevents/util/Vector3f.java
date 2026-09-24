@@ -32,6 +32,9 @@ import java.util.Objects;
  * @since 1.8
  */
 public class Vector3f {
+
+    private static final Vector3f ZERO = new Vector3f(0.0f, 0.0f, 0.0f);
+
     /**
      * X (coordinate/angle/whatever you wish)
      */
@@ -232,7 +235,7 @@ public class Vector3f {
     }
 
     public static Vector3f zero() {
-        return new Vector3f();
+        return ZERO;
     }
 }
 

@@ -27,7 +27,7 @@ package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.HashMap;
+import static com.github.retrooper.packetevents.protocol.world.chunk.palette.Int2IntHashMap.EMPTY_VALUE;
 
 /**
  * A palette backed by a map.
@@ -36,13 +36,13 @@ public class MapPalette implements Palette {
 
     private final int bits;
     private final int[] idToState;
-    // TODO: Can we use fastutils here?
-    private final HashMap<Object, Integer> stateToId = new HashMap<>();
+    private final Int2IntHashMap stateToId;
     private int nextId = 0;
 
     public MapPalette(int bitsPerEntry) {
         this.bits = bitsPerEntry;
         this.idToState = new int[1 << bitsPerEntry];
+        this.stateToId = new Int2IntHashMap(1 << bitsPerEntry);
     }
 
     @Deprecated
@@ -77,18 +77,13 @@ public class MapPalette implements Palette {
 
     @Override
     public int stateToId(int state) {
-        Integer id = this.stateToId.get(state);
-        if (id == null && this.size() < this.idToState.length) {
+        int id = this.stateToId.get(state);
+        if (id == EMPTY_VALUE && this.size() < this.idToState.length) {
             id = this.nextId++;
             this.idToState[id] = state;
             this.stateToId.put(state, id);
         }
-
-        if (id != null) {
-            return id;
-        } else {
-            return -1;
-        }
+        return id;
     }
 
     @Override

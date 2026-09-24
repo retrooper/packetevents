@@ -1,4 +1,21 @@
 {
+  "V_26_3": [
+    "boolean",
+    "tri_state",
+    "float",
+    "angle_degrees",
+    "rgb_color",
+    "argb_color",
+    "integer",
+    "moon_phase",
+    "activity",
+    "bed_rule",
+    "particle",
+    "ambient_particles",
+    "background_music",
+    "ambient_sounds",
+    "mob_spawn_settings"
+  ],
   "V_26_1": [
     "boolean",
     "tri_state",

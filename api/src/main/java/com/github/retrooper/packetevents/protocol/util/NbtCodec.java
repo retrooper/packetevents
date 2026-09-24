@@ -80,6 +80,10 @@ public interface NbtCodec<T> extends NbtEncoder<T>, NbtDecoder<T> {
         };
     }
 
+    default NbtCodec<List<T>> applyFixedList(int length) {
+        return this.applyList().validate(list -> list.size() == length);
+    }
+
     default NbtCodec<List<T>> applyList() {
         return new NbtCodec<List<T>>() {
             @Override

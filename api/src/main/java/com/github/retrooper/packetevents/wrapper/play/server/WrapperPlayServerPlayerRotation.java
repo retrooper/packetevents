@@ -82,7 +82,9 @@ public class WrapperPlayServerPlayerRotation extends PacketWrapper<WrapperPlaySe
     @Override
     public void copy(WrapperPlayServerPlayerRotation wrapper) {
         this.yaw = wrapper.yaw;
+        this.relativeYaw = wrapper.relativeYaw;
         this.pitch = wrapper.pitch;
+        this.relativePitch = wrapper.relativePitch;
     }
 
     public float getYaw() {

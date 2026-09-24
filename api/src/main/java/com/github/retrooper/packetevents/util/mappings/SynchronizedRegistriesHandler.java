@@ -43,12 +43,16 @@ import com.github.retrooper.packetevents.protocol.entity.pig.PigSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigVariant;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigVariants;
+import com.github.retrooper.packetevents.protocol.entity.sulfurcube.SulfurCubeArchtype;
+import com.github.retrooper.packetevents.protocol.entity.sulfurcube.SulfurCubeArchtypes;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfVariant;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfVariants;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.item.blocktransformer.BlockTransformer;
+import com.github.retrooper.packetevents.protocol.item.blocktransformer.BlockTransformers;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
@@ -72,10 +76,14 @@ import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Tim
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timelines;
 import com.github.retrooper.packetevents.protocol.world.biome.Biome;
 import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
+import com.github.retrooper.packetevents.protocol.world.blockentity.decopot.DecoratedPotPattern;
+import com.github.retrooper.packetevents.protocol.world.blockentity.decopot.DecoratedPotPatterns;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
+import com.github.retrooper.packetevents.protocol.world.generation.BlockStateProvider;
+import com.github.retrooper.packetevents.protocol.world.generation.BlockStateProviders;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant;
@@ -108,8 +116,8 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(Biomes.getRegistry(), Biome.CODEC),
                 new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
                 new RegistryEntry<>(TrimPatterns.getRegistry(), (NbtEntryDecoder<TrimPattern>) TrimPattern::decode),
-                new RegistryEntry<>(TrimMaterials.getRegistry(), (NbtEntryDecoder<TrimMaterial>) TrimMaterial::decode),
-                new RegistryEntry<>(WolfVariants.getRegistry(), (NbtEntryDecoder<WolfVariant>) WolfVariant::decode),
+                new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial.DIRECT_CODEC),
+                new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant.CODEC),
                 new RegistryEntry<>(WolfSoundVariants.getRegistry(), WolfSoundVariant.CODEC),
                 new RegistryEntry<>(PigVariants.getRegistry(), PigVariant::decode),
                 new RegistryEntry<>(FrogVariants.getRegistry(), FrogVariant::decode),
@@ -117,9 +125,9 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(CowVariants.getRegistry(), CowVariant.CODEC),
                 new RegistryEntry<>(ChickenVariants.getRegistry(), ChickenVariant.CODEC),
                 new RegistryEntry<>(ZombieNautilusVariants.getRegistry(), ZombieNautilusVariant::decode),
-                new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant::decode),
+                new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant.CODEC),
                 new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType.CODEC),
-                new RegistryEntry<>(DamageTypes.getRegistry(), DamageType::decode),
+                new RegistryEntry<>(DamageTypes.getRegistry(), DamageType.DIRECT_CODEC),
                 new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
                 new RegistryEntry<>(EnchantmentTypes.getRegistry(), (NbtEntryDecoder<EnchantmentType>) EnchantmentType::decode),
                 new RegistryEntry<>(JukeboxSongs.getRegistry(), (NbtEntryDecoder<IJukeboxSong>) IJukeboxSong::decode),
@@ -130,7 +138,11 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(CatSoundVariants.getRegistry(), CatSoundVariant.CODEC),
                 new RegistryEntry<>(CowSoundVariants.getRegistry(), CowSoundVariant.CODEC),
                 new RegistryEntry<>(ChickenSoundVariants.getRegistry(), ChickenSoundVariant.CODEC),
-                new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC)
+                new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC),
+                new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC),
+                new RegistryEntry<>(DecoratedPotPatterns.getRegistry(), DecoratedPotPattern.CODEC),
+                new RegistryEntry<>(BlockTransformers.getRegistry(), BlockTransformer.DIRECT_CODEC),
+                new RegistryEntry<>(BlockStateProviders.getRegistry(), BlockStateProvider.DIRECT_CODEC)
         ).forEach(entry -> REGISTRY_KEYS.put(entry.getRegistryKey(), entry));
     }
 
@@ -323,7 +335,7 @@ public final class SynchronizedRegistriesHandler {
 
             // can't find this element anywhere
             // TODO dummy values to make at least simple stuff work?
-            PacketEvents.getAPI().getLogger().warning("Unknown registry entry "
+            PacketEvents.getAPI().getLogManager().warn("Unknown registry entry "
                     + elementName + " for " + this.getRegistryKey());
         }
 

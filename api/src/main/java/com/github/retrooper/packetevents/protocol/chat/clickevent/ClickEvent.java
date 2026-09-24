@@ -22,10 +22,13 @@ import com.github.retrooper.packetevents.protocol.dialog.Dialog;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTEnd;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.adventure.AdventureSupportUtil;
 import com.github.retrooper.packetevents.util.adventure.NbtTagHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.event.ClickEvent.Payload;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.Locale;
 
 @NullMarked
 public interface ClickEvent {
@@ -45,27 +48,27 @@ public interface ClickEvent {
     ClickEventAction<?> getAction();
 
     static ClickEvent fromAdventure(net.kyori.adventure.text.event.ClickEvent clickEvent) {
-        switch (clickEvent.action()) {
-            case OPEN_URL:
-                return new OpenUrlClickEvent(clickEvent.value());
-            case OPEN_FILE:
-                return new OpenFileClickEvent(clickEvent.value());
-            case RUN_COMMAND:
-                return new RunCommandClickEvent(clickEvent.value());
-            case SUGGEST_COMMAND:
-                return new SuggestCommandClickEvent(clickEvent.value());
-            case CHANGE_PAGE:
-                return new ChangePageClickEvent(clickEvent.value());
-            case COPY_TO_CLIPBOARD:
-                return new CopyToClipboardClickEvent(clickEvent.value());
-            case SHOW_DIALOG:
+        switch (clickEvent.action().name().toLowerCase(Locale.ROOT)) {
+            case "open_url":
+                return new OpenUrlClickEvent(AdventureSupportUtil.getStringValue(clickEvent));
+            case "open_file":
+                return new OpenFileClickEvent(AdventureSupportUtil.getStringValue(clickEvent));
+            case "run_command":
+                return new RunCommandClickEvent(AdventureSupportUtil.getStringValue(clickEvent));
+            case "suggest_command":
+                return new SuggestCommandClickEvent(AdventureSupportUtil.getStringValue(clickEvent));
+            case "change_page":
+                return new ChangePageClickEvent(AdventureSupportUtil.getStringValue(clickEvent));
+            case "copy_to_clipboard":
+                return new CopyToClipboardClickEvent(AdventureSupportUtil.getStringValue(clickEvent));
+            case "show_dialog":
                 return new ShowDialogClickEvent((Dialog) ((Payload.Dialog) clickEvent.payload()).dialog());
-            case CUSTOM:
+            case "custom":
                 Payload.Custom payload = (Payload.Custom) clickEvent.payload();
                 NbtTagHolder nbtTag = (NbtTagHolder) payload.nbt();
                 return new CustomClickEvent(
                         new ResourceLocation(payload.key()),
-                        nbtTag.getTag() instanceof NBTEnd ? null : nbtTag.getTag()
+                        nbtTag == null || nbtTag.getTag() instanceof NBTEnd ? null : nbtTag.getTag()
                 );
             default:
                 throw new UnsupportedOperationException("Unsupported clickevent: " + clickEvent);

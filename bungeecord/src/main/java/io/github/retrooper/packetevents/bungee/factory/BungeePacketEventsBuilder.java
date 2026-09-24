@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.bungee.factory;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -34,17 +33,14 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.LogManager;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
+import com.github.retrooper.packetevents.util.PEVersions;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.injector.BungeePipelineInjector;
 import io.github.retrooper.packetevents.processor.InternalBungeeProcessor;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -53,14 +49,10 @@ import net.md_5.bungee.protocol.ProtocolConstants;
 import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
 
 public class BungeePacketEventsBuilder {
-    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
     private static PacketEventsAPI<Plugin> INSTANCE;
 
     public static void clearBuildCache() {
@@ -103,7 +95,7 @@ public class BungeePacketEventsBuilder {
                     if (version == null) {
                         version = ServerVersion.getById(ProtocolConstants.SUPPORTED_VERSION_IDS.get(0));
                         if (version == null) {
-                            logManager.warn("PacketEvents currently does not support the protocol version " + ProtocolConstants.SUPPORTED_VERSION_IDS.get(0) + " but will act as if the minecraft version were " + ServerVersion.getLatest().getReleaseName() + "!");
+                            getLogManager().warn("PacketEvents currently does not support the protocol version " + ProtocolConstants.SUPPORTED_VERSION_IDS.get(0) + " but will act as if the minecraft version were " + ServerVersion.getLatest().getReleaseName() + "!");
                             version = ServerVersion.getLatest();
                         }
                     }
@@ -176,16 +168,6 @@ public class BungeePacketEventsBuilder {
 
             private final ChannelInjector injector = new BungeePipelineInjector();
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final LogManager logManager = new LogManager() {
-                @Override
-                protected void log(Level level, @Nullable NamedTextColor color, String message) {
-                    // First we must strip away the color codes that might be in this message
-                    message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
-                    ProxyServer.getInstance().getLogger().info(message);
-                    // TODO: Remove "[com.github.retrooper.packetevents.PacketEventsAPI]:" From logger
-                    // PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
-                }
-            };
             private boolean loaded;
             private boolean initialized;
             private boolean terminated;
@@ -202,15 +184,12 @@ public class BungeePacketEventsBuilder {
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
 
-                    WrappedBlockState.ensureLoad();
-                    SynchronizedRegistriesHandler.init();
+                    super.load();
 
                     injector.inject();
                     loaded = true;
 
-                    // Register internal packet listener (should be the first listener)
-                    // This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener());
+                    this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + id));
                 }
             }
 
@@ -247,10 +226,7 @@ public class BungeePacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    // Uninject the injector if needed(depends on the injector implementation)
-                    injector.uninject();
-                    // Unregister all our listeners
-                    getEventManager().unregisterAllListeners();
+                    super.terminate();
                     initialized = false;
                     terminated = true;
                 }
@@ -264,11 +240,6 @@ public class BungeePacketEventsBuilder {
             @Override
             public Plugin getPlugin() {
                 return plugin;
-            }
-
-            @Override
-            public LogManager getLogManager() {
-                return logManager;
             }
 
             @Override

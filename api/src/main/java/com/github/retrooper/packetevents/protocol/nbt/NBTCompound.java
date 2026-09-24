@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.util.NbtEncoder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+@NullMarked
 public class NBTCompound extends NBT {
 
     protected final Map<String, NBT> tags = new LinkedHashMap<>();
@@ -199,7 +201,7 @@ public class NBTCompound extends NBT {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NBT> T removeTagAndReturnIfType(String key, Class<T> type) {
+    public <T extends NBT> @Nullable T removeTagAndReturnIfType(String key, Class<T> type) {
         NBT tag = removeTag(key);
         if (type.isInstance(tag)) {
             return (T) tag;
@@ -208,7 +210,7 @@ public class NBTCompound extends NBT {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NBT> NBTList<T> removeTagAndReturnIfListType(String key, Class<T> type) {
+    public <T extends NBT> @Nullable NBTList<T> removeTagAndReturnIfListType(String key, Class<T> type) {
         NBTList<?> list = removeTagAndReturnIfType(key, NBTList.class);
         if ((list != null) && type.isAssignableFrom(list.getTagsType().getNBTClass())) {
             return (NBTList<T>) list;
@@ -216,7 +218,7 @@ public class NBTCompound extends NBT {
         return null;
     }
 
-    public void setTag(String key, NBT tag) {
+    public void setTag(String key, @Nullable NBT tag) {
         if (tag != null) {
             tags.put(key, tag);
         } else {
@@ -251,7 +253,6 @@ public class NBTCompound extends NBT {
         return tag != null ? decoder.decode(tag, wrapper) : def;
     }
 
-    @Contract("_, _, !null, _ -> !null")
     public <T> @Nullable T getOrSupply(String key, NbtDecoder<T> decoder, Supplier<@Nullable T> def, PacketWrapper<?> wrapper) {
         NBT tag = this.getTagOrNull(key);
         return tag != null ? decoder.decode(tag, wrapper) : def.get();
@@ -333,7 +334,7 @@ public class NBTCompound extends NBT {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (other instanceof NBTCompound) {
             if (isEmpty() && ((NBTCompound) other).isEmpty()) {
                 return true;

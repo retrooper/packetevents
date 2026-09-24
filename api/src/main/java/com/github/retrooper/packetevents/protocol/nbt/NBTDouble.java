@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class NBTDouble extends NBTNumber {
 
     protected final double value;
@@ -72,7 +76,7 @@ public class NBTDouble extends NBTNumber {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }

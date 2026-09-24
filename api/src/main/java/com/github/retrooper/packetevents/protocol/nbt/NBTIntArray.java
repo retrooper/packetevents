@@ -18,8 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Arrays;
 
+@NullMarked
 public class NBTIntArray extends NBT {
 
     protected final int[] array;
@@ -38,7 +42,7 @@ public class NBTIntArray extends NBT {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }

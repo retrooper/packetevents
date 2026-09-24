@@ -77,7 +77,7 @@ public class DefaultNBTSerializer extends NBTSerializer<DataInput, DataOutput> {
             return new NBTByte(stream.readByte());
         }, (stream, tag) -> stream.writeByte(tag.getAsByte()));
         registerType(NBTType.SHORT, 2, (limiter, stream) -> {
-            limiter.increment(OBJECT_HEADER_BYTES + Short.SIZE);
+            limiter.increment(OBJECT_HEADER_BYTES + Short.BYTES);
             return new NBTShort(stream.readShort());
         }, (stream, tag) -> stream.writeShort(tag.getAsShort()));
         registerType(NBTType.INT, 3, (limiter, stream) -> {

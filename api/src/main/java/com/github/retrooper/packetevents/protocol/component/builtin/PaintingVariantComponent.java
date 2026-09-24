@@ -33,12 +33,12 @@ public class PaintingVariantComponent {
     }
 
     public static PaintingVariantComponent read(PacketWrapper<?> wrapper) {
-        PaintingVariant variant = wrapper.readMappedEntity(PaintingVariants.getRegistry());
+        PaintingVariant variant = PaintingVariant.read(wrapper);
         return new PaintingVariantComponent(variant);
     }
 
     public static void write(PacketWrapper<?> wrapper, PaintingVariantComponent component) {
-        wrapper.writeMappedEntity(component.variant);
+        PaintingVariant.write(wrapper, component.variant);
     }
 
     public PaintingVariant getVariant() {

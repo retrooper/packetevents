@@ -27,15 +27,20 @@ dependencies {
     api(project(":patch:adventure-text-serializer-gson", "shadow")) {
         excludeAdventure()
     }
-    api(libs.adventure.text.serializer.legacy) {
+    api(project(":patch:adventure-text-serializer-legacy", "shadow")) {
         excludeAdventure()
     }
     compileOnly(libs.gson)
+    compileOnly(libs.adventure.text.logger.slf4j)
     compileOnly(libs.checkerqual)
 
+    testRuntimeOnly(testlibs.bundles.adventure)
+    testRuntimeOnly(testlibs.bundles.adventure.serializers)
     testImplementation(libs.bundles.adventure)
     testImplementation(project(":patch:adventure-text-serializer-gson"))
+    testImplementation(project(":patch:adventure-text-serializer-legacy"))
     testImplementation(libs.adventure.text.serializer.legacy)
+    testImplementation(libs.adventure.text.logger.slf4j)
     testImplementation(project(":netty-common"))
     testImplementation(testlibs.mockbukkit)
     testImplementation(testlibs.paper.api)

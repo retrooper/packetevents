@@ -23,31 +23,25 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.common.client.WrapperCommonClientPluginMessage;
 
 /**
  * Mods and plugins can use this to send their data.
  * Minecraft itself uses some plugin channels.
  * These internal channels are in the minecraft namespace.
  */
-public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayClientPluginMessage> {
-    private String channelName;
-    private byte[] data;
+public class WrapperPlayClientPluginMessage extends WrapperCommonClientPluginMessage<WrapperPlayClientPluginMessage> {
 
     public WrapperPlayClientPluginMessage(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPluginMessage(String channelName, byte[] data) {
-        super(PacketType.Play.Client.PLUGIN_MESSAGE);
-        this.channelName = channelName;
-        this.data = data;
+    public WrapperPlayClientPluginMessage(ResourceLocation channelName, byte[] data) {
+        this(channelName.toString(), data);
     }
 
-    public WrapperPlayClientPluginMessage(ResourceLocation channelName, byte[] data) {
-        super(PacketType.Play.Client.PLUGIN_MESSAGE);
-        this.channelName = channelName.toString();
-        this.data = data;
+    public WrapperPlayClientPluginMessage(String channelName, byte[] data) {
+        super(PacketType.Play.Client.PLUGIN_MESSAGE, channelName, data);
     }
 
     @Override
@@ -81,43 +75,4 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
         writeBytes(this.data);
     }
 
-    @Override
-    public void copy(WrapperPlayClientPluginMessage wrapper) {
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    /**
-     * The channel name of the plugin message.
-     * @return The channel name.
-     */
-    public String getChannelName() {
-        return channelName;
-    }
-
-    /**
-     * Sets the channel name of the plugin message.
-     * @param channelName The channel name.
-     */
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-    }
-
-    /**
-     * The data of the plugin message.
-     *
-     * @return The data.
-     */
-    public byte[] getData() {
-        return data;
-    }
-
-    /**
-     * Sets the data of the plugin message.
-     *
-     * @param data The data.
-     */
-    public void setData(byte[] data) {
-        this.data = data;
-    }
 }

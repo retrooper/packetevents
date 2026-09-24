@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.item.consumables.builtin;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.consumables.ConsumeEffect;
 import com.github.retrooper.packetevents.protocol.item.consumables.ConsumeEffectTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -25,22 +26,45 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class TeleportRandomlyConsumeEffect extends ConsumeEffect<TeleportRandomlyConsumeEffect> {
 
     private final float diameter;
+    /**
+     * @versions 26.3+
+     */
+    private final boolean directionalParticles;
 
     public TeleportRandomlyConsumeEffect(float diameter) {
+        this(diameter, true);
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public TeleportRandomlyConsumeEffect(float diameter, boolean directionalParticles) {
         super(ConsumeEffectTypes.TELEPORT_RANDOMLY);
         this.diameter = diameter;
+        this.directionalParticles = directionalParticles;
     }
 
     public static TeleportRandomlyConsumeEffect read(PacketWrapper<?> wrapper) {
         float diameter = wrapper.readFloat();
-        return new TeleportRandomlyConsumeEffect(diameter);
+        boolean directionalParticles = wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3) || wrapper.readBoolean();
+        return new TeleportRandomlyConsumeEffect(diameter, directionalParticles);
     }
 
     public static void write(PacketWrapper<?> wrapper, TeleportRandomlyConsumeEffect effect) {
         wrapper.writeFloat(effect.diameter);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            wrapper.writeBoolean(effect.directionalParticles);
+        }
     }
 
     public float getDiameter() {
         return this.diameter;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public boolean isDirectionalParticles() {
+        return this.directionalParticles;
     }
 }

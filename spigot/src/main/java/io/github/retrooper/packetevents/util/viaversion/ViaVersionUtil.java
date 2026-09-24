@@ -23,7 +23,8 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class ViaVersionUtil {
+public final class ViaVersionUtil {
+
     private static ViaState available = ViaState.UNKNOWN;
     private static ViaVersionAccessor viaVersionAccessor;
 

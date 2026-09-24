@@ -6,24 +6,18 @@ import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
-import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
-import java.util.logging.Level;
 
 public class TestPacketEventsBuilder {
 
@@ -63,20 +57,7 @@ public class TestPacketEventsBuilder {
                 }
             };
             private final ServerManager serverManager = new ServerManagerImpl();
-
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final LogManager logManager = new LogManager() {
-                @Override
-                protected void log(Level level, @Nullable NamedTextColor color, String message) {
-                    if (level == Level.SEVERE) {
-                        LOGGER.error(message);
-                    } else if (level == Level.WARNING) {
-                        LOGGER.warn(message);
-                    } else {
-                        LOGGER.info(message);
-                    }
-                }
-            };
 
             private boolean loaded;
             private boolean initialized;
@@ -165,11 +146,6 @@ public class TestPacketEventsBuilder {
             @Override
             public ChannelInjector getInjector() {
                 return null;
-            }
-
-            @Override
-            public LogManager getLogManager() {
-                return logManager;
             }
         };
     }

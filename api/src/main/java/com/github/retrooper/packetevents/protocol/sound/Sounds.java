@@ -3044,6 +3044,363 @@ public final class Sounds {
      * @versions 26.1+
      */
     public static final Sound ENTITY_BABY_WOLF_WHINE = define("entity.baby_wolf.whine");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ITEM_BUCKET_EMPTY_SULFUR_CUBE = define("item.bucket.empty_sulfur_cube");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ITEM_BUCKET_FILL_SULFUR_CUBE = define("item.bucket.fill_sulfur_cube");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound MUSIC_DISC_BOUNCE = define("music_disc.bounce");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound MUSIC_OVERWORLD_SULFUR_CAVES = define("music.overworld.sulfur_caves");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_SPIKE_BREAK = define("block.sulfur_spike.break");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_SPIKE_STEP = define("block.sulfur_spike.step");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_SPIKE_PLACE = define("block.sulfur_spike.place");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_SPIKE_HIT = define("block.sulfur_spike.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_SPIKE_FALL = define("block.sulfur_spike.fall");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_SPIKE_LAND = define("block.sulfur_spike.land");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_BREAK = define("block.sulfur.break");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_STEP = define("block.sulfur.step");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_PLACE = define("block.sulfur.place");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_HIT = define("block.sulfur.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_SULFUR_FALL = define("block.sulfur.fall");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_BREAK = define("block.potent_sulfur.break");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_STEP = define("block.potent_sulfur.step");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_PLACE = define("block.potent_sulfur.place");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_HIT = define("block.potent_sulfur.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_FALL = define("block.potent_sulfur.fall");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_GEYSER_ERUPTION = define("block.potent_sulfur.geyser_eruption");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_GEYSER_ERUPTION_ACTIVE = define("block.potent_sulfur.geyser_eruption_active");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_GEYSER_CONTINUOUS_ERUPTION = define("block.potent_sulfur.geyser_continuous_eruption");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_GEYSER_CONTINUOUS_ERUPTION_ACTIVE = define("block.potent_sulfur.geyser_continuous_eruption_active");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_CINNABAR_BREAK = define("block.cinnabar.break");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_CINNABAR_STEP = define("block.cinnabar.step");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_CINNABAR_PLACE = define("block.cinnabar.place");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_CINNABAR_HIT = define("block.cinnabar.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_CINNABAR_FALL = define("block.cinnabar.fall");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_ABSORB = define("entity.sulfur_cube.absorb");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_BOUNCE = define("entity.sulfur_cube.bounce");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_DEATH = define("entity.sulfur_cube.death");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_EJECT = define("entity.sulfur_cube.eject");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_HURT = define("entity.sulfur_cube.hurt");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_JUMP = define("entity.sulfur_cube.jump");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_REGULAR_HIT = define("entity.sulfur_cube.regular.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_REGULAR_PUSH = define("entity.sulfur_cube.regular.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_BOUNCY_HIT = define("entity.sulfur_cube.bouncy.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_BOUNCY_PUSH = define("entity.sulfur_cube.bouncy.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_SLOW_BOUNCY_HIT = define("entity.sulfur_cube.slow_bouncy.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_SLOW_BOUNCY_PUSH = define("entity.sulfur_cube.slow_bouncy.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_SLOW_FLAT_HIT = define("entity.sulfur_cube.slow_flat.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_SLOW_FLAT_PUSH = define("entity.sulfur_cube.slow_flat.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_FAST_FLAT_HIT = define("entity.sulfur_cube.fast_flat.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_FAST_FLAT_PUSH = define("entity.sulfur_cube.fast_flat.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_LIGHT_HIT = define("entity.sulfur_cube.light.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_LIGHT_PUSH = define("entity.sulfur_cube.light.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_FAST_SLIDING_HIT = define("entity.sulfur_cube.fast_sliding.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_FAST_SLIDING_PUSH = define("entity.sulfur_cube.fast_sliding.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_SLOW_SLIDING_HIT = define("entity.sulfur_cube.slow_sliding.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_SLOW_SLIDING_PUSH = define("entity.sulfur_cube.slow_sliding.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_STICKY_HIT = define("entity.sulfur_cube.sticky.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_STICKY_PUSH = define("entity.sulfur_cube.sticky.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_HIGH_RESISTANCE_HIT = define("entity.sulfur_cube.high_resistance.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_HIGH_RESISTANCE_PUSH = define("entity.sulfur_cube.high_resistance.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_EXPLOSIVE_HIT = define("entity.sulfur_cube.explosive.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_EXPLOSIVE_PUSH = define("entity.sulfur_cube.explosive.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_HOT_HIT = define("entity.sulfur_cube.hot.hit");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_HOT_PUSH = define("entity.sulfur_cube.hot.push");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SULFUR_CUBE_SQUISH = define("entity.sulfur_cube.squish");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound BLOCK_POTENT_SULFUR_NOXIOUS_GAS = define("block.potent_sulfur.noxious_gas");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SMALL_SULFUR_CUBE_DEATH = define("entity.small_sulfur_cube.death");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SMALL_SULFUR_CUBE_HURT = define("entity.small_sulfur_cube.hurt");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SMALL_SULFUR_CUBE_JUMP = define("entity.small_sulfur_cube.jump");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SMALL_SULFUR_CUBE_SQUISH = define("entity.small_sulfur_cube.squish");
+    /**
+     * @versions 26.2+
+     */
+    public static final Sound ENTITY_SMALL_SULFUR_CUBE_EAT = define("entity.small_sulfur_cube.eat");
+
+    /**
+     * ** @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_BREAK = define("entity.cushion.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_PLACE = define("entity.cushion.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_SIT = define("entity.cushion.sit");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_GET_UP = define("entity.cushion.get_up");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_BREAK = define("block.shelf_mushroom.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_FALL = define("block.shelf_mushroom.fall");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_PLACE = define("block.shelf_mushroom.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_STEP = define("block.shelf_mushroom.step");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_BOUNCE = define("block.shelf_mushroom.bounce");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_BREAK = define("block.poplar_leaves.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_HIT = define("block.poplar_leaves.hit");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_FALL = define("block.poplar_leaves.fall");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_PLACE = define("block.poplar_leaves.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_STEP = define("block.poplar_leaves.step");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_AMBIENT = define("block.poplar_leaves.ambient");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_BREAK = define("block.straw_bed.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_BREAK_LEAVE = define("block.straw_bed.break_leave");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_STEP = define("block.straw_bed.step");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_PLACE = define("block.straw_bed.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_HIT = define("block.straw_bed.hit");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_FALL = define("block.straw_bed.fall");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_RED_SHRUB_BREAK = define("block.red_shrub.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_RED_SHRUB_PLACE = define("block.red_shrub.place");
 
     /**
      * Returns an immutable view of the sounds.

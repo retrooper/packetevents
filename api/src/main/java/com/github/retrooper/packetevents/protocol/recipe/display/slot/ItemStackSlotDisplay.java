@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.recipe.display.slot;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -33,12 +34,12 @@ public class ItemStackSlotDisplay extends SlotDisplay<ItemStackSlotDisplay> {
     }
 
     public static ItemStackSlotDisplay read(PacketWrapper<?> wrapper) {
-        ItemStack stack = wrapper.readItemStack();
+        ItemStack stack = ItemStackSerialization.readTemplate(wrapper);
         return new ItemStackSlotDisplay(stack);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemStackSlotDisplay display) {
-        wrapper.writeItemStack(display.stack);
+        ItemStackSerialization.writeTemplate(wrapper, display.stack);
     }
 
     public ItemStack getStack() {

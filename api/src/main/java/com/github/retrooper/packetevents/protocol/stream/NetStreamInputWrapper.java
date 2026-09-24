@@ -33,6 +33,59 @@ public class NetStreamInputWrapper extends NetStreamInput {
     }
 
     @Override
+    public byte readByte() {
+        return this.wrapper.readByte();
+    }
+
+    @Override
+    public int readUnsignedByte() {
+        return this.wrapper.readUnsignedByte();
+    }
+
+    @Override
+    public short readShort() {
+        return this.wrapper.readShort();
+    }
+
+    @Override
+    public int readUnsignedShort() {
+        return this.wrapper.readUnsignedShort();
+    }
+
+    @Override
+    public int readVarInt() {
+        return this.wrapper.readVarInt();
+    }
+
+    @Override
+    public long readLong() {
+        return this.wrapper.readLong();
+    }
+
+    @Override
+    public long[] readLongs(int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("Array cannot have length less than 0.");
+        }
+        long[] values = new long[length];
+        readLongs(values);
+        return values;
+    }
+
+    @Override
+    public int readLongs(long[] values) {
+        return this.readLongs(values, 0, values.length);
+    }
+
+    @Override
+    public int readLongs(long[] values, int offset, int length) {
+        for (int index = offset; index < offset + length; index++) {
+            values[index] = this.wrapper.readLong();
+        }
+        return length;
+    }
+
+    @Override
     public int read() {
         return this.wrapper.readUnsignedByte();
     }

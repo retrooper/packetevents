@@ -79,6 +79,17 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
          */
         private boolean showHat;
 
+        public PlayerInfo(PlayerInfo other) {
+            this.profile = other.profile;
+            this.listed = other.listed;
+            this.latency = other.latency;
+            this.gameMode = other.gameMode;
+            this.displayName = other.displayName;
+            this.chatSession = other.chatSession;
+            this.listOrder = other.listOrder;
+            this.showHat = other.showHat;
+        }
+
         public PlayerInfo(UUID profileId) {
             this(new UserProfile(profileId, ""));
         }

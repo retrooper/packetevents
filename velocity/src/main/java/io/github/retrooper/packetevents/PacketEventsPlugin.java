@@ -59,7 +59,6 @@ public class PacketEventsPlugin {
 
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
-        logger.info("Injecting packetevents...");
         PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer, logger, dataDirectory));
         PacketEvents.getAPI().load();
         // It should only be enabled in a development environment, not globally
@@ -97,8 +96,6 @@ public class PacketEventsPlugin {
         Metrics metrics = metricsFactory.make(this, 11327);
         //Just to have an idea of which versions of packetevents people use
         metrics.addCustomChart(new SimplePie("packetevents_version", () -> PacketEvents.getAPI().getVersion().toStringWithoutSnapshot()));
-
-        logger.info("Plugin started");
     }
 
     @Subscribe

@@ -18,10 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.advancements;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public final class AdvancementDisplay {
@@ -40,8 +43,25 @@ public final class AdvancementDisplay {
     private float x;
     private float y;
 
-    public AdvancementDisplay(Component title, Component description, ItemStack icon, AdvancementType type, @Nullable ResourceLocation background, boolean showToast,
-                              boolean hidden, float x, float y) {
+    public AdvancementDisplay(
+            Component title, Component description, ItemStack icon, AdvancementType type,
+            @Nullable ResourceLocation background, boolean showToast, boolean hidden
+    ) {
+        this.title = title;
+        this.description = description;
+        this.icon = icon;
+        this.type = type;
+        this.showToast = showToast;
+        this.hidden = hidden;
+        this.background = background;
+    }
+
+    @ApiStatus.Obsolete
+    public AdvancementDisplay(
+            Component title, Component description, ItemStack icon, AdvancementType type,
+            @Nullable ResourceLocation background, boolean showToast, boolean hidden,
+            float x, float y
+    ) {
         this.title = title;
         this.description = description;
         this.icon = icon;
@@ -56,28 +76,34 @@ public final class AdvancementDisplay {
     public static AdvancementDisplay read(PacketWrapper<?> wrapper) {
         Component title = wrapper.readComponent();
         Component description = wrapper.readComponent();
-        ItemStack icon = wrapper.readItemStack();
+        ItemStack icon = ItemStackSerialization.readTemplate(wrapper);
         AdvancementType type = wrapper.readEnum(AdvancementType.class);
         int flags = wrapper.readInt();
         ResourceLocation background = (flags & FLAG_HAS_BACKGROUND) != 0 ? ResourceLocation.read(wrapper) : null;
         boolean showToast = (flags & FLAG_SHOW_TOAST) != 0;
         boolean hidden = (flags & FLAG_HIDDEN) != 0;
-        float x = wrapper.readFloat();
-        float y = wrapper.readFloat();
+        float x = 0f;
+        float y = 0f;
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
+            x = wrapper.readFloat();
+            y = wrapper.readFloat();
+        }
         return new AdvancementDisplay(title, description, icon, type, background, showToast, hidden, x, y);
     }
 
     public static void write(PacketWrapper<?> wrapper, AdvancementDisplay display) {
         wrapper.writeComponent(display.title);
         wrapper.writeComponent(display.description);
-        wrapper.writeItemStack(display.icon);
+        ItemStackSerialization.writeTemplate(wrapper, display.icon);
         wrapper.writeEnum(display.type);
         wrapper.writeInt(display.packFlags());
         if (display.background != null) {
             ResourceLocation.write(wrapper, display.background);
         }
-        wrapper.writeFloat(display.x);
-        wrapper.writeFloat(display.y);
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
+            wrapper.writeFloat(display.x);
+            wrapper.writeFloat(display.y);
+        }
     }
 
     public int packFlags() {
@@ -150,18 +176,30 @@ public final class AdvancementDisplay {
         this.background = background;
     }
 
+    /**
+     * @versions -26.2
+     */
     public float getX() {
         return this.x;
     }
 
+    /**
+     * @versions -26.2
+     */
     public void setX(float x) {
         this.x = x;
     }
 
+    /**
+     * @versions -26.2
+     */
     public float getY() {
         return this.y;
     }
 
+    /**
+     * @versions -26.2
+     */
     public void setY(float y) {
         this.y = y;
     }

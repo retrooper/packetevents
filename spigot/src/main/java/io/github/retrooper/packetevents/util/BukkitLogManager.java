@@ -18,42 +18,46 @@
 
 package io.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.util.ColorUtil;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.util.LogManager;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.command.ConsoleCommandSender;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.logging.Level;
 
-public class BukkitLogManager extends LogManager {
-    private final String prefixText = ColorUtil.toString(NamedTextColor.AQUA) + "[packetevents] " + ColorUtil.toString(NamedTextColor.WHITE);
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.AQUA;
+import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
-    @Override
-    protected void log(Level level, @Nullable NamedTextColor color, String message) {
-        Bukkit.getConsoleSender().sendMessage(prefixText + ColorUtil.toString(color) + message);
+@NullMarked
+@ApiStatus.Internal
+public final class BukkitLogManager extends LogManager {
+
+    private static final Component PREFIX = text("[" + LOGGER_NAME + "] ").color(AQUA);
+
+    public BukkitLogManager(PacketEventsAPI<?> packetevents) {
+        super(packetevents);
     }
 
     @Override
-    public void info(String message) {
-        log(Level.INFO, NamedTextColor.WHITE, message);
-    }
-
-    @Override
-    public void warn(final String message) {
-        log(Level.WARNING, NamedTextColor.YELLOW, message);
-    }
-
-    @Override
-    public void severe(String message) {
-        log(Level.SEVERE, NamedTextColor.RED, message);
-    }
-
-    @Override
-    public void debug(String message) {
-        if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
-            log(Level.FINE, NamedTextColor.GRAY, message);
+    public void log(Level level, ComponentLike component, @Nullable Throwable error) {
+        ComponentLike line = text().append(PREFIX).append(component);
+        ConsoleCommandSender sender = Bukkit.getConsoleSender();
+        if (sender instanceof Audience) {
+            sender.sendMessage(line);
+        } else {
+            // either spigot or old paper
+            sender.sendMessage(legacySection().serialize(line.asComponent()));
+        }
+        if (error != null) {
+            // I don't know if there is a better way to do this properly
+            Bukkit.getLogger().log(level, "", error);
         }
     }
 }

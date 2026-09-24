@@ -1,10 +1,16 @@
 [versions]
+adventure = "5.0.1"
 mockbukkit = "4.98.0"
 paper = "1.21.10-R0.1-SNAPSHOT"
 slf4j = "2.0.16"
 junit = "5.11.2"
 
 [libraries]
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
+adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-text-serializer-json-legacy = { group = "net.kyori", name = "adventure-text-serializer-json-legacy-impl", version.ref = "adventure" }
 mockbukkit = { group = "org.mockbukkit.mockbukkit", name = "mockbukkit-v1.21", version.ref = "mockbukkit" }
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper"}
 slf4j = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
@@ -13,4 +19,6 @@ junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", ver
 junit-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 
 [bundles]
+adventure = ["adventure-api", "adventure-nbt"]
+adventure-serializers = ["adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy"]
 junit = [ "junit-api", "junit-engine", "junit-launcher" ]

@@ -32,15 +32,8 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.BlockNBTComponent;
-import net.kyori.adventure.text.BuildableComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.EntityNBTComponent;
@@ -60,6 +53,13 @@ import net.kyori.adventure.text.object.SpriteObjectContents;
 import net.kyori.adventure.text.serializer.json.JSONOptions;
 import net.kyori.option.OptionState;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static net.kyori.adventure.text.serializer.commons.ComponentTreeConstants.EXTRA;
 import static net.kyori.adventure.text.serializer.commons.ComponentTreeConstants.KEYBIND;
@@ -105,7 +105,7 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
     }
 
     @Override
-    public BuildableComponent<?, ?> read(final JsonReader in) throws IOException {
+    public Component read(final JsonReader in) throws IOException { // packetevents patch
         final JsonToken token = in.peek();
         if (token == JsonToken.STRING || token == JsonToken.NUMBER || token == JsonToken.BOOLEAN) {
             return Component.text(GsonHacks.readString(in));
@@ -113,9 +113,11 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
             ComponentBuilder<?, ?> parent = null;
             in.beginArray();
             while (in.hasNext()) {
-                final BuildableComponent<?, ?> child = this.read(in);
+                // packetevents patch start
+                final Component child = this.read(in);
                 if (parent == null) {
-                    parent = child.toBuilder();
+                    parent = BackwardCompatUtil.toBuilder(child);
+                    // packetevents patch end
                 } else {
                     parent.append(child);
                 }
@@ -124,7 +126,7 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
                 throw notSureHowToDeserialize(in.getPath());
             }
             in.endArray();
-            return parent.build();
+            return BackwardCompatUtil.build(parent); // packetevents patch
         } else if (token != JsonToken.BEGIN_OBJECT) {
             throw notSureHowToDeserialize(in.getPath());
         }
@@ -323,7 +325,7 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
         builder.style(this.gson.fromJson(style, SerializerFactory.STYLE_TYPE))
                 .append(extra);
         in.endObject();
-        return builder.build();
+        return BackwardCompatUtil.build(builder); // packetevents patch
     }
 
     private static <C extends NBTComponent<C, B>, B extends NBTComponentBuilder<C, B>> B nbt(final B builder, final String nbt, final boolean interpret, final @Nullable Component separator) {
@@ -378,9 +380,9 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
                 }
             }
             boolean argsPresent;
-            if (BackwardCompatUtil.IS_4_15_0_OR_NEWER){
+            if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
                 argsPresent = !translatable.arguments().isEmpty();
-            } else  {
+            } else {
                 argsPresent = !translatable.args().isEmpty();
             }
             if (argsPresent) {

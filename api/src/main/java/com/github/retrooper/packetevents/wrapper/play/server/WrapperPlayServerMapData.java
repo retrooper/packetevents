@@ -131,6 +131,20 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         }
     }
 
+    @Override
+    public void copy(WrapperPlayServerMapData wrapper) {
+        this.mapId = wrapper.mapId;
+        this.scale = wrapper.scale;
+        this.trackingPosition = wrapper.trackingPosition;
+        this.locked = wrapper.locked;
+        this.decorations = wrapper.decorations;
+        this.columns = wrapper.columns;
+        this.rows = wrapper.rows;
+        this.x = wrapper.x;
+        this.z = wrapper.z;
+        this.data = wrapper.data;
+    }
+
     public static class MapDecoration {
 
         private MapDecorationType type;

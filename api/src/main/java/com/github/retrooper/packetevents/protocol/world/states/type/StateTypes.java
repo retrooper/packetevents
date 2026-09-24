@@ -421,7 +421,8 @@ public final class StateTypes {
     /**
      * @versions 1.21.6-1.21.8
      */
-    @ApiStatus.Obsolete @RuntimeObsolete(since = "2.11.1", reason = "Removed and replaced with different chain types in 1.21.9")
+    @ApiStatus.Obsolete
+    @RuntimeObsolete(since = "2.11.1", reason = "Removed and replaced with different chain types in 1.21.9")
     public static StateType CHAIN = StateTypes.builder().name("CHAIN").blastResistance(6.0f).hardness(5.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
     public static StateType GLASS_PANE = StateTypes.builder().name("GLASS_PANE").blastResistance(0.3f).hardness(0.3f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.GLASS).build();
     public static StateType MELON = StateTypes.builder().name("MELON").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.VEGETABLE).build();
@@ -531,7 +532,8 @@ public final class StateTypes {
     public static StateType TERRACOTTA = StateTypes.builder().name("TERRACOTTA").blastResistance(4.2f).hardness(1.25f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType PACKED_ICE = StateTypes.builder().name("PACKED_ICE").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.ICE_SOLID).build();
     public static StateType DIRT_PATH = StateTypes.builder().name("DIRT_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
-    @ApiStatus.Obsolete @RuntimeObsolete(since = "2.9.0", reason = "Renamed to DIRT_PATH in 1.17")
+    @ApiStatus.Obsolete
+    @RuntimeObsolete(since = "2.9.0", reason = "Renamed to DIRT_PATH in 1.17")
     public static StateType GRASS_PATH = StateTypes.builder().name("GRASS_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
     public static StateType SUNFLOWER = StateTypes.builder().name("SUNFLOWER").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
     public static StateType LILAC = StateTypes.builder().name("LILAC").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
@@ -1476,7 +1478,479 @@ public final class StateTypes {
     /**
      * @versions 26.1+
      */
-    public static StateType POTTED_GOLDEN_DANDELION = StateTypes.builder().name("POTTED_GOLDEN_DANDELION").blastResistance(0.0f).hardness(0.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.DECORATION).build();
+    public static StateType POTTED_GOLDEN_DANDELION = StateTypes.builder().name("POTTED_GOLDEN_DANDELION").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR = StateTypes.builder().name("SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POTENT_SULFUR = StateTypes.builder().name("POTENT_SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_SLAB = StateTypes.builder().name("SULFUR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_STAIRS = StateTypes.builder().name("SULFUR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_WALL = StateTypes.builder().name("SULFUR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR = StateTypes.builder().name("POLISHED_SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR_SLAB = StateTypes.builder().name("POLISHED_SULFUR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR_STAIRS = StateTypes.builder().name("POLISHED_SULFUR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR_WALL = StateTypes.builder().name("POLISHED_SULFUR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICKS = StateTypes.builder().name("SULFUR_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICK_SLAB = StateTypes.builder().name("SULFUR_BRICK_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICK_STAIRS = StateTypes.builder().name("SULFUR_BRICK_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICK_WALL = StateTypes.builder().name("SULFUR_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CHISELED_SULFUR = StateTypes.builder().name("CHISELED_SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR = StateTypes.builder().name("CINNABAR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_SLAB = StateTypes.builder().name("CINNABAR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_STAIRS = StateTypes.builder().name("CINNABAR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_WALL = StateTypes.builder().name("CINNABAR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR = StateTypes.builder().name("POLISHED_CINNABAR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR_SLAB = StateTypes.builder().name("POLISHED_CINNABAR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR_STAIRS = StateTypes.builder().name("POLISHED_CINNABAR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR_WALL = StateTypes.builder().name("POLISHED_CINNABAR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICKS = StateTypes.builder().name("CINNABAR_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICK_SLAB = StateTypes.builder().name("CINNABAR_BRICK_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICK_STAIRS = StateTypes.builder().name("CINNABAR_BRICK_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICK_WALL = StateTypes.builder().name("CINNABAR_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CHISELED_CINNABAR = StateTypes.builder().name("CHISELED_CINNABAR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_SPIKE = StateTypes.builder().name("SULFUR_SPIKE").blastResistance(3.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_PLANKS = StateTypes.builder().name("POPLAR_PLANKS").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_SAPLING = StateTypes.builder().name("POPLAR_SAPLING").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_LOG = StateTypes.builder().name("POPLAR_LOG").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType STRIPPED_POPLAR_LOG = StateTypes.builder().name("STRIPPED_POPLAR_LOG").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_WOOD = StateTypes.builder().name("POPLAR_WOOD").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType STRIPPED_POPLAR_WOOD = StateTypes.builder().name("STRIPPED_POPLAR_WOOD").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType RED_POPLAR_LEAVES = StateTypes.builder().name("RED_POPLAR_LEAVES").blastResistance(0.2f).hardness(0.2f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.LEAVES).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType ORANGE_POPLAR_LEAVES = StateTypes.builder().name("ORANGE_POPLAR_LEAVES").blastResistance(0.2f).hardness(0.2f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.LEAVES).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType YELLOW_POPLAR_LEAVES = StateTypes.builder().name("YELLOW_POPLAR_LEAVES").blastResistance(0.2f).hardness(0.2f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.LEAVES).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType STRAW_BED = StateTypes.builder().name("STRAW_BED").blastResistance(0.2f).hardness(0.2f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType RED_SHRUB = StateTypes.builder().name("RED_SHRUB").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType WHITE_WOOL_STAIRS = StateTypes.builder().name("WHITE_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType ORANGE_WOOL_STAIRS = StateTypes.builder().name("ORANGE_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType MAGENTA_WOOL_STAIRS = StateTypes.builder().name("MAGENTA_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_BLUE_WOOL_STAIRS = StateTypes.builder().name("LIGHT_BLUE_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType YELLOW_WOOL_STAIRS = StateTypes.builder().name("YELLOW_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIME_WOOL_STAIRS = StateTypes.builder().name("LIME_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PINK_WOOL_STAIRS = StateTypes.builder().name("PINK_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GRAY_WOOL_STAIRS = StateTypes.builder().name("GRAY_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_GRAY_WOOL_STAIRS = StateTypes.builder().name("LIGHT_GRAY_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType CYAN_WOOL_STAIRS = StateTypes.builder().name("CYAN_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PURPLE_WOOL_STAIRS = StateTypes.builder().name("PURPLE_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLUE_WOOL_STAIRS = StateTypes.builder().name("BLUE_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BROWN_WOOL_STAIRS = StateTypes.builder().name("BROWN_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GREEN_WOOL_STAIRS = StateTypes.builder().name("GREEN_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType RED_WOOL_STAIRS = StateTypes.builder().name("RED_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLACK_WOOL_STAIRS = StateTypes.builder().name("BLACK_WOOL_STAIRS").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType WHITE_WOOL_SLAB = StateTypes.builder().name("WHITE_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType ORANGE_WOOL_SLAB = StateTypes.builder().name("ORANGE_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType MAGENTA_WOOL_SLAB = StateTypes.builder().name("MAGENTA_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_BLUE_WOOL_SLAB = StateTypes.builder().name("LIGHT_BLUE_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType YELLOW_WOOL_SLAB = StateTypes.builder().name("YELLOW_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIME_WOOL_SLAB = StateTypes.builder().name("LIME_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PINK_WOOL_SLAB = StateTypes.builder().name("PINK_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GRAY_WOOL_SLAB = StateTypes.builder().name("GRAY_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_GRAY_WOOL_SLAB = StateTypes.builder().name("LIGHT_GRAY_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType CYAN_WOOL_SLAB = StateTypes.builder().name("CYAN_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PURPLE_WOOL_SLAB = StateTypes.builder().name("PURPLE_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLUE_WOOL_SLAB = StateTypes.builder().name("BLUE_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BROWN_WOOL_SLAB = StateTypes.builder().name("BROWN_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GREEN_WOOL_SLAB = StateTypes.builder().name("GREEN_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType RED_WOOL_SLAB = StateTypes.builder().name("RED_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLACK_WOOL_SLAB = StateTypes.builder().name("BLACK_WOOL_SLAB").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_SHELF = StateTypes.builder().name("POPLAR_SHELF").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_SIGN = StateTypes.builder().name("POPLAR_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_WALL_SIGN = StateTypes.builder().name("POPLAR_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_HANGING_SIGN = StateTypes.builder().name("POPLAR_HANGING_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_WALL_HANGING_SIGN = StateTypes.builder().name("POPLAR_WALL_HANGING_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_PRESSURE_PLATE = StateTypes.builder().name("POPLAR_PRESSURE_PLATE").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_TRAPDOOR = StateTypes.builder().name("POPLAR_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType SHELF_MUSHROOM = StateTypes.builder().name("SHELF_MUSHROOM").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.PLANT).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POTTED_POPLAR_SAPLING = StateTypes.builder().name("POTTED_POPLAR_SAPLING").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_BUTTON = StateTypes.builder().name("POPLAR_BUTTON").blastResistance(0.5f).hardness(0.5f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.DECORATION).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_STAIRS = StateTypes.builder().name("POPLAR_STAIRS").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_SLAB = StateTypes.builder().name("POPLAR_SLAB").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_FENCE_GATE = StateTypes.builder().name("POPLAR_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_FENCE = StateTypes.builder().name("POPLAR_FENCE").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType POPLAR_DOOR = StateTypes.builder().name("POPLAR_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType WHITE_CONCRETE_STAIRS = StateTypes.builder().name("WHITE_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType ORANGE_CONCRETE_STAIRS = StateTypes.builder().name("ORANGE_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType MAGENTA_CONCRETE_STAIRS = StateTypes.builder().name("MAGENTA_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_BLUE_CONCRETE_STAIRS = StateTypes.builder().name("LIGHT_BLUE_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType YELLOW_CONCRETE_STAIRS = StateTypes.builder().name("YELLOW_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIME_CONCRETE_STAIRS = StateTypes.builder().name("LIME_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PINK_CONCRETE_STAIRS = StateTypes.builder().name("PINK_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GRAY_CONCRETE_STAIRS = StateTypes.builder().name("GRAY_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_GRAY_CONCRETE_STAIRS = StateTypes.builder().name("LIGHT_GRAY_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType CYAN_CONCRETE_STAIRS = StateTypes.builder().name("CYAN_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PURPLE_CONCRETE_STAIRS = StateTypes.builder().name("PURPLE_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLUE_CONCRETE_STAIRS = StateTypes.builder().name("BLUE_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BROWN_CONCRETE_STAIRS = StateTypes.builder().name("BROWN_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GREEN_CONCRETE_STAIRS = StateTypes.builder().name("GREEN_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType RED_CONCRETE_STAIRS = StateTypes.builder().name("RED_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLACK_CONCRETE_STAIRS = StateTypes.builder().name("BLACK_CONCRETE_STAIRS").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType WHITE_CONCRETE_SLAB = StateTypes.builder().name("WHITE_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType ORANGE_CONCRETE_SLAB = StateTypes.builder().name("ORANGE_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType MAGENTA_CONCRETE_SLAB = StateTypes.builder().name("MAGENTA_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_BLUE_CONCRETE_SLAB = StateTypes.builder().name("LIGHT_BLUE_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType YELLOW_CONCRETE_SLAB = StateTypes.builder().name("YELLOW_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIME_CONCRETE_SLAB = StateTypes.builder().name("LIME_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PINK_CONCRETE_SLAB = StateTypes.builder().name("PINK_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GRAY_CONCRETE_SLAB = StateTypes.builder().name("GRAY_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType LIGHT_GRAY_CONCRETE_SLAB = StateTypes.builder().name("LIGHT_GRAY_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType CYAN_CONCRETE_SLAB = StateTypes.builder().name("CYAN_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType PURPLE_CONCRETE_SLAB = StateTypes.builder().name("PURPLE_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLUE_CONCRETE_SLAB = StateTypes.builder().name("BLUE_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BROWN_CONCRETE_SLAB = StateTypes.builder().name("BROWN_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType GREEN_CONCRETE_SLAB = StateTypes.builder().name("GREEN_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType RED_CONCRETE_SLAB = StateTypes.builder().name("RED_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    /**
+     * @versions 26.3+
+     */
+    public static StateType BLACK_CONCRETE_SLAB = StateTypes.builder().name("BLACK_CONCRETE_SLAB").blastResistance(1.8f).hardness(1.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     // </editor-fold>
 
     static {

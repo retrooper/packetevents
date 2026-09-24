@@ -19,13 +19,15 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NullUnmarked;
 
 @NullMarked
 public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEvent, PlayerEvent {
 
     private final User user;
-    private final Object player;
+    private final @UnknownNullability Object player;
 
     public UserLoginEvent(User user, Object player) {
         this.user = user;
@@ -38,7 +40,8 @@ public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEv
     }
 
     @Override
-    public <T> T getPlayer() {
+    @NullUnmarked
+    public <T> @UnknownNullability T getPlayer() {
         return (T) player;
     }
 

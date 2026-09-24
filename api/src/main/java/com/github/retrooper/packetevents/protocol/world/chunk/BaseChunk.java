@@ -66,7 +66,7 @@ public interface BaseChunk {
     static BaseChunk create() {
         ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
         if (version.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            return new Chunk_v1_18();
+            return new Chunk_v1_18(version.toClientVersion());
         } else if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             return new Chunk_v1_9(0, PaletteType.CHUNK.create());
         } else if (version.isNewerThanOrEquals(ServerVersion.V_1_9)) {

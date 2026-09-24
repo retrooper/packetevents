@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRef;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRefSet;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.mapper.ResolvableEntity;
@@ -121,7 +122,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     /**
      * @versions 26.1+
      */
-    private final @Nullable WorldClock defaultClock;
+    private final @Nullable MappedEntityRef<WorldClock> defaultClock;
     /**
      * @versions 26.1+
      */
@@ -174,7 +175,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
             boolean natural, boolean bedWorks, boolean respawnAnchorWorks, @Nullable ResourceLocation effects,
             double coordinateScale, int minY, int height, NBT monsterSpawnLightLevel, int monsterSpawnBlockLightLimit,
             boolean hasSkylight, boolean hasCeiling, int logicalHeight, TagKey infiniburn, float ambientLight,
-            @Nullable WorldClock defaultClock, boolean hasEnderDragonFight
+            @Nullable MappedEntityRef<WorldClock> defaultClock, boolean hasEnderDragonFight
     ) {
         super(data);
         this.hasFixedTime = hasFixedTime;
@@ -356,6 +357,11 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
 
     @Override
     public @Nullable WorldClock getDefaultClock() {
+        return this.defaultClock != null ? this.defaultClock.get() : null;
+    }
+
+    @Override
+    public @Nullable MappedEntityRef<WorldClock> getDefaultClockRef() {
         return this.defaultClock;
     }
 

@@ -28,6 +28,8 @@ plugins {
 dependencies {
     // include dependencies
     include(libs.bundles.adventure)
+    api(libs.adventure.text.logger.slf4j)
+    include(libs.adventure.text.logger.slf4j)
     include(project(":api", "shadow"))
     include(project(":netty-common"))
 
@@ -46,7 +48,10 @@ configure<ModPublishExtension> {
 
 tasks {
     register<ServerProductionRunTask>("prodServer") {
-        minecraftVersion = libs.versions.fabric.minecraft.official.get()
+        // always run this task if asked to
+        outputs.upToDateWhen { false }
+
+        minecraftVersion = "26.3"
         loaderVersion = libs.versions.fabric.loader
         runDir = project.layout.projectDirectory.dir("run").dir(minecraftVersion.get())
 

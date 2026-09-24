@@ -52,6 +52,12 @@ public class WrapperPlayServerDeclareCommands extends PacketWrapper<WrapperPlayS
         writeVarInt(rootIndex);
     }
 
+    @Override
+    public void copy(WrapperPlayServerDeclareCommands wrapper) {
+        this.nodes = wrapper.nodes;
+        this.rootIndex = wrapper.rootIndex;
+    }
+
     public List<Node> getNodes() {
         return nodes;
     }

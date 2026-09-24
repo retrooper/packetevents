@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class NBTEnd extends NBT {
 
     public static final NBTEnd INSTANCE = new NBTEnd();
@@ -28,7 +32,7 @@ public class NBTEnd extends NBT {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
