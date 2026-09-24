@@ -25,7 +25,6 @@ import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -37,6 +36,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 
@@ -44,12 +44,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
+@ApiStatus.Internal
 public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     public User user;
     public UUID player;
-    private boolean handleCompression;
-    private boolean handledCompression;
+    public boolean handleCompression;
+    public boolean handledCompression;
     private ChannelPromise promise;
 
     public PacketEventsEncoder(User user) {
@@ -67,15 +68,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, byteBuf);
-        PacketSendEvent event = this.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
-        if (!this.handledCompression && event != null) {
-            if (event.getConnectionState() == ConnectionState.PLAY) {
-                // Late injection or server doesn't have compression enabled
-                this.handledCompression = true;
-            } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
-                this.handleCompression = true;
-            }
-        }
+        this.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 
         if (needsRecompression) {
             this.compress(ctx, byteBuf);
