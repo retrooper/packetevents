@@ -82,7 +82,8 @@ public class InternalPacketListener extends PacketListenerAbstract {
                     : event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
                 user.setEncoderState(ConnectionState.CONFIGURATION);
             } else {
-                user.setConnectionState(ConnectionState.PLAY);
+                user.setEncoderState(ConnectionState.PLAY);
+                user.setDecoderState(ConnectionState.PLAY);
             }
         }
 
