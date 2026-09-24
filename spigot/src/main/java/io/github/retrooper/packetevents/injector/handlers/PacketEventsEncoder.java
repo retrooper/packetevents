@@ -134,7 +134,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         this.promise = promise;
 
         if (msg instanceof ByteBuf) {
-            boolean needsRecompression = this.handleCompression(ctx, (ByteBuf) msg);
+            boolean needsRecompression = this.handleCompression && !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
             PacketSendEvent packetSendEvent = this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
             if (!handledCompression && packetSendEvent != null) {
                 if (packetSendEvent.getConnectionState() == ConnectionState.PLAY) {
@@ -248,7 +248,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (!handleCompression || handledCompression) return false;
         List<String> handlerNames = ctx.pipeline().names();
         int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;

@@ -66,7 +66,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        boolean needsRecompression = handleCompression(ctx, byteBuf);
+        boolean needsRecompression = !handledCompression && handleCompression && handleCompression(ctx, byteBuf);
         PacketSendEvent event = handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
         if (!handledCompression && event != null) {
             if (event.getConnectionState() == ConnectionState.PLAY) {
@@ -164,7 +164,6 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (!handleCompression || handledCompression) return false;
         List<String> handlerNames = ctx.pipeline().names();
         int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
