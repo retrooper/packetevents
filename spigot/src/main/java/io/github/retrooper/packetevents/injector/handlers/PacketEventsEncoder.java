@@ -136,12 +136,12 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = this.handleCompression && !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
             PacketSendEvent packetSendEvent = this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
-            if (!handledCompression && packetSendEvent != null) {
+            if (!this.handledCompression && packetSendEvent != null) {
                 if (packetSendEvent.getConnectionState() == ConnectionState.PLAY) {
                     // Late injection or server doesn't have compression enabled
-                    handledCompression = true;
+                    this.handledCompression = true;
                 } else if (packetSendEvent.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
-                    handleCompression = true;
+                    this.handleCompression = true;
                 }
             }
 

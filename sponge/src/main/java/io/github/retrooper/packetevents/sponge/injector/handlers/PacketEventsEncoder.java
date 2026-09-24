@@ -66,19 +66,19 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        boolean needsRecompression = !handledCompression && handleCompression && handleCompression(ctx, byteBuf);
-        PacketSendEvent event = handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
-        if (!handledCompression && event != null) {
+        boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, byteBuf);
+        PacketSendEvent event = this.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
+        if (!this.handledCompression && event != null) {
             if (event.getConnectionState() == ConnectionState.PLAY) {
                 // Late injection or server doesn't have compression enabled
-                handledCompression = true;
+                this.handledCompression = true;
             } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
-                handleCompression = true;
+                this.handleCompression = true;
             }
         }
 
         if (needsRecompression) {
-            compress(ctx, byteBuf);
+            this.compress(ctx, byteBuf);
         }
 
         // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
