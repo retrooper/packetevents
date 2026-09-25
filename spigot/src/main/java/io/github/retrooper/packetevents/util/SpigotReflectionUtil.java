@@ -1002,6 +1002,13 @@ public final class SpigotReflectionUtil {
     }
 
     public static ItemType getItemTypeByMaterial(Material material) {
+        if (V_1_20_5_OR_HIGHER && !material.isLegacy() && material.isItem()) {
+            ItemType type = ItemTypes.getByName(material.getKey().toString());
+            if (type != null && type.getId(VERSION.toClientVersion()) >= 0) {
+                return type;
+            }
+        }
+        // Older versions and renamed items still need the version-aware codec.
         ItemType type = MATERIAL_TO_ITEM_TYPE.get(material);
         if (type == null) {
             type = decodeBukkitItemStackSlow(new ItemStack(material)).getType();
@@ -1011,6 +1018,13 @@ public final class SpigotReflectionUtil {
     }
 
     public static Material getMaterialByItemType(ItemType itemType) {
+        if (V_1_20_5_OR_HIGHER && itemType.getId(VERSION.toClientVersion()) >= 0) {
+            ResourceLocation name = itemType.getName();
+            Material material = Registry.MATERIAL.get(new NamespacedKey(name.getNamespace(), name.getKey()));
+            if (material != null && material.isItem()) {
+                return material;
+            }
+        }
         Material material = ITEM_TYPE_TO_MATERIAL.get(itemType);
         if (material == null) {
             material = encodeBukkitItemStackSlow(com.github.retrooper.packetevents.protocol.item.ItemStack
