@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticAttribute extends AbstractMappedEntity implements Attribute {
 
     private final @Nullable ResourceLocation legacyName;
@@ -67,6 +69,33 @@ public class StaticAttribute extends AbstractMappedEntity implements Attribute {
         }
         return version.isNewerThanOrEquals(ClientVersion.V_1_21_2) || this.legacyName == null
                 ? this.data.getName() : this.legacyName;
+    }
+
+    @Override
+    public ResourceLocation getName() {
+        if (this.data == null && this.legacyName != null) {
+            return this.legacyName;
+        }
+        return super.getName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.data == null && this.legacyName != null) {
+            if (this == obj) return true;
+            if (!(obj instanceof StaticAttribute)) return false;
+            StaticAttribute that = (StaticAttribute) obj;
+            return that.data == null && this.legacyName.equals(that.legacyName);
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        if (this.data == null && this.legacyName != null) {
+            return Objects.hash(StaticAttribute.class, this.legacyName);
+        }
+        return super.hashCode();
     }
 
     @Override
