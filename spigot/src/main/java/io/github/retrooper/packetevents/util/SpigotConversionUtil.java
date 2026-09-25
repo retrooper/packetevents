@@ -121,18 +121,14 @@ public final class SpigotConversionUtil {
         }
     }
 
-    //This is sort of a lazy approach, but likely works.
+    //This is sort of a lazy approach, but likely works. The result is cached per material.
     public static ItemType fromBukkitItemMaterial(org.bukkit.Material material) {
-        org.bukkit.inventory.ItemStack bukkitStack = new org.bukkit.inventory.ItemStack(material);
-        ItemStack stack = fromBukkitItemStack(bukkitStack);
-        return stack.getType();
+        return SpigotReflectionUtil.getItemTypeByMaterial(material);
     }
 
-    //This is a lazy approach, but likely works.
+    //This is a lazy approach, but likely works. The result is cached per item type.
     public static org.bukkit.Material toBukkitItemMaterial(ItemType itemType) {
-        ItemStack stack = ItemStack.builder().type(itemType).build();
-        org.bukkit.inventory.ItemStack bukkitStack = toBukkitItemStack(stack);
-        return bukkitStack.getType();
+        return SpigotReflectionUtil.getMaterialByItemType(itemType);
     }
 
     /**
