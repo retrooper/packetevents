@@ -32,6 +32,17 @@ public class StaticAttribute extends AbstractMappedEntity implements Attribute {
     private final double minValue;
     private final double maxValue;
 
+    /**
+     * Unregistered attribute that round-trips by name (custom server attributes on 1.16–1.20.4).
+     */
+    public StaticAttribute(ResourceLocation name, double defaultValue, double minValue, double maxValue) {
+        super(null);
+        this.legacyName = name;
+        this.defaultValue = defaultValue;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
+
     @ApiStatus.Internal
     public StaticAttribute(
             @Nullable TypesBuilderData data, String legacyPrefix,
@@ -48,6 +59,10 @@ public class StaticAttribute extends AbstractMappedEntity implements Attribute {
     @Override
     public ResourceLocation getName(ClientVersion version) {
         if (this.data == null) {
+            // unregistered custom attribute — name stored in legacyName
+            if (this.legacyName != null) {
+                return this.legacyName;
+            }
             throw new UnsupportedOperationException();
         }
         return version.isNewerThanOrEquals(ClientVersion.V_1_21_2) || this.legacyName == null
