@@ -158,7 +158,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     public void setAmbient(boolean isAmbient) {
         if (serverVersion.isNewerThan(ServerVersion.V_1_8_8)) {
             // used as a boolean in 1.9, works either way though
-            setFlags(constructFlags(isVisible(), isAmbient, isShowIcon()));
+            setFlags(constructFlags(isAmbient, isVisible(), isShowIcon()));
         }
     }
 
@@ -178,7 +178,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
             return;
         }
-        setFlags(constructFlags(isVisible, isAmbient(), isShowIcon()));
+        setFlags(constructFlags(isAmbient(), isVisible, isShowIcon()));
     }
 
     public boolean isShowIcon() {
@@ -192,6 +192,6 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
             return;
         }
-        setFlags(constructFlags(isVisible(), isAmbient(), showIcon));
+        setFlags(constructFlags(isAmbient(), isVisible(), showIcon));
     }
 }
