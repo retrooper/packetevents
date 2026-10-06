@@ -346,9 +346,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 ByteBufHelper.writerIndex(dataBuffer, newWriterIndex);
             }
         } else if (v1_8) {
-            NetworkChunkData data = ChunkReader_v1_8.chunksToData((Chunk_v1_8[]) chunks, column.getBiomeDataBytes());
-            writeShort(data.getMask());
-            writeByteArray(data.getData());
+            Chunk_v1_8[] legacyChunks = (Chunk_v1_8[]) chunks;
+            byte[] biomes = column.getBiomeDataBytes();
+            int mask = ChunkReader_v1_8.calculateChunkMask(legacyChunks, biomes != null);
+            int dataLength = ChunkReader_v1_8.calculateDataLength(legacyChunks, biomes, mask);
+            writeShort(mask);
+            writeVarInt(dataLength);
+            ChunkReader_v1_8.writeChunkData(this, legacyChunks, biomes, mask, dataLength);
             return;
         } else {
             NetworkChunkData data = ChunkReader_v1_7.chunksToData((Chunk_v1_7[]) chunks, column.getBiomeDataBytes());
