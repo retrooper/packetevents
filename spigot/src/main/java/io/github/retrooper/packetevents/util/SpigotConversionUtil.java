@@ -231,12 +231,16 @@ public final class SpigotConversionUtil {
         return SpigotReflectionUtil.getEntityById(world, entityId);
     }
 
+    public static EntityPose fromBukkitPose(Pose pose) {
+        return EntityPose.values()[pose.ordinal()];
+    }
+
     public static Pose toBukkitPose(EntityPose pose) {
         return Pose.values()[pose.ordinal()];
     }
 
-    public static EntityPose fromBukkitPose(Pose pose) {
-        return EntityPose.values()[pose.ordinal()];
+    public static HumanoidArm fromBukkitHand(MainHand hand) {
+        return HumanoidArm.getById(hand.ordinal());
     }
 
     public static MainHand toBukkitHand(HumanoidArm arm) {
