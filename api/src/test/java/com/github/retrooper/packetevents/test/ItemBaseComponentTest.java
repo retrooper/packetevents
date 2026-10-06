@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.test;
 
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemInstrument;
+import com.github.retrooper.packetevents.protocol.item.instrument.Instruments;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.test.base.BaseDummyAPITest;
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ItemBaseComponentTest extends BaseDummyAPITest {
@@ -55,5 +58,21 @@ public class ItemBaseComponentTest extends BaseDummyAPITest {
         assertNull(airComponents1205.get(ComponentTypes.ITEM_NAME));
         assertEquals(Component.translatable("block.minecraft.air"),
                 airComponents1212.get(ComponentTypes.ITEM_NAME));
+    }
+
+    @Test
+    @DisplayName("Goat horn default instrument is ponder on 26.x")
+    public void testGoatHornDefaultInstrumentIsPonder() {
+        for (ClientVersion version : new ClientVersion[]{
+                ClientVersion.V_26_1, ClientVersion.V_26_2, ClientVersion.V_26_3
+        }) {
+            ItemInstrument instrument = ItemTypes.GOAT_HORN.getComponents(version)
+                    .get(ComponentTypes.ITEM_INSTRUMENT);
+            assertNotNull(instrument, () -> "missing instrument component for " + version);
+            assertEquals(Instruments.PONDER_GOAT_HORN, instrument.getInstrument().getValue(),
+                    () -> "expected ponder goat horn default for " + version);
+            assertNotEquals(Instruments.ADMIRE_GOAT_HORN, instrument.getInstrument().getValue(),
+                    () -> "admire must not be the mapped default for " + version);
+        }
     }
 }
