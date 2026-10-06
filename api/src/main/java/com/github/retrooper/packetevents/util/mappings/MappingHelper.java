@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.IdTable;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.BufferedInputStream;
@@ -112,7 +113,8 @@ public class MappingHelper {
     public static <T extends MappedEntity> void registerMapping(
             TypesBuilder builder,
             Map<String, T>[] typeNames,
-            Map<Integer, T>[] typeIds,
+            IdTable<T> typeIdTable,
+            Map<Integer, T>[] typeIdOverflow,
             TypesBuilderData typeData,
             T type
     ) {
@@ -128,11 +130,16 @@ public class MappingHelper {
             }
             nameMap.put(typeData.getName().toString(), type);
             // set by version-specific id
-            Map<Integer, T> idMap = typeIds[index];
-            if (idMap == null) {
-                typeIds[index] = idMap = new HashMap<>();
+            int id = typeData.getId(version);
+            if (id >= 0 && id < IdTable.MAX_ID) {
+                typeIdTable.put(index, id, type);
+            } else {
+                Map<Integer, T> overflow = typeIdOverflow[index];
+                if (overflow == null) {
+                    typeIdOverflow[index] = overflow = new HashMap<>(4);
+                }
+                overflow.put(id, type);
             }
-            idMap.put(typeData.getId(version), type);
         }
     }
 
