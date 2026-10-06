@@ -133,6 +133,17 @@ public class MappingHelper {
                 typeIds[index] = idMap = new HashMap<>();
             }
             idMap.put(typeData.getId(version), type);
+            // Array mappings may reuse one modern name for several legacy ids
+            // (e.g. particle "block" = BLOCK_CRACK + BLOCK_DUST). Register them all.
+            List<String> ordered = builder.getOrderedEntries(version);
+            if (ordered != null) {
+                String key = typeData.getName().getKey();
+                for (int i = 0; i < ordered.size(); i++) {
+                    if (key.equals(ordered.get(i))) {
+                        idMap.put(i, type);
+                    }
+                }
+            }
         }
     }
 

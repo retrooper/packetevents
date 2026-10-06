@@ -44,6 +44,12 @@ import java.util.stream.StreamSupport;
 public class TypesBuilder {
     private final String mapPath;
     private Map<ClientVersion, Map<String, Integer>> entries = new HashMap<>();
+    /**
+     * Array-style mappings only: index = numeric id, value = short name.
+     * Needed so duplicate names (e.g. legacy particle "block" at ids 37 and 38)
+     * can all be registered into typeIds.
+     */
+    private Map<ClientVersion, List<String>> orderedEntries = new HashMap<>();
     private VersionMapper versionMapper;
 
     @Nullable
@@ -63,6 +69,9 @@ public class TypesBuilder {
     public void load() {
         if (this.entries == null) {
             this.entries = new HashMap<>();
+        }
+        if (this.orderedEntries == null) {
+            this.orderedEntries = new HashMap<>();
         }
         try (final SequentialNBTReader.Compound rootCompound = MappingHelper.decompress("mappings/" + this.mapPath)) {
             rootCompound.skipOne(); // skip version tag for now
@@ -104,6 +113,8 @@ public class TypesBuilder {
                 map.put(lastEntries.get(i), i);
             }
             this.entries.put(version, map);
+            // Keep full id->name order so duplicate names still resolve on getById
+            this.orderedEntries.put(version, new ArrayList<>(lastEntries));
         };
         mapLoader.accept(start);
 
@@ -176,6 +187,9 @@ public class TypesBuilder {
             int baseIndex = this.versionMapper.getIndex(version);
             ClientVersion baseVersion = this.versionMapper.getVersions()[baseIndex];
             this.entries.put(version, this.entries.get(baseVersion));
+            if (this.orderedEntries != null && this.orderedEntries.containsKey(baseVersion)) {
+                this.orderedEntries.put(version, this.orderedEntries.get(baseVersion));
+            }
             this.versionMapper = newMapper; // save new mapper
         }
     }
@@ -188,6 +202,17 @@ public class TypesBuilder {
     public void unloadFileMappings() {
         entries.clear();
         entries = null;
+        if (orderedEntries != null) {
+            orderedEntries.clear();
+            orderedEntries = null;
+        }
+    }
+
+    /**
+     * @return ordered short names by numeric id for array-style mappings, or null for map-style
+     */
+    public @Nullable List<String> getOrderedEntries(ClientVersion version) {
+        return this.orderedEntries == null ? null : this.orderedEntries.get(version);
     }
 
     public TypesBuilderData define(String key, VersionRange range) {
