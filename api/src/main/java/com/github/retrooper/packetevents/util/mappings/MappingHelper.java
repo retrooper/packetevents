@@ -45,7 +45,7 @@ public class MappingHelper {
 
     public static SequentialNBTReader.Compound decompress(final String path) {
         try {
-            final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
+            final DataInputStream dataInput = new DataInputStream(new BufferedInputStream(new GZIPInputStream(
                     PacketEvents.getAPI().getSettings().getResourceProvider().apply("assets/" + path + ".nbt"))));
             return (SequentialNBTReader.Compound) SequentialNBTReader.INSTANCE.deserializeTag(NBTLimiter.noop(), dataInput);
         } catch (IOException e) {
