@@ -29,10 +29,13 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,7 +49,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+@ApiStatus.Internal
 public final class SpongeReflectionUtil {
 
     public static ServerVersion VERSION;
@@ -58,15 +63,15 @@ public final class SpongeReflectionUtil {
             PLAYER_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS,
             NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS,
             STREAM_CODEC, STREAM_DECODER, STREAM_ENCODER, REGISTRY_FRIENDLY_BYTE_BUF,
-            REGISTRY_ACCESS, REGISTRY_ACCESS_FROZEN;
+            REGISTRY_ACCESS, REGISTRY_ACCESS_FROZEN, SERVER_LEVEL_CLASS, NMS_ENTITY_CLASS, SERVER_ENTITY_CLASS;
 
     // Fields
-    public static Field BYTE_BUF_IN_PACKET_DATA_SERIALIZER, NMS_MK_KEY_FIELD;
+    public static Field BYTE_BUF_IN_PACKET_DATA_SERIALIZER, NMS_MK_KEY_FIELD, ENTITY_ID_COUNTER, NMS_ENTITY_IN_SERVER_ENTITY;
 
     // Methods
     public static Method IS_DEBUGGING,
             READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD,
-            STREAM_DECODER_DECODE, STREAM_ENCODER_ENCODE;
+            STREAM_DECODER_DECODE, STREAM_ENCODER_ENCODE, GET_NEXT_ENTITY_ID, GET_ENTITY_ID;
 
     // Constructors
     private static Constructor<?> REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR;
@@ -95,11 +100,21 @@ public final class SpongeReflectionUtil {
 
         STREAM_DECODER_DECODE = STREAM_DECODER.getMethods()[0];
         STREAM_ENCODER_ENCODE = STREAM_ENCODER.getMethods()[0];
+
+        GET_NEXT_ENTITY_ID = Reflection.getMethod(SERVER_LEVEL_CLASS, "getNextEntityId");
+        GET_ENTITY_ID = Reflection.getMethod(NMS_ENTITY_CLASS, "getId");
     }
 
     private static void initFields() {
         BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, ByteBuf.class, 0, true);
         NMS_MK_KEY_FIELD = Reflection.getField(NMS_MINECRAFT_KEY_CLASS, "key");
+
+        ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
+        if (ENTITY_ID_COUNTER == null) {
+            ENTITY_ID_COUNTER = Reflection.getField(SERVER_LEVEL_CLASS, "ENTITY_COUNTER");
+        }
+
+        NMS_ENTITY_IN_SERVER_ENTITY = Reflection.getField(SERVER_ENTITY_CLASS, "entity");
     }
 
     private static void initClasses() {
@@ -127,6 +142,10 @@ public final class SpongeReflectionUtil {
 
         REGISTRY_ACCESS = getServerClass("core.RegistryAccess");
         REGISTRY_ACCESS_FROZEN = getServerClass("core.RegistryAccess$Frozen");
+
+        SERVER_LEVEL_CLASS = getServerClass("server.level.ServerLevel");
+        NMS_ENTITY_CLASS = getServerClass("world.entity.Entity");
+        SERVER_ENTITY_CLASS = getServerClass("server.level.ServerEntity");
     }
 
     private static void initObjects() {
@@ -152,6 +171,47 @@ public final class SpongeReflectionUtil {
     @Nullable
     public static Class<?> getServerClass(String modern) {
         return Reflection.getClassByNameWithoutException("net.minecraft." + modern);
+    }
+
+    public static int getEntityId(Entity entity) {
+        if (NMS_ENTITY_IN_SERVER_ENTITY == null)
+            throw new IllegalStateException("Failed to find nms entity field in server entity class");
+        try {
+            Object nmsEntity = NMS_ENTITY_IN_SERVER_ENTITY.get(entity);
+            return (int) GET_ENTITY_ID.invoke(nmsEntity);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException("Failed to get entity id: ", exception);
+        }
+    }
+
+    public static int generateEntityId(ServerWorld world) {
+        // use vanilla logic if available
+        if (GET_NEXT_ENTITY_ID != null) {
+            try {
+                // sponge uses mixins to make the nms class implement ServerWorld, just casting works
+                return (int) GET_NEXT_ENTITY_ID.invoke(world);
+            } catch (ReflectiveOperationException exception) {
+                throw new RuntimeException("Failed to generate entity id: ", exception);
+            }
+        }
+        return generateEntityId();
+    }
+
+    private static int generateEntityId() {
+        try {
+            if (ENTITY_ID_COUNTER.getType() == AtomicInteger.class) {
+                //Newer versions
+                AtomicInteger atomicInteger = (AtomicInteger) ENTITY_ID_COUNTER.get(null);
+                return atomicInteger.incrementAndGet();
+            } else {
+                int id = ENTITY_ID_COUNTER.getInt(null);
+                ENTITY_ID_COUNTER.set(null, id + 1);
+                return id;
+            }
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        }
+        throw new IllegalStateException("Failed to generate a new unique entity ID!");
     }
 
     public static boolean isMinecraftServerInstanceDebugging() {
