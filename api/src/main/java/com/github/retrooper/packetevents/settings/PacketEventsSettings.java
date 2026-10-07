@@ -40,6 +40,7 @@ public class PacketEventsSettings {
     private boolean fullStackTraceEnabled = false;
     private boolean kickOnPacketExceptionEnabled = true;
     private boolean kickIfTerminated = true;
+    private boolean useBinaryBuffer = false;
     private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
             .getClassLoader()
             .getResourceAsStream(path);
@@ -53,6 +54,18 @@ public class PacketEventsSettings {
     @ApiStatus.Internal
     public PacketEventsSettings timeStampMode(TimeStampMode timeStampMode) {
         this.timestampMode = timeStampMode;
+        return this;
+    }
+
+    /**
+     * NOTE TO TOFAA: Delete this after testing phase. TODO
+     * Should we use the new binary buffer system in {@link com.github.retrooper.packetevents.wrapper.PacketWrapper}
+     * @param useBinaryBuffer True if we should use the binary buffer system, false otherwise.
+     * @return Settings instance
+     */
+    @ApiStatus.Internal
+    public PacketEventsSettings useBinaryBuffer(boolean useBinaryBuffer) {
+        this.useBinaryBuffer = useBinaryBuffer;
         return this;
     }
 
@@ -192,6 +205,14 @@ public class PacketEventsSettings {
         return downsampleColors;
     }
 
+
+    /**
+     * Should we use the new binary buffer system in {@link com.github.retrooper.packetevents.wrapper.PacketWrapper}?
+     * @return Getter for {@link #useBinaryBuffer}
+     */
+    public boolean shouldUseBinaryBuffer() {
+        return useBinaryBuffer;
+    }
 
     /**
      * Should we collect server data anonymously and report to bStats?
