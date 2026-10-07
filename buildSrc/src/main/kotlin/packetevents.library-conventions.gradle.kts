@@ -94,58 +94,18 @@ tasks {
             from(writeVersionFile)
         }
     }
-
-    defaultTasks("build")
 }
 
 publishing {
     publications {
-        create<MavenPublication>("shadow") {
+        create<MavenPublication>("maven") {
             groupId = project.group as String
-            artifactId = "packetevents-" + project.name
+            artifactId = "${rootProject.name}-${project.name}"
             version = rootProject.ext["versionNoHash"] as String
 
-            if (isShadow) {
-                artifact(project.tasks.withType<ShadowJar>().getByName("shadowJar").archiveFile)
-
-                val allDependencies = project.provider {
-                    project.configurations.getByName("shadow").allDependencies
-                        .filter { it is ProjectDependency || it !is FileCollectionDependency }
-                }
-
-                pom {
-                    withXml {
-                        val (libraryDeps, projectDeps) = allDependencies.get().partition { it !is ProjectDependency }
-                        val dependenciesNode =
-                            asNode().get("dependencies") as? Node ?: asNode().appendNode("dependencies")
-
-                        libraryDeps.forEach {
-                            val dependencyNode = dependenciesNode.appendNode("dependency")
-                            dependencyNode.appendNode("groupId", it.group)
-                            dependencyNode.appendNode("artifactId", it.name)
-                            dependencyNode.appendNode("version", it.version)
-                            dependencyNode.appendNode("scope", "compile")
-                        }
-
-                        // project dependencies are other packetevents subprojects
-                        // which this subproject depends on, so it's fine to assume some stuff here
-                        projectDeps.forEach {
-                            val dependencyNode = dependenciesNode.appendNode("dependency")
-                            dependencyNode.appendNode("groupId", it.group)
-                            dependencyNode.appendNode("artifactId", "packetevents-" + it.name)
-                            dependencyNode.appendNode("version", rootProject.ext["versionNoHash"])
-                            dependencyNode.appendNode("scope", "compile")
-                        }
-                    }
-                }
-
-                artifact(tasks["sourcesJar"])
-            } else {
-                from(components["java"])
-            }
+            from(components["java"])
 
             pom {
-                name = "${rootProject.name}-${project.name}"
                 description = rootProject.description
                 url = "https://github.com/retrooper/packetevents"
 
@@ -161,6 +121,11 @@ publishing {
                         id = "retrooper"
                         name = "Retrooper"
                         email = "retrooperdev@gmail.com"
+                    }
+                    developer {
+                        id = "booky10"
+                        name = "booky"
+                        email = "booky@booky.dev"
                     }
                 }
 
@@ -195,10 +160,4 @@ publishing {
 // So that SNAPSHOT is always the latest SNAPSHOT
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
-}
-
-val taskNames = gradle.startParameter.taskNames
-if (taskNames.any { it.contains("build") }
-    && taskNames.any { it.contains("publish") }) {
-    throw IllegalStateException("Cannot build and publish at the same time.")
 }

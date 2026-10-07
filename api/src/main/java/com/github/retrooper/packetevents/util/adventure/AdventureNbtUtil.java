@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.util.adventure;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufInputStream;
@@ -25,17 +26,19 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.EndBinaryTag;
-import net.kyori.adventure.nbt.TagStringIO;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -45,23 +48,42 @@ public final class AdventureNbtUtil {
 
     private static final byte END_TAG_ID = 0;
 
-    private static final TagStringIO TAG_STRING_IO;
-
-    static {
-        TagStringIO tagStringIo;
-        try {
-            tagStringIo = TagStringIO.tagStringIO();
-        } catch (Throwable ignored) {
-            // pre adventure v4.22.0
-            tagStringIo = TagStringIO.get();
-        }
-        TAG_STRING_IO = tagStringIo;
-    }
-
     // BinaryTagType is an interface since adventure v5, we need to access everything via Reflection to support both v4 and v5
     private static final Method TAG_TYPE_GET_ID = Reflection.getMethodExact(BinaryTagType.class, "id", byte.class);
     private static final Method TAG_TYPE_READ = Reflection.getMethodExact(BinaryTagType.class, "read", BinaryTag.class, DataInput.class);
     private static final Method TAG_TYPE_WRITE = Reflection.getMethodExact(BinaryTagType.class, "write", void.class, BinaryTag.class, DataOutput.class);
+
+    private static final Constructor<?> CHAR_BUFFER_CTOR;
+    private static final Method CHAR_BUFFER_SKIP_WHITESPACE;
+    private static final Method CHAR_BUFFER_HAS_MORE;
+    private static final Constructor<?> TAG_STRING_READER_CTOR;
+    private static final @Nullable Method TAG_STRING_READER_HETEROGENEOUS_LISTS;
+    private static final Method TAG_STRING_READER_TAG;
+
+    private static final Constructor<?> TAG_STRING_WRITER_CTOR;
+    private static final @Nullable Method TAG_STRING_WRITER_HETEROGENEOUS_LISTS;
+    private static final Method TAG_STRING_WRITER_WRITE_TAG;
+
+    static {
+        try {
+            Class<?> charBuffer = Class.forName("net.kyori.adventure.nbt.CharBuffer");
+            Class<?> tagStringReader = Class.forName("net.kyori.adventure.nbt.TagStringReader");
+            Class<?> tagStringWriter = Class.forName("net.kyori.adventure.nbt.TagStringWriter");
+
+            CHAR_BUFFER_CTOR = Reflection.getConstructor(charBuffer, CharSequence.class);
+            CHAR_BUFFER_SKIP_WHITESPACE = Reflection.getMethodExact(charBuffer, "skipWhitespace", charBuffer);
+            CHAR_BUFFER_HAS_MORE = Reflection.getMethodExact(charBuffer, "hasMore", boolean.class);
+            TAG_STRING_READER_CTOR = Reflection.getConstructor(tagStringReader, charBuffer);
+            TAG_STRING_READER_HETEROGENEOUS_LISTS = Reflection.getMethodExact(tagStringReader, "heterogeneousLists", tagStringReader, boolean.class);
+            TAG_STRING_READER_TAG = Reflection.getMethodExact(tagStringReader, "tag", BinaryTag.class);
+
+            TAG_STRING_WRITER_CTOR = Reflection.getConstructor(tagStringWriter, Appendable.class, String.class);
+            TAG_STRING_WRITER_HETEROGENEOUS_LISTS = Reflection.getMethodExact(tagStringWriter, "heterogeneousLists", tagStringWriter, boolean.class);
+            TAG_STRING_WRITER_WRITE_TAG = Reflection.getMethodExact(tagStringWriter, "writeTag", tagStringWriter, BinaryTag.class);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException("Error looking up adventure string binary tag i/o");
+        }
+    }
 
     private static final BinaryTagType<?>[] NBT_TAG_TYPES = buildNbtTagTypes();
 
@@ -162,21 +184,43 @@ public final class AdventureNbtUtil {
     }
 
     public static NBT fromString(String string) {
+        return fromString(string, PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
+    public static NBT fromString(String string, ClientVersion version) {
         BinaryTag advTag;
         try {
-            advTag = TAG_STRING_IO.asTag(string);
-        } catch (IOException exception) {
+            Object buffer = CHAR_BUFFER_CTOR.newInstance(string);
+            Object reader = TAG_STRING_READER_CTOR.newInstance(buffer);
+            if (TAG_STRING_READER_HETEROGENEOUS_LISTS != null) {
+                TAG_STRING_READER_HETEROGENEOUS_LISTS.invoke(reader, version.isNewerThanOrEquals(ClientVersion.V_1_21_5));
+            }
+            advTag = (BinaryTag) TAG_STRING_READER_TAG.invoke(reader);
+            CHAR_BUFFER_SKIP_WHITESPACE.invoke(buffer);
+            if ((boolean) CHAR_BUFFER_HAS_MORE.invoke(buffer)) {
+                throw new IOException("Document had trailing content after first Tag");
+            }
+        } catch (Exception exception) {
             throw new RuntimeException("Error while decoding nbt from string: " + string, exception);
         }
         return fromAdventure(advTag);
     }
 
     public static String toString(NBT tag) {
+        return toString(tag, PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
+    public static String toString(NBT tag, ClientVersion version) {
         BinaryTag advTag = toAdventure(tag);
-        try {
-            return TAG_STRING_IO.asString(advTag);
-        } catch (IOException exception) {
+        StringBuilder bob = new StringBuilder();
+        try (AutoCloseable writer = (AutoCloseable) TAG_STRING_WRITER_CTOR.newInstance(bob, "")) {
+            if (TAG_STRING_WRITER_HETEROGENEOUS_LISTS != null) {
+                TAG_STRING_WRITER_HETEROGENEOUS_LISTS.invoke(writer, version.isNewerThanOrEquals(ClientVersion.V_1_21_5));
+            }
+            TAG_STRING_WRITER_WRITE_TAG.invoke(writer, advTag);
+        } catch (Exception exception) {
             throw new RuntimeException("Error while encoding nbt to string: " + advTag, exception);
         }
+        return bob.toString();
     }
 }

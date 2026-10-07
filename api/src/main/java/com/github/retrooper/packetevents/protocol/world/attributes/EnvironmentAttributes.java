@@ -25,8 +25,8 @@ import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.util.NbtCodec;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.world.biome.BiomeEffects.ParticleSettings;
+import com.github.retrooper.packetevents.util.TriState;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
-import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
