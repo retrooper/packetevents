@@ -21,9 +21,11 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.world.states.BlockStateCodec;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -67,13 +69,13 @@ public class ParticleBlockStateData extends ParticleData implements LegacyConver
 
     public static ParticleBlockStateData decode(NBTCompound compound, ClientVersion version) {
         String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "block_state" : "value";
-        WrappedBlockState state = WrappedBlockState.decode(compound.getTagOrThrow(key), version);
+        WrappedBlockState state = compound.getOrThrow(key, BlockStateCodec.CODEC, PacketWrapper.createDummyWrapper(version));
         return new ParticleBlockStateData(state);
     }
 
     public static void encode(ParticleBlockStateData data, ClientVersion version, NBTCompound compound) {
         String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "block_state" : "value";
-        compound.setTag(key, WrappedBlockState.encode(data.blockState, version));
+        compound.setTag(key, BlockStateCodec.CODEC.encode(PacketWrapper.createDummyWrapper(version), data.blockState));
     }
 
     @Override
@@ -87,7 +89,7 @@ public class ParticleBlockStateData extends ParticleData implements LegacyConver
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == null || this.getClass() != obj.getClass()) return false;
         ParticleBlockStateData that = (ParticleBlockStateData) obj;
         return this.blockState.equals(that.blockState);

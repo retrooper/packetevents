@@ -19,11 +19,17 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ClientboundMoveEntityPacket$Rot
+ */
 public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlayServerEntityRotation> {
+
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
+
     private int entityID;
     private float yaw;
     private float pitch;
@@ -44,9 +50,14 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     @Override
     public void read() {
         entityID = readVarInt();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            this.onGround = this.readBoolean();
+        }
         yaw = readByte() / ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
-        onGround = readBoolean();
+        if (this.serverVersion.isOlderThan(ServerVersion.V_26_3)) {
+            this.onGround = this.readBoolean();
+        }
     }
 
     @Override
@@ -60,9 +71,14 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     @Override
     public void write() {
         writeVarInt(entityID);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            this.writeBoolean(this.onGround);
+        }
         writeByte((int) (yaw * ROTATION_FACTOR));
         writeByte((int) (pitch * ROTATION_FACTOR));
-        writeBoolean(onGround);
+        if (this.serverVersion.isOlderThan(ServerVersion.V_26_3)) {
+            this.writeBoolean(this.onGround);
+        }
     }
 
     public int getEntityId() {

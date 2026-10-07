@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.common.server.WrapperCommonServerPluginMessage;
@@ -54,6 +55,9 @@ public class WrapperPlayServerPluginMessage extends WrapperCommonServerPluginMes
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             //We ignore this, because it's not needed.
             int legacyDataSize = readShort();
+        }
+        if (ByteBufHelper.readableBytes(buffer) > 1048576) {
+            throw new RuntimeException("Payload may not be larger than 1048576 bytes");
         }
         this.data = readRemainingBytes();
     }

@@ -62,6 +62,7 @@ public final class ArmorMaterials {
     }
 
     public static final ArmorMaterial LEATHER = define("leather");
+
     public static final ArmorMaterial CHAINMAIL = define("chainmail");
     public static final ArmorMaterial IRON = define("iron");
     public static final ArmorMaterial GOLD = define("gold");
@@ -78,7 +79,7 @@ public final class ArmorMaterials {
     public static final ArmorMaterial TURTLE = TURTLE_SCUTE;
 
     /**
-     * Added with 1.16
+     * @versions 1.16+
      */
     public static final ArmorMaterial NETHERITE = define("netherite");
 
@@ -93,77 +94,157 @@ public final class ArmorMaterials {
     public static final ArmorMaterial ARMADILLO = ARMADILLO_SCUTE;
 
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial ELYTRA = define("elytra");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial WHITE_CARPET = define("white_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial ORANGE_CARPET = define("orange_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial MAGENTA_CARPET = define("magenta_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial LIGHT_BLUE_CARPET = define("light_blue_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial YELLOW_CARPET = define("yellow_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial LIME_CARPET = define("lime_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial PINK_CARPET = define("pink_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial GRAY_CARPET = define("gray_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial LIGHT_GRAY_CARPET = define("light_gray_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial CYAN_CARPET = define("cyan_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial PURPLE_CARPET = define("purple_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial BLUE_CARPET = define("blue_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial BROWN_CARPET = define("brown_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial GREEN_CARPET = define("green_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial RED_CARPET = define("red_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial BLACK_CARPET = define("black_carpet");
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public static final ArmorMaterial TRADER_LLAMA = define("trader_llama");
+
+    /**
+     * @versions 1.21.5+
+     */
+    public static final ArmorMaterial SADDLE = define("saddle");
+
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial WHITE_HARNESS = define("white_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial ORANGE_HARNESS = define("orange_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial MAGENTA_HARNESS = define("magenta_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial LIGHT_BLUE_HARNESS = define("light_blue_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial YELLOW_HARNESS = define("yellow_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial LIME_HARNESS = define("lime_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial PINK_HARNESS = define("pink_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial GRAY_HARNESS = define("gray_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial LIGHT_GRAY_HARNESS = define("light_gray_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial CYAN_HARNESS = define("cyan_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial PURPLE_HARNESS = define("purple_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial BLUE_HARNESS = define("blue_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial BROWN_HARNESS = define("brown_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial GREEN_HARNESS = define("green_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial RED_HARNESS = define("red_harness");
+    /**
+     * @versions 1.21.6+
+     */
+    public static final ArmorMaterial BLACK_HARNESS = define("black_harness");
+
+    /**
+     * @versions 1.21.9+
+     */
+    public static final ArmorMaterial COPPER = define("copper");
+
+    /**
+     * @versions 26.1+
+     */
+    public static final ArmorMaterial TRADER_LLAMA_BABY = define("trader_llama_baby");
 
     static {
         REGISTRY.unloadMappings();

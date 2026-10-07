@@ -28,6 +28,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByteArray;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -53,6 +55,7 @@ public final class ItemTypes {
 
     private static final VersionedRegistry<ItemType> REGISTRY = new VersionedRegistry<>("item");
     private static final Map<StateType, ItemType> HELD_TO_PLACED_MAP = new HashMap<>();
+    private static final NbtCodec<ItemType> CODEC = NbtCodecs.forRegistry(REGISTRY);
 
     // <editor-fold desc="item type definitions" defaultstate="collapsed">
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
@@ -2052,6 +2055,491 @@ public final class ItemTypes {
     public static final ItemType SULFUR_SPIKE = builder("sulfur_spike").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_SPIKE).build();
 
     /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_PLANKS = builder("poplar_planks").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_PLANKS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_SAPLING = builder("poplar_sapling").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_SAPLING).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_LOG = builder("poplar_log").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_LOG).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType STRIPPED_POPLAR_LOG = builder("stripped_poplar_log").setMaxAmount(64).setPlacedType(StateTypes.STRIPPED_POPLAR_LOG).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType STRIPPED_POPLAR_WOOD = builder("stripped_poplar_wood").setMaxAmount(64).setPlacedType(StateTypes.STRIPPED_POPLAR_WOOD).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_WOOD = builder("poplar_wood").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_WOOD).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType RED_POPLAR_LEAVES = builder("red_poplar_leaves").setMaxAmount(64).setPlacedType(StateTypes.RED_POPLAR_LEAVES).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType ORANGE_POPLAR_LEAVES = builder("orange_poplar_leaves").setMaxAmount(64).setPlacedType(StateTypes.ORANGE_POPLAR_LEAVES).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType YELLOW_POPLAR_LEAVES = builder("yellow_poplar_leaves").setMaxAmount(64).setPlacedType(StateTypes.YELLOW_POPLAR_LEAVES).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType RED_SHRUB = builder("red_shrub").setMaxAmount(64).setPlacedType(StateTypes.RED_SHRUB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType WHITE_WOOL_STAIRS = builder("white_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.WHITE_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType ORANGE_WOOL_STAIRS = builder("orange_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.ORANGE_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType MAGENTA_WOOL_STAIRS = builder("magenta_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.MAGENTA_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_BLUE_WOOL_STAIRS = builder("light_blue_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_BLUE_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType YELLOW_WOOL_STAIRS = builder("yellow_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.YELLOW_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIME_WOOL_STAIRS = builder("lime_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.LIME_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PINK_WOOL_STAIRS = builder("pink_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.PINK_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GRAY_WOOL_STAIRS = builder("gray_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.GRAY_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_GRAY_WOOL_STAIRS = builder("light_gray_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_GRAY_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType CYAN_WOOL_STAIRS = builder("cyan_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.CYAN_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PURPLE_WOOL_STAIRS = builder("purple_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.PURPLE_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLUE_WOOL_STAIRS = builder("blue_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.BLUE_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BROWN_WOOL_STAIRS = builder("brown_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.BROWN_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GREEN_WOOL_STAIRS = builder("green_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.GREEN_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType RED_WOOL_STAIRS = builder("red_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.RED_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLACK_WOOL_STAIRS = builder("black_wool_stairs").setMaxAmount(64).setPlacedType(StateTypes.BLACK_WOOL_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType WHITE_WOOL_SLAB = builder("white_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.WHITE_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType ORANGE_WOOL_SLAB = builder("orange_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.ORANGE_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType MAGENTA_WOOL_SLAB = builder("magenta_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.MAGENTA_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_BLUE_WOOL_SLAB = builder("light_blue_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_BLUE_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType YELLOW_WOOL_SLAB = builder("yellow_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.YELLOW_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIME_WOOL_SLAB = builder("lime_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.LIME_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PINK_WOOL_SLAB = builder("pink_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.PINK_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GRAY_WOOL_SLAB = builder("gray_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.GRAY_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_GRAY_WOOL_SLAB = builder("light_gray_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_GRAY_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType CYAN_WOOL_SLAB = builder("cyan_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.CYAN_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PURPLE_WOOL_SLAB = builder("purple_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.PURPLE_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLUE_WOOL_SLAB = builder("blue_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.BLUE_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BROWN_WOOL_SLAB = builder("brown_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.BROWN_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GREEN_WOOL_SLAB = builder("green_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.GREEN_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType RED_WOOL_SLAB = builder("red_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.RED_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLACK_WOOL_SLAB = builder("black_wool_slab").setMaxAmount(64).setPlacedType(StateTypes.BLACK_WOOL_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType SHELF_MUSHROOM = builder("shelf_mushroom").setMaxAmount(64).setPlacedType(StateTypes.SHELF_MUSHROOM).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_SLAB = builder("poplar_slab").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_SLAB).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_SHELF = builder("poplar_shelf").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_SHELF).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_FENCE = builder("poplar_fence").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_FENCE).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_STAIRS = builder("poplar_stairs").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_STAIRS).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType WHITE_CONCRETE_STAIRS = builder("white_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.WHITE_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType ORANGE_CONCRETE_STAIRS = builder("orange_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.ORANGE_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType MAGENTA_CONCRETE_STAIRS = builder("magenta_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.MAGENTA_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_BLUE_CONCRETE_STAIRS = builder("light_blue_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_BLUE_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType YELLOW_CONCRETE_STAIRS = builder("yellow_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.YELLOW_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIME_CONCRETE_STAIRS = builder("lime_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.LIME_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PINK_CONCRETE_STAIRS = builder("pink_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.PINK_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GRAY_CONCRETE_STAIRS = builder("gray_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.GRAY_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_GRAY_CONCRETE_STAIRS = builder("light_gray_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_GRAY_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType CYAN_CONCRETE_STAIRS = builder("cyan_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.CYAN_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PURPLE_CONCRETE_STAIRS = builder("purple_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.PURPLE_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLUE_CONCRETE_STAIRS = builder("blue_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.BLUE_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BROWN_CONCRETE_STAIRS = builder("brown_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.BROWN_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GREEN_CONCRETE_STAIRS = builder("green_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.GREEN_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType RED_CONCRETE_STAIRS = builder("red_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.RED_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLACK_CONCRETE_STAIRS = builder("black_concrete_stairs").setMaxAmount(64).setPlacedType(StateTypes.BLACK_CONCRETE_STAIRS).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType WHITE_CONCRETE_SLAB = builder("white_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.WHITE_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType ORANGE_CONCRETE_SLAB = builder("orange_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.ORANGE_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType MAGENTA_CONCRETE_SLAB = builder("magenta_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.MAGENTA_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_BLUE_CONCRETE_SLAB = builder("light_blue_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_BLUE_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType YELLOW_CONCRETE_SLAB = builder("yellow_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.YELLOW_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIME_CONCRETE_SLAB = builder("lime_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.LIME_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PINK_CONCRETE_SLAB = builder("pink_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.PINK_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GRAY_CONCRETE_SLAB = builder("gray_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.GRAY_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_GRAY_CONCRETE_SLAB = builder("light_gray_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_GRAY_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType CYAN_CONCRETE_SLAB = builder("cyan_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.CYAN_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PURPLE_CONCRETE_SLAB = builder("purple_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.PURPLE_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLUE_CONCRETE_SLAB = builder("blue_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.BLUE_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BROWN_CONCRETE_SLAB = builder("brown_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.BROWN_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GREEN_CONCRETE_SLAB = builder("green_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.GREEN_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType RED_CONCRETE_SLAB = builder("red_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.RED_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLACK_CONCRETE_SLAB = builder("black_concrete_slab").setMaxAmount(64).setPlacedType(StateTypes.BLACK_CONCRETE_SLAB).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_BUTTON = builder("poplar_button").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_BUTTON).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_PRESSURE_PLATE = builder("poplar_pressure_plate").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_PRESSURE_PLATE).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_DOOR = builder("poplar_door").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_TRAPDOOR = builder("poplar_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_TRAPDOOR).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_FENCE_GATE = builder("poplar_fence_gate").setMaxAmount(64).setPlacedType(StateTypes.POPLAR_FENCE_GATE).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_BOAT = builder("poplar_boat").setMaxAmount(1).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_CHEST_BOAT = builder("poplar_chest_boat").setMaxAmount(1).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_SIGN = builder("poplar_sign").setMaxAmount(16).setPlacedType(StateTypes.POPLAR_SIGN).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType POPLAR_HANGING_SIGN = builder("poplar_hanging_sign").setMaxAmount(16).setPlacedType(StateTypes.POPLAR_HANGING_SIGN).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType WHITE_CUSHION = builder("white_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType ORANGE_CUSHION = builder("orange_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType MAGENTA_CUSHION = builder("magenta_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_BLUE_CUSHION = builder("light_blue_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType YELLOW_CUSHION = builder("yellow_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIME_CUSHION = builder("lime_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PINK_CUSHION = builder("pink_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GRAY_CUSHION = builder("gray_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType LIGHT_GRAY_CUSHION = builder("light_gray_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType CYAN_CUSHION = builder("cyan_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PURPLE_CUSHION = builder("purple_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLUE_CUSHION = builder("blue_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BROWN_CUSHION = builder("brown_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType GREEN_CUSHION = builder("green_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType RED_CUSHION = builder("red_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BLACK_CUSHION = builder("black_cushion").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType STRAW_BED = builder("straw_bed").setMaxAmount(16).setPlacedType(StateTypes.STRAW_BED).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType OCEAN_MONUMENT_MAP = builder("ocean_monument_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType WOODLAND_MANSION_MAP = builder("woodland_mansion_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BURIED_TRIAL_CHAMBERS_MAP = builder("buried_trial_chambers_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType JUNGLE_PYRAMID_MAP = builder("jungle_pyramid_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType SWAMP_HUT_MAP = builder("swamp_hut_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType DESERT_VILLAGE_MAP = builder("desert_village_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType PLAINS_VILLAGE_MAP = builder("plains_village_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType SAVANNA_VILLAGE_MAP = builder("savanna_village_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType SNOWY_VILLAGE_MAP = builder("snowy_village_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType TAIGA_VILLAGE_MAP = builder("taiga_village_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BURIED_TREASURE_MAP = builder("buried_treasure_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BURIED_ANCIENT_CITY_MAP = builder("buried_ancient_city_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType BURIED_MINESHAFT_MAP = builder("buried_mineshaft_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType DESERT_PYRAMID_MAP = builder("desert_pyramid_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType ABANDONED_CAMP_MAP = builder("abandoned_camp_map").setMaxAmount(64).build();
+    /**
+     * @versions 26.3+
+     */
+    public static final ItemType WARM_OCEAN_RUINS_MAP = builder("warm_ocean_ruins_map").setMaxAmount(64).build();
+
+    /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
      */
     @Deprecated
@@ -2190,8 +2678,8 @@ public final class ItemTypes {
                     ((StaticItemType) type).setComponents(version, defaults);
                 }
             }
-        } catch (IOException exception) {
-            throw new RuntimeException("Error while parsing item base component data", exception);
+        } catch (Exception exception) {
+            throw new RuntimeException("Error while parsing item base component data for " + version, exception);
         }
     }
 
@@ -2201,7 +2689,7 @@ public final class ItemTypes {
                 ClientVersion.V_1_20_5, ClientVersion.V_1_21, ClientVersion.V_1_21_2,
                 ClientVersion.V_1_21_4, ClientVersion.V_1_21_5, ClientVersion.V_1_21_6,
                 ClientVersion.V_1_21_7, ClientVersion.V_1_21_9, ClientVersion.V_1_21_11,
-                ClientVersion.V_26_1, ClientVersion.V_26_2,
+                ClientVersion.V_26_1, ClientVersion.V_26_2, ClientVersion.V_26_3,
         };
         for (ClientVersion version : versions) {
             parseAllComponents(version);
@@ -2215,6 +2703,10 @@ public final class ItemTypes {
 
     public static VersionedRegistry<ItemType> getRegistry() {
         return REGISTRY;
+    }
+
+    public static NbtCodec<ItemType> getCodec() {
+        return CODEC;
     }
 
     public static Collection<ItemType> values() {

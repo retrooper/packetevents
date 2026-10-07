@@ -3310,6 +3310,99 @@ public final class Sounds {
     public static final Sound ENTITY_SMALL_SULFUR_CUBE_EAT = define("entity.small_sulfur_cube.eat");
 
     /**
+     * ** @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_BREAK = define("entity.cushion.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_PLACE = define("entity.cushion.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_SIT = define("entity.cushion.sit");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound ENTITY_CUSHION_GET_UP = define("entity.cushion.get_up");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_BREAK = define("block.shelf_mushroom.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_FALL = define("block.shelf_mushroom.fall");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_PLACE = define("block.shelf_mushroom.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_STEP = define("block.shelf_mushroom.step");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_SHELF_MUSHROOM_BOUNCE = define("block.shelf_mushroom.bounce");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_BREAK = define("block.poplar_leaves.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_HIT = define("block.poplar_leaves.hit");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_FALL = define("block.poplar_leaves.fall");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_PLACE = define("block.poplar_leaves.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_STEP = define("block.poplar_leaves.step");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_POPLAR_LEAVES_AMBIENT = define("block.poplar_leaves.ambient");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_BREAK = define("block.straw_bed.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_BREAK_LEAVE = define("block.straw_bed.break_leave");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_STEP = define("block.straw_bed.step");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_PLACE = define("block.straw_bed.place");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_HIT = define("block.straw_bed.hit");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_STRAW_BED_FALL = define("block.straw_bed.fall");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_RED_SHRUB_BREAK = define("block.red_shrub.break");
+    /**
+     * @versions 26.3+
+     */
+    public static final Sound BLOCK_RED_SHRUB_PLACE = define("block.red_shrub.place");
+
+    /**
      * Returns an immutable view of the sounds.
      *
      * @return Sounds

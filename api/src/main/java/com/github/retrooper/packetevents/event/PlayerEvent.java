@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.event;
 
 import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NullUnmarked;
 
 /**
  * Every event that has an associated player is recommended to implement this interface.
@@ -32,8 +33,10 @@ public interface PlayerEvent {
 
     /**
      * Associated player.
+     * May be null (e.g. early connection states).
      *
      * @return Player.
      */
+    @NullUnmarked
     <T> @UnknownNullability T getPlayer();
 }

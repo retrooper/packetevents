@@ -123,13 +123,14 @@ public enum ClientVersion {
 
     V_26_1(775),
     V_26_2(776),
+    V_26_3(777),
     //TODO UPDATE Add new protocol version field
 
     @Deprecated
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_2.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
     @Deprecated
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_26_2.protocolVersion + 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_26_3.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 

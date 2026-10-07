@@ -123,6 +123,9 @@ public class UpdateChecker {
 
     @ApiStatus.Internal
     public void handleUpdateCheck() {
+        if (Boolean.getBoolean("packetevents.disable-update-checker")) {
+            return; // disabled via system property
+        }
         handleUpdateCheck((Runnable) null);
     }
 

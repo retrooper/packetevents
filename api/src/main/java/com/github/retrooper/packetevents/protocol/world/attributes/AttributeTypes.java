@@ -135,9 +135,17 @@ public final class AttributeTypes {
     @ApiStatus.Obsolete
     public static final AttributeType<?> BED_RULE = defineUnsynced("bed_rule");
     public static final AttributeType<Particle<?>> PARTICLE = define("particle", Particle.CODEC);
-    public static final AttributeType<List<ParticleSettings>> AMBIENT_PARTICLES = define("ambient_particles", ParticleSettings.CODEC.applyList());
+    public static final AttributeType<List<ParticleSettings>> AMBIENT_PARTICLES = define("ambient_particles", ParticleSettings.CODEC.applyList(), AttributeModifier.listLibrary());
     public static final AttributeType<BackgroundMusic> BACKGROUND_MUSIC = define("background_music", BackgroundMusic.CODEC);
     public static final AttributeType<AmbientSounds> AMBIENT_SOUNDS = define("ambient_sounds", AmbientSounds.CODEC);
+
+    /**
+     * Not synced via network, not usable via packetevents.
+     *
+     * @versions 26.3+
+     */
+    @ApiStatus.Obsolete
+    public static final AttributeType<?> MOB_SPAWN_SETTINGS = defineUnsynced("mob_spawn_settings");
 
     static {
         REGISTRY.unloadMappings();

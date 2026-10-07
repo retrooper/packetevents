@@ -61,7 +61,6 @@ public class StaticPigSoundVariant extends AbstractMappedEntity implements PigSo
     @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticPigSoundVariant)) return false;
-        if (!super.equals(obj)) return false;
         StaticPigSoundVariant that = (StaticPigSoundVariant) obj;
         if (!this.adultSounds.equals(that.adultSounds)) return false;
         return this.babySounds.equals(that.babySounds);
@@ -69,6 +68,6 @@ public class StaticPigSoundVariant extends AbstractMappedEntity implements PigSo
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.adultSounds, this.babySounds);
+        return Objects.hash(this.adultSounds, this.babySounds);
     }
 }

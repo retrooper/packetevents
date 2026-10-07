@@ -1,7 +1,10 @@
+import xyz.jpenilla.runwaterfall.task.RunWaterfall
+
 plugins {
     packetevents.`shadow-conventions`
     packetevents.`library-conventions`
     packetevents.`publish-conventions`
+    xyz.jpenilla.`run-waterfall`
 }
 
 repositories {
@@ -16,4 +19,12 @@ dependencies {
 
     compileOnly(libs.bungeecord)
     implementation(libs.bstats.bungeecord)
+}
+
+tasks {
+    named<RunWaterfall>("runWaterfall") {
+        val mcVersion = "1.21"
+        waterfallVersion(mcVersion)
+        runDirectory = rootDir.resolve("run/waterfall/$mcVersion")
+    }
 }

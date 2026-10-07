@@ -74,8 +74,8 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
 
     @Override
     public void copy(WrapperPlayServerUseBed wrapper) {
-        wrapper.entityId = entityId;
-        wrapper.position = position;
+        this.entityId = wrapper.entityId;
+        this.position = wrapper.position;
     }
 
     public int getEntityId() {

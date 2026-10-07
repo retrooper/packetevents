@@ -160,9 +160,33 @@ public final class MapDecorationTypes {
     public static final MapDecorationType SWAMP_HUT = define("swamp_hut",
             true, LIGHT_GRAY_COLOR, true, false);
 
-    // Added with 1.20.5
+    /**
+     * @versions 1.20.5+
+     */
     public static final MapDecorationType TRIAL_CHAMBERS = define("trial_chambers",
             true, COPPER_COLOR, true, false);
+
+    /**
+     * @versions 26.3+
+     */
+    public static final MapDecorationType ABANDONED_CAMP = define("abandoned_camp", true, false);
+    /**
+     * @versions 26.3+
+     */
+    public static final MapDecorationType ANCIENT_CITY = define("ancient_city", true, false);
+    /**
+     * @versions 26.3+
+     */
+    public static final MapDecorationType DESERT_PYRAMID = define("desert_pyramid", true, false);
+    /**
+     * @versions 26.3+
+     */
+    public static final MapDecorationType MINESHAFT = define("mineshaft", true, false);
+    /**
+     * @versions 26.3+
+     */
+    public static final MapDecorationType OCEAN_RUIN_WARM = define("ocean_ruin_warm", minecraft("warm_ocean_ruins"),
+            true, false);
 
     /**
      * Returns an immutable view of the map decoration types.

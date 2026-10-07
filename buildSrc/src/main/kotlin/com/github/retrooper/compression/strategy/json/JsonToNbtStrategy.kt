@@ -59,7 +59,7 @@ object JsonToNbtStrategy : JsonCompressionStrategy() {
         is LazilyParsedNumber -> {
             val str = this.toString()
             if (str.contains('.')) {
-                FloatTag(str.toFloat())
+                DoubleTag(str.toDouble())
             } else {
                 IntTag(str.toInt())
             }

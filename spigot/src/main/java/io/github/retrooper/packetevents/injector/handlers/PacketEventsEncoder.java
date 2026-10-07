@@ -41,12 +41,15 @@ import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.Queue;
 
+@ApiStatus.Internal
 public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     public static final Object COMPRESSION_ENABLED_EVENT = paperCompressionEnabledEvent();
@@ -66,7 +69,8 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     public User user;
     public Player player;
-    private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
+    public boolean handleCompression;
+    public boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
@@ -79,6 +83,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public PacketEventsEncoder(ChannelHandler encoder) {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
+        handleCompression = ((PacketEventsEncoder) encoder).handleCompression;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
         promise = ((PacketEventsEncoder) encoder).promise;
     }
@@ -130,7 +135,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         this.promise = promise;
 
         if (msg instanceof ByteBuf) {
-            boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
+            boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, (ByteBuf) msg);
             this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
 
             // check if the packet got cancelled
@@ -236,11 +241,11 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (handledCompression) return false;
-        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        List<String> handlerNames = ctx.pipeline().names();
+        int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = handlerNames.indexOf(PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
         if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.

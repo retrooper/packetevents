@@ -61,7 +61,6 @@ public class StaticChickenSoundVariant extends AbstractMappedEntity implements C
     @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticChickenSoundVariant)) return false;
-        if (!super.equals(obj)) return false;
         StaticChickenSoundVariant that = (StaticChickenSoundVariant) obj;
         if (!this.adultSounds.equals(that.adultSounds)) return false;
         return this.babySounds.equals(that.babySounds);
@@ -69,6 +68,6 @@ public class StaticChickenSoundVariant extends AbstractMappedEntity implements C
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.adultSounds, this.babySounds);
+        return Objects.hash(this.adultSounds, this.babySounds);
     }
 }

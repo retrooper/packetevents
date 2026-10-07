@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.entity.data;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProfile;
 import com.github.retrooper.packetevents.protocol.entity.armadillo.ArmadilloState;
 import com.github.retrooper.packetevents.protocol.entity.cat.CatSoundVariant;
@@ -332,6 +333,12 @@ public final class EntityDataTypes {
      */
     public static final EntityDataType<PigSoundVariant> PIG_SOUND_VARIANT =
             define("pig_sound_variant_type", PigSoundVariant::read, PigSoundVariant::write);
+
+    /**
+     * @versions 26.3+
+     */
+    public static final EntityDataType<DyeColor> DYE_COLOR =
+            define("dye_color", DyeColor::read, DyeColor::write);
 
     private EntityDataTypes() {
     }

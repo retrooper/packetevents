@@ -20,6 +20,11 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -35,6 +40,22 @@ import java.util.Objects;
  * @since 1.7
  */
 public class Vector3i {
+
+    public static final NbtCodec<Vector3i> CODEC = new NbtCodec<Vector3i>() {
+        @Override
+        public Vector3i decode(NBT tag, PacketWrapper<?> wrapper) {
+            int[] arr = NbtCodecs.INT_ARRAY.decode(tag, wrapper);
+            if (arr.length != 3) {
+                throw new NbtCodecException("Expected 3 vector components, but got " + arr.length);
+            }
+            return new Vector3i(arr[0], arr[1], arr[2]);
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Vector3i value) {
+            return new NBTIntArray(new int[]{value.getX(), value.getY(), value.getZ()});
+        }
+    };
 
     private static final Vector3i ZERO = new Vector3i(0, 0, 0);
 
@@ -77,7 +98,7 @@ public class Vector3i {
             z = (int) (val << 26 >> 38);
         } else {
             // 1.13 and below store X Y Z
-            y = (int) ((val >> 26) & 0xFFF);
+            y = (int) (val << 26 >> 52);
             z = (int) (val << 38 >> 38);
         }
 
