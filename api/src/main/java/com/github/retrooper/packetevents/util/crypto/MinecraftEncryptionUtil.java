@@ -98,4 +98,20 @@ public class MinecraftEncryptionUtil {
             return null;
         }
     }
+
+    /**
+     * Generates an RSA key pair with a key size of 1024 bits.
+     *
+     * @return The generated key pair
+     */
+    public static KeyPair generateKeyPair() {
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(1024);
+            return generator.generateKeyPair();
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 }
