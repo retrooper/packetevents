@@ -23,8 +23,12 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 public class WrapperConfigClientPluginMessage extends PacketWrapper<WrapperConfigClientPluginMessage> {
+
+    @ApiStatus.Internal
+    public static final int MAX_PAYLOAD_BYTES = Integer.getInteger("packetevents.max-custom-payload-bytes", 32767);
 
     private String channelName;
     private byte[] data;
@@ -46,8 +50,11 @@ public class WrapperConfigClientPluginMessage extends PacketWrapper<WrapperConfi
     @Override
     public void read() {
         this.channelName = this.readString();
-        if (ByteBufHelper.readableBytes(this.buffer) > 32767) {
-            throw new RuntimeException("Payload may not be larger than 32767 bytes");
+        if (MAX_PAYLOAD_BYTES >= 0) {
+            int readable = ByteBufHelper.readableBytes(this.buffer);
+            if (readable > MAX_PAYLOAD_BYTES) {
+                throw new RuntimeException("Payload may not be larger than " + MAX_PAYLOAD_BYTES + " bytes (got " + readable + ")");
+            }
         }
         this.data = this.readRemainingBytes();
     }

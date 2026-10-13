@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import static com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientPluginMessage.MAX_PAYLOAD_BYTES;
+
 /**
  * Mods and plugins can use this to send their data.
  * Minecraft itself uses some plugin channels.
@@ -63,6 +65,12 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
             int legacyDataSize = readShort();
         }
 
+        if (MAX_PAYLOAD_BYTES >= 0) {
+            int readable = ByteBufHelper.readableBytes(this.buffer);
+            if (readable > MAX_PAYLOAD_BYTES) {
+                throw new RuntimeException("Payload may not be larger than " + MAX_PAYLOAD_BYTES + " bytes (got " + readable + ")");
+            }
+        }
         this.data = readRemainingBytes();
     }
 
