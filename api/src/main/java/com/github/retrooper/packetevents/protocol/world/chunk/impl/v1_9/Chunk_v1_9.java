@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16;
+package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_9;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -153,6 +153,10 @@ public class Chunk_v1_9 implements BaseChunk {
         return this.blockCount == 0;
     }
 
+    public DataPalette getDataPalette() {
+        return dataPalette;
+    }
+
     public @Nullable NibbleArray3d getSkyLight() {
         return this.skyLight;
     }
@@ -167,5 +171,13 @@ public class Chunk_v1_9 implements BaseChunk {
 
     public void setBlockLight(@Nullable NibbleArray3d blockLight) {
         this.blockLight = blockLight;
+    }
+
+    public int getBlockCount() {
+        return blockCount;
+    }
+
+    public void setBlockCount(int blockCount) {
+        this.blockCount = blockCount;
     }
 }
