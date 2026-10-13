@@ -452,8 +452,6 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (size > maxSize) {
             throw new RuntimeException(size + " elements exceeded max size of: " + maxSize);
         }
-        // The no-arg readMap passes Integer.MAX_VALUE as maxSize, so without this the table
-        // below is sized straight from the wire.
         this.checkElementCount(size);
 
         Map<K, V> map = new HashMap<>(size);
@@ -1384,19 +1382,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
     }
 
-    /**
-     * Checks an element count read off the wire before it is used to size an allocation.
-     *
-     * <p>Every element costs at least one byte, so a count larger than the bytes left in the
-     * buffer cannot be honest. Without this an attacker sends a five-byte VarInt of
-     * {@link Integer#MAX_VALUE} with nothing behind it and the collection is built at that
-     * capacity before the first element is read, which asks the JVM for two billion references.
-     *
-     * <p>This is the same rule {@link #readByteArray()}, {@link #readVarIntArray()} and
-     * {@link #readLongArray()} already apply to their lengths.
-     */
     private int checkElementCount(int count) {
-        int readableBytes = ByteBufHelper.readableBytes(buffer);
+        int readableBytes = ByteBufHelper.readableBytes(this.buffer);
         if (count > readableBytes) {
             throw new IllegalStateException("Collection with size " + count
                     + " is bigger than allowed " + readableBytes);
@@ -1414,8 +1401,6 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (size > maxSize) {
             throw new RuntimeException(size + " elements exceeded max size of: " + maxSize);
         }
-        // maxSize alone is not enough: it is often far larger than any real packet, so a
-        // count under it can still size a multi-megabyte allocation from a tiny packet.
         return readFixedCollection(function, reader, this.checkElementCount(size));
     }
 
