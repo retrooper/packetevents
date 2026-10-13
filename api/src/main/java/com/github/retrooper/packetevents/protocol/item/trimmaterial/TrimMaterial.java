@@ -189,7 +189,7 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
         Map<ArmorMaterial, String> overrideArmorMaterials = Collections.emptyMap();
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
             overrideArmorMaterials = wrapper.readMap(
-                    ew -> ew.readMappedEntity(ArmorMaterials::getById),
+                    ew -> ArmorMaterials.getByName(ew.readIdentifier().getKey()),
                     PacketWrapper::readString);
         }
         Component description = wrapper.readComponent();
@@ -215,7 +215,7 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
         }
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
             wrapper.writeMap(material.getOverrideArmorMaterials(),
-                    PacketWrapper::writeMappedEntity, PacketWrapper::writeString);
+                    (ew, k) -> ew.writeIdentifier(k.getName()), PacketWrapper::writeString);
         }
         wrapper.writeComponent(material.getDescription());
     }
