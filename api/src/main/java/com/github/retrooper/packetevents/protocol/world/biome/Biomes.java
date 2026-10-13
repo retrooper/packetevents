@@ -236,6 +236,10 @@ public final class Biomes {
      * @versions 1.21.2+
      */
     public static final Biome PALE_GARDEN = define("pale_garden");
+    /**
+     * @versions 26.2+
+     */
+    public static final Biome SULFUR_CAVES = define("sulfur_caves");
 
     static {
         BIOME_DATA.clear();

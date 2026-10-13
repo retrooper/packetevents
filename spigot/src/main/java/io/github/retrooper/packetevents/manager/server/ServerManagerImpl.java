@@ -23,23 +23,22 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.PEVersion;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 
 public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
 
     private ServerVersion resolveVersionNoCache() {
-        Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
+        LogManager logger = PacketEvents.getAPI().getLogManager();
         String bukkitVersion = Bukkit.getBukkitVersion();
         ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
 
         String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the Server version is " + fallbackVersion.name() + "...\n If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
 
         if (bukkitVersion.contains("Unknown")) {
-            plugin.getLogger().warning(failureToDetectVersionMsg);
+            logger.warn(failureToDetectVersionMsg);
             return fallbackVersion;
         }
 
@@ -50,7 +49,7 @@ public class ServerManagerImpl implements ServerManager {
             }
         }
 
-        plugin.getLogger().warning(failureToDetectVersionMsg);
+        logger.warn(failureToDetectVersionMsg);
         return fallbackVersion;
     }
 

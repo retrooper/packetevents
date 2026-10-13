@@ -22,16 +22,9 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.ApiStatus;
+import com.github.retrooper.packetevents.wrapper.common.client.WrapperCommonClientPluginMessage;
 
-public class WrapperConfigClientPluginMessage extends PacketWrapper<WrapperConfigClientPluginMessage> {
-
-    @ApiStatus.Internal
-    public static final int MAX_PAYLOAD_BYTES = Integer.getInteger("packetevents.max-custom-payload-bytes", 32767);
-
-    private String channelName;
-    private byte[] data;
+public class WrapperConfigClientPluginMessage extends WrapperCommonClientPluginMessage<WrapperConfigClientPluginMessage> {
 
     public WrapperConfigClientPluginMessage(PacketReceiveEvent event) {
         super(event);
@@ -42,9 +35,7 @@ public class WrapperConfigClientPluginMessage extends PacketWrapper<WrapperConfi
     }
 
     public WrapperConfigClientPluginMessage(String channelName, byte[] data) {
-        super(PacketType.Configuration.Client.PLUGIN_MESSAGE);
-        this.channelName = channelName;
-        this.data = data;
+        super(PacketType.Configuration.Client.PLUGIN_MESSAGE, channelName, data);
     }
 
     @Override
@@ -65,25 +56,4 @@ public class WrapperConfigClientPluginMessage extends PacketWrapper<WrapperConfi
         this.writeBytes(this.data);
     }
 
-    @Override
-    public void copy(WrapperConfigClientPluginMessage wrapper) {
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    public String getChannelName() {
-        return this.channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-    }
-
-    public byte[] getData() {
-        return this.data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
 }

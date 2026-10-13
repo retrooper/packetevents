@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.protocol.particle.data.ParticleColorDat
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustColorTransitionData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticleGeyserBaseData;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticleGeyserData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleItemStackData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticlePowerData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleSculkChargeData;
@@ -35,7 +37,9 @@ import com.github.retrooper.packetevents.protocol.particle.data.ParticleVibratio
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.util.NbtCodec;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
+import com.github.retrooper.packetevents.protocol.util.NbtMapCodec;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper.Writer;
 import org.jetbrains.annotations.ApiStatus;
@@ -70,17 +74,28 @@ public final class ParticleTypes {
     public static <T extends ParticleData> ParticleType<T> define(
             String name,
             Reader<T> reader, @Nullable Writer<T> writer,
+            NbtMapCodec<T> codec
+    ) {
+        Decoder<T> decoder = Decoder.fromCodec(codec);
+        Encoder<T> encoder = Encoder.fromCodec(codec);
+        return define(name, reader, writer, decoder, encoder);
+    }
+
+    @ApiStatus.Internal
+    public static <T extends ParticleData> ParticleType<T> define(
+            String name,
+            Reader<T> reader, @Nullable Writer<T> writer,
             Decoder<T> decoder, @Nullable Encoder<T> encoder
     ) {
         return REGISTRY.define(name, data ->
                 new StaticParticleType<>(data, reader, writer, decoder, encoder));
     }
 
-    public static ParticleType<?> getByName(String name) {
+    public static @Nullable ParticleType<?> getByName(String name) {
         return REGISTRY.getByName(name);
     }
 
-    public static ParticleType<?> getById(ClientVersion version, int id) {
+    public static @Nullable ParticleType<?> getById(ClientVersion version, int id) {
         return REGISTRY.getById(version, id);
     }
 
@@ -306,6 +321,42 @@ public final class ParticleTypes {
      * @versions 26.1+
      */
     public static final ParticleType<ParticleData> RESET_MOB_GROWTH = define("reset_mob_growth");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> SULFUR_BUBBLES = define("sulfur_bubbles");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> NOXIOUS_GAS = define("noxious_gas");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> NOXIOUS_GAS_CLOUD = define("noxious_gas_cloud");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserData> GEYSER = define("geyser",
+            ParticleGeyserData::read, ParticleGeyserData::write, ParticleGeyserData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserBaseData> GEYSER_BASE = define("geyser_base",
+            ParticleGeyserBaseData::read, ParticleGeyserBaseData::write, ParticleGeyserBaseData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserBaseData> GEYSER_POOF = define("geyser_poof",
+            ParticleGeyserBaseData::read, ParticleGeyserBaseData::write, ParticleGeyserBaseData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserData> GEYSER_PLUME = define("geyser_plume",
+            ParticleGeyserData::read, ParticleGeyserData::write, ParticleGeyserData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> SULFUR_CUBE_GOO = define("sulfur_cube_goo");
 
     /**
      * Returns an immutable view of the particle types.
@@ -323,12 +374,22 @@ public final class ParticleTypes {
     @ApiStatus.Internal
     @FunctionalInterface
     public interface Decoder<T> {
+
+        static <T> Decoder<T> fromCodec(NbtMapCodec<T> codec) {
+            return (tag, ver) -> codec.decode(tag, PacketWrapper.createDummyWrapper(ver));
+        }
+
         T decode(NBTCompound compound, ClientVersion version);
     }
 
     @ApiStatus.Internal
     @FunctionalInterface
     public interface Encoder<T> {
+
+        static <T> Encoder<T> fromCodec(NbtMapCodec<T> codec) {
+            return (val, ver, tag) -> codec.encode(tag, PacketWrapper.createDummyWrapper(ver), val);
+        }
+
         void encode(T value, ClientVersion version, NBTCompound compound);
     }
 }

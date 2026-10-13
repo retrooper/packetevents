@@ -300,7 +300,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         this.clientVersion = clientVersion;
     }
 
-    public ServerVersion getServerVersion() {
+    public final ServerVersion getServerVersion() {
         return serverVersion;
     }
 
@@ -832,8 +832,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (size > readableBytes) {
             throw new IllegalStateException("LongArray with size " + size + " is bigger than allowed " + readableBytes);
         }
-        long[] array = new long[size];
+        return this.readLongArray(new long[size]);
+    }
 
+    public long[] readLongArray(long[] array) {
         for (int i = 0; i < array.length; i++) {
             array[i] = readLong();
         }

@@ -1,3 +1,67 @@
+!!!!! v2.13.0
+
+# PacketEvents 2.13.0 is finally out! 🎉
+
+This minor release includes mainly support for Minecraft 26.2, but also includes a few smaller fixes and improvements.
+
+Recent donors: **@PebbleHost**\
+If you intend on donating and do not wish to be mentioned, please add such a note on your donation.
+
+# Announcement 📢
+
+Visit our website: https://packetevents.com/ \
+Documentation: https://docs.packetevents.com/ \
+Javadoc: https://javadocs.packetevents.com/
+
+Thanks to all contributors who helped make this release possible:
+- @booky10
+- @Jan1k1
+- @linsaftw
+- @rafi67000
+- @retrooper
+- @Rothes
+- @TheFaser
+
+## What's Changed
+
+* Improve chunk reading performance ([#1526](https://github.com/retrooper/packetevents/pull/1526))
+* Add PluginMessage Common Wrapper ([#1523](https://github.com/retrooper/packetevents/pull/1523))
+* Fix custom world clock use in dimension types ([`7c4dd0b`](https://github.com/retrooper/packetevents/commit/7c4dd0b039e695e5ae7d9c0562082f913cbb2677))
+* Add support for 26.2 ([#1529](https://github.com/retrooper/packetevents/pull/1529), [`471a9e2`](https://github.com/retrooper/packetevents/commit/471a9e21144f0ea56e4053bda0477cca8402dc69), [`b1bbbae`](https://github.com/retrooper/packetevents/commit/b1bbbaed2f7bd8e09ff758bfa02f9b63df21c3b1))
+* Update Gradle, Gradle plugins and actions ([#1533](https://github.com/retrooper/packetevents/pull/1533), [#1534](https://github.com/retrooper/packetevents/pull/1534))
+* Fix nullability annotations for ProtcolManager/PlayerManager ([#1535](https://github.com/retrooper/packetevents/pull/1535))
+* Ignore udp listeners during injection ([#1537](https://github.com/retrooper/packetevents/pull/1537))
+
+**View Full Changelog**: [`v2.12.2...v2.13.0`](https://github.com/retrooper/packetevents/compare/v2.12.2...v2.13.0)
+
+!!!!! v2.12.2
+# PacketEvents 2.12.2 is finally out! 🎉
+
+This patch release contains a few critical bug fixes as well as some optimizations and reworks.
+
+Recent donors: **@PebbleHost, @perlsol, @TRGReal**\
+If you intend on donating and do not wish to be mentioned, please add such a note on your donation.
+
+Unfortunately, the PacketEvents PayPal account is no longer active. I hope to resolve any concerns with PayPal, who has frozen funds and activity on the account. If you want to donate, please use [GitHub Sponsors](https://github.com/sponsors/retrooper) or the newly setup [BuyMeACoffee](https://buymeacoffee.com/retrooper).
+
+Thanks to all contributors who helped make this release possible:
+- @booky10
+- @Beaness
+- @SamB440
+- @retrooper
+- @LeonTG
+
+## What's Changed
+* Rework logging system in PacketEvents (now more consistently used across API) [`a1067f5`](https://github.com/retrooper/packetevents/commit/a1067f5e4f53bcd7fbeaa19fb4d8046a3f6248ca)
+* Optimize SpigotReflectionUtil.generateEntityId() method [`95afd3f`](https://github.com/retrooper/packetevents/commit/95afd3fce8bfbf7087233a3bd31e0705cd1e4df5)
+* Fix transmission/copying of packet wrappers when dealing with multiple packet listeners for the following wrappers: WrapperLoginServerLoginSuccess, WrapperPlayServerDeclareCommands, WrapperPlayServerMapData, WrapperPlayServerPlayerRotation, WrapperPlayServerSpawnWeatherEntity [`20d2bd3`](https://github.com/retrooper/packetevents/commit/20d2bd34326ea9fab602ff07333fcfc713ae6ced)
+* Allow for the customization of chat message length limit for legacy Minecraft versions [`a1067f5`](https://github.com/retrooper/packetevents/commit/a1067f5e4f53bcd7fbeaa19fb4d8046a3f6248ca)
+* Multiple fixes for WrapperPlayServerSoundEffect [`66d768d`](https://github.com/retrooper/packetevents/commit/66d768d00f6f69c71a9ba27998976a6d2b5020f7), [`73603f8`](https://github.com/retrooper/packetevents/commit/73603f89b7aafab6ff7eed7be488b03fa5e064dc)
+* Fix incorrect swapping of pitch and yaw for WrapperPlayServerSpawnEntity on Minecraft versions lower than 1.15 [`0634827`](https://github.com/retrooper/packetevents/commit/063482716d0fd858bef8e65b9c4714c8e1fd4aa9)
+* Fix injection cleanup issues on Velocity ([#1489](https://github.com/retrooper/packetevents/issues/1489), [`cb8fb8b`](https://github.com/retrooper/packetevents/commit/cb8fb8b9268f7fb83f2a931432757d7d36ae220b))
+
+**View Full Changelog**: [`v2.12.1...v2.12.2`](https://github.com/retrooper/packetevents/compare/v2.12.1...v2.12.2)
+
 !!!!! v2.12.1
 
 # PacketEvents 2.12.1 is finally out! 🎉

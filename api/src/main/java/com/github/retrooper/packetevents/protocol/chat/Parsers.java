@@ -55,11 +55,11 @@ public final class Parsers {
         return REGISTRY.define(key, data -> new Parser(data, reader, writer));
     }
 
-    public static Parser getByName(String name) {
+    public static @Nullable Parser getByName(String name) {
         return REGISTRY.getByName(name);
     }
 
-    public static Parser getById(ClientVersion version, int id) {
+    public static @Nullable Parser getById(ClientVersion version, int id) {
         return REGISTRY.getById(version, id);
     }
 
@@ -145,6 +145,10 @@ public final class Parsers {
     public static final Parser BLOCK_PREDICATE = define("block_predicate", null, null);
     public static final Parser ITEM_STACK = define("item_stack", null, null);
     public static final Parser ITEM_PREDICATE = define("item_predicate", null, null);
+    /**
+     * @versions -26.1.2
+     */
+    @ApiStatus.Obsolete
     public static final Parser COLOR = define("color", null, null);
     public static final Parser COMPONENT = define("component", null, null);
     public static final Parser STYLE = define("style", null, null);
@@ -213,7 +217,7 @@ public final class Parsers {
     public static final Parser UUID = define("uuid", null, null);
 
     /**
-     * Added with 1.21.5
+     * @versions 1.21.5+
      */
     public static final Parser RESOURCE_SELECTOR = define("resource_selector",
             wrapper -> Collections.singletonList(wrapper.readIdentifier()),
@@ -221,28 +225,35 @@ public final class Parsers {
     );
 
     /**
-     * Added with 1.21.6
+     * @versions 1.21.6+
      */
     public static final Parser HEX_COLOR = define("hex_color", null, null);
     /**
-     * Added with 1.21.6
+     * @versions 1.21.6+
      */
     public static final Parser DIALOG = define("dialog", null, null);
+
+    /**
+     * @versions 26.2+
+     */
+    public static final Parser TEAM_COLOR = define("team_color", null, null);
 
     static {
         REGISTRY.unloadMappings();
     }
 
     @FunctionalInterface
-    public interface Reader extends Function<PacketWrapper<?>, List<Object>> {}
+    public interface Reader extends Function<PacketWrapper<?>, List<Object>> {
+    }
 
     @FunctionalInterface
-    public interface Writer extends BiConsumer<PacketWrapper<?>, List<Object>> {}
+    public interface Writer extends BiConsumer<PacketWrapper<?>, List<Object>> {
+    }
 
     public static final class Parser extends AbstractMappedEntity {
 
-        private final Reader reader;
-        private final Writer writer;
+        private final @Nullable Reader reader;
+        private final @Nullable Writer writer;
 
         @Deprecated
         public Parser(String name, @Nullable Function<PacketWrapper<?>, List<Object>> read, @Nullable BiConsumer<PacketWrapper<?>, List<Object>> write) {

@@ -40,6 +40,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.RabbitVarian
 import com.github.retrooper.packetevents.protocol.component.builtin.SalmonSizeComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.SheepColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.ShulkerColorComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.SulfurCubeContentComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishBaseColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishPatternColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishPatternComponent;
@@ -561,6 +562,11 @@ public final class ComponentTypes {
      */
     public static final ComponentType<PigSoundVariantComponent> PIG_SOUND_VARIANT = define("pig/sound_variant",
             PigSoundVariantComponent::read, PigSoundVariantComponent::write);
+    /**
+     * @versions 26.2+
+     */
+    public static final ComponentType<SulfurCubeContentComponent> SULFUR_CUBE_CONTENT = define("sulfur_cube_content",
+            SulfurCubeContentComponent::read, SulfurCubeContentComponent::write);
 
     /**
      * Returns an immutable view of the component types.

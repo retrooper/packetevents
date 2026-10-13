@@ -110,7 +110,7 @@ public final class SpigotReflectionUtil {
             RESOURCE_KEY, REGISTRY, WRITABLE_REGISTRY, NBT_ACCOUNTER, CHUNK_PROVIDER_SERVER_CLASS, ICHUNKPROVIDER_CLASS, CHUNK_STATUS_CLASS,
             BLOCK_POSITION_CLASS, PLAYER_CHUNK_MAP_CLASS, PLAYER_CHUNK_CLASS, CHUNK_CLASS, IBLOCKACCESS_CLASS, ICHUNKACCESS_CLASS, REMOTE_CHAT_SESSION_CLASS,
             DATA_WATCHER_CLASS, CLIENTBOUND_SET_ENTITY_DATA_PACKET_CLASS, DATA_WATCHER_ITEM_CLASS, DATA_WATCHER_VALUE_CLASS,
-            PAPER_COMMON_CONNECTION_CLASS;
+            PAPER_COMMON_CONNECTION_CLASS, REGISTRY_OPS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
@@ -134,7 +134,7 @@ public final class SpigotReflectionUtil {
             NBT_ACCOUNTER_UNLIMITED_HEAP, CHUNK_CACHE_GET_IBLOCKACCESS, CHUNK_CACHE_GET_ICHUNKACCESS,
             IBLOCKACCESS_GET_BLOCK_DATA, CHUNK_GET_BLOCK_DATA, PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK, PLAYER_CHUNK_GET_CHUNK,
             LEGACY_DATA_WATCHER_WRITE_METHOD, CLIENTBOUND_SET_ENTITY_DATA_PACKET_WRITE_DATA_WATCHER_METHOD, GET_DATA_VALUE_FROM_DATA_ITEM_METHOD,
-            GET_TPS;
+            GET_TPS, REGISTRY_OPS_CREATE, GET_NEXT_ENTITY_ID;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR,
@@ -293,6 +293,8 @@ public final class SpigotReflectionUtil {
         CLIENTBOUND_SET_ENTITY_DATA_PACKET_WRITE_DATA_WATCHER_METHOD = Reflection.getMethod(CLIENTBOUND_SET_ENTITY_DATA_PACKET_CLASS, 0, List.class, REGISTRY_FRIENDLY_BYTE_BUF);
         GET_DATA_VALUE_FROM_DATA_ITEM_METHOD = Reflection.getMethod(DATA_WATCHER_ITEM_CLASS, DATA_WATCHER_VALUE_CLASS, 0);
         GET_TPS = Reflection.getMethod(Server.class, "getTPS");
+        REGISTRY_OPS_CREATE = Reflection.getMethod(REGISTRY_OPS, REGISTRY_OPS, 0);
+        GET_NEXT_ENTITY_ID = Reflection.getMethod(SERVER_LEVEL_CLASS, "getNextEntityId");
     }
 
     private static void initFields() {
@@ -329,6 +331,9 @@ public final class SpigotReflectionUtil {
         ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
         if (ENTITY_ID_COUNTER == null) {
             ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
+        }
+        if (ENTITY_ID_COUNTER == null) {
+            ENTITY_ID_COUNTER = Reflection.getField(SERVER_LEVEL_CLASS, "ENTITY_COUNTER");
         }
     }
 
@@ -441,6 +446,7 @@ public final class SpigotReflectionUtil {
         CLIENTBOUND_SET_ENTITY_DATA_PACKET_CLASS = SpigotReflectionUtil.getServerClass("network.protocol.game.ClientboundSetEntityDataPacket", "PacketPlayOutEntityMetadata");
         DATA_WATCHER_ITEM_CLASS = NestedClassUtil.getNestedClass(DATA_WATCHER_CLASS, 0);
         DATA_WATCHER_VALUE_CLASS = NestedClassUtil.getNestedClass(DATA_WATCHER_CLASS, 1);
+        REGISTRY_OPS = getServerClass("resources.RegistryOps", "RegistryOps");
     }
 
     private static void initObjects() {
@@ -751,6 +757,9 @@ public final class SpigotReflectionUtil {
                 Object finalDimensionType = dimensionType;
                 dimensionType = (Supplier<Object>) () -> finalDimensionType;
             }
+            if (REGISTRY_OPS_CREATE != null) {
+                nbtOps = REGISTRY_OPS_CREATE.invoke(null, nbtOps, getFrozenRegistryAccess());
+            }
             Object encodedDimType = CODEC_ENCODE_METHOD.invoke(dimensionTypeCodec, nbtOps, dimensionType);
             Optional<?> optionalDimType = (Optional<?>) DATA_RESULT_GET_METHOD.invoke(encodedDimType);
             return optionalDimType.orElse(null);
@@ -799,6 +808,19 @@ public final class SpigotReflectionUtil {
             return null;
         }
         return "{\"text\": \"" + message + "\"}";
+    }
+
+    public static int generateEntityId(World world) {
+        // use vanilla logic if available
+        if (GET_NEXT_ENTITY_ID != null) {
+            try {
+                Object level = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
+                return (int) GET_NEXT_ENTITY_ID.invoke(level);
+            } catch (ReflectiveOperationException exception) {
+                throw new RuntimeException("Failed to generate entity id: ", exception);
+            }
+        }
+        return generateEntityId();
     }
 
     public static int generateEntityId() {

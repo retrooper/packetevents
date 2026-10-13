@@ -28,6 +28,8 @@ plugins {
 dependencies {
     // include dependencies
     include(libs.bundles.adventure)
+    api(libs.adventure.text.logger.slf4j)
+    include(libs.adventure.text.logger.slf4j)
     include(project(":api", "shadow"))
     include(project(":netty-common"))
 
@@ -49,7 +51,7 @@ tasks {
         // always run this task if asked to
         outputs.upToDateWhen { false }
 
-        minecraftVersion = "1.21.11"
+        minecraftVersion = "26.2-rc-2"
         loaderVersion = libs.versions.fabric.loader
         runDir = project.layout.projectDirectory.dir("run").dir(minecraftVersion.get())
 

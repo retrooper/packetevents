@@ -53,6 +53,7 @@ public enum ServerVersion {
     //1.21 and 1.21.1 have the same protocol version. 1.21.2 and 1.21.3 have the same protocol version. 1.21.7 and 1.21.8 have the same protocol version. 1.21.9 and 1.21.10 have the same protocol version
     V_1_21(767), V_1_21_1(767), V_1_21_2(768), V_1_21_3(768), V_1_21_4(769), V_1_21_5(770), V_1_21_6(771), V_1_21_7(772), V_1_21_8(772), V_1_21_9(773), V_1_21_10(773), V_1_21_11(774),
     V_26_1(775), V_26_1_1(775), V_26_1_2(775),
+    V_26_2(776),
     //TODO UPDATE Add server version constant
     ERROR(-1, true);
 

@@ -124,7 +124,7 @@ public class Chunk_v1_9 implements BaseChunk {
     }
 
     public void set(int x, int y, int z, int state) {
-        int curr = this.dataPalette.set(x, y, z, state);
+        int curr = this.dataPalette.getAndSet(x, y, z, state);
         // Pre-1.14 we don't get block counts
         if (blockCount == Integer.MAX_VALUE) return;
         if (state != AIR && curr == AIR) {

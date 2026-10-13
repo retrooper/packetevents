@@ -77,7 +77,7 @@ public class Vector3i {
             z = (int) (val << 26 >> 38);
         } else {
             // 1.13 and below store X Y Z
-            y = (int) ((val >> 26) & 0xFFF);
+            y = (int) (val << 26 >> 52);
             z = (int) (val << 38 >> 38);
         }
 

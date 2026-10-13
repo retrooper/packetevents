@@ -37,11 +37,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
 import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.google.gson.JsonElement;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.BlockNBTComponent;
@@ -71,6 +73,7 @@ import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.gson.BackwardCompatUtil;
+import net.kyori.adventure.text.serializer.gson.GsonDataComponentValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,12 +85,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
-
 public class AdventureNBTSerializer implements ComponentSerializer<Component, Component, NBT> {
+
+    private static final Set<TextDecoration> DECORATIONS = TextDecoration.NAMES.values();
 
     private final ClientVersion version;
     private final boolean downsampleColor;
@@ -166,7 +170,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         }
 
         if (input instanceof NBTNumber) { // Serialized as number
-            return Component.text(((NBTNumber) input).getAsInt());
+            return Component.text(((NBTNumber) input).getAsNumber().toString());
         }
 
         // Serialized as tree
@@ -179,7 +183,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             } else if (nbt.getType() == NBTType.BYTE && ((NBTByte) nbt).getAsByte() < 2) {
                 return String.valueOf(((NBTByte) nbt).getAsByte() == 1);
             } else if (nbt instanceof NBTNumber) {
-                return String.valueOf(((NBTNumber) nbt).getAsInt());
+                return ((NBTNumber) nbt).getAsNumber().toString();
             } else {
                 throw new IllegalStateException("Don't know how to deserialize " + nbt.getType() + " to text");
             }
@@ -467,22 +471,27 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         Style.Builder style = Style.style();
         NBTReader reader = new NBTReader(wrapper, input);
 
-        reader.useUTF("font", value -> style.font(Key.key(value)));
-        reader.useUTF("color", value -> {
-            TextColor color = this.deserializeColor(value);
+        String font = reader.getUTF("font");
+        if (font != null) style.font(Key.key(font));
+
+        String colorName = reader.getUTF("color");
+        if (colorName != null) {
+            TextColor color = this.deserializeColor(colorName);
             if (color != null) style.color(color);
-        });
-        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
-            reader.useNumber("shadow_color", num ->
-                    style.shadowColor(ShadowColor.shadowColor(num.intValue())));
         }
 
-        for (String decorationKey : TextDecoration.NAMES.keys()) {
-            reader.useBoolean(decorationKey, value -> style.decoration(
-                    indexValueOrThrow(TextDecoration.NAMES, decorationKey),
-                    TextDecoration.State.byBoolean(value)));
+        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
+            Number shadowColor = reader.getNumber("shadow_color");
+            if (shadowColor != null) style.shadowColor(ShadowColor.shadowColor(shadowColor.intValue()));
         }
-        reader.useUTF("insertion", style::insertion);
+
+        for (TextDecoration decoration : DECORATIONS) {
+            Boolean value = reader.getBoolean(decoration.toString());
+            if (value != null) style.decoration(decoration, TextDecoration.State.byBoolean(value));
+        }
+
+        String insertion = reader.getUTF("insertion");
+        if (insertion != null) style.insertion(insertion);
 
         boolean modernEvents = this.version.isNewerThanOrEquals(ClientVersion.V_1_21_5);
         NBTReader clickEvent = reader.child(modernEvents ? "click_event" : "clickEvent");
@@ -602,7 +611,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (shadowColor != null) writer.writeInt("shadow_color", shadowColor.value());
         }
 
-        for (TextDecoration decoration : TextDecoration.NAMES.values()) {
+        for (TextDecoration decoration : DECORATIONS) {
             TextDecoration.State state = style.decoration(decoration);
             if (state != TextDecoration.State.NOT_SET) {
                 writer.writeBoolean(decoration.toString(), state == TextDecoration.State.TRUE);
@@ -709,8 +718,18 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                                 if (entry.getValue() instanceof NbtTagHolder) {
                                     NBT compNbt = ((NbtTagHolder) entry.getValue()).getTag();
                                     compsNbt.write(entry.getKey().toString(), compNbt);
+                                } else if (entry.getValue() instanceof DataComponentValue.TagSerializable) {
+                                    DataComponentValue.TagSerializable tagSerializable = (DataComponentValue.TagSerializable) entry.getValue();
+                                    NBT tag = AdventureNbtUtil.fromString(tagSerializable.asBinaryTag().string());
+                                    compsNbt.write(entry.getKey().toString(), tag);
+                                } else if (entry.getValue() instanceof GsonDataComponentValue) {
+                                    // there is no way to recover 100% of the actual information
+                                    // without implementing JSON data serialization for every
+                                    // available component
+                                    JsonElement element = ((GsonDataComponentValue) entry.getValue()).element();
+                                    compsNbt.write(entry.getKey().toString(), NBTCodec.jsonToNBT(element));
                                 }
-                                // unsupported entry component value, skip for now
+                                // else: unsupported entry component value, skip
                             }
                         }
                     }
@@ -789,7 +808,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (nbt instanceof NBTByte) {
                 arguments.add(TranslationArgument.bool(((NBTByte) nbt).getAsByte() != (byte) 0));
             } else if (nbt instanceof NBTNumber) {
-                arguments.add(TranslationArgument.numeric(((NBTNumber) nbt).getAsInt()));
+                arguments.add(TranslationArgument.numeric(((NBTNumber) nbt).getAsNumber()));
             } else if (nbt instanceof NBTString) {
                 arguments.add(TranslationArgument.component(Component.text(((NBTString) nbt).getValue())));
             } else {
@@ -853,6 +872,23 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
         public <R> R readUTF(String key, Function<String, R> function) {
             return withTag(key, tag -> function.apply(requireType(tag, NBTType.STRING).getValue()));
+        }
+
+        public @Nullable String getUTF(String key) {
+            NBT tag = compound.getTagOrNull(key);
+            return tag == null ? null : requireType(tag, NBTType.STRING).getValue();
+        }
+
+        public @Nullable Number getNumber(String key) {
+            NBT tag = compound.getTagOrNull(key);
+            if (tag == null) return null;
+            if (tag instanceof NBTNumber) return ((NBTNumber) tag).getAsNumber();
+            throw new IllegalArgumentException("Expected number but got " + tag.getType());
+        }
+
+        public @Nullable Boolean getBoolean(String key) {
+            Number number = getNumber(key);
+            return number == null ? null : number.byteValue() != 0;
         }
 
         public void useByteArray(String key, Consumer<byte[]> consumer) {

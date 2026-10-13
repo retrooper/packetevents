@@ -98,7 +98,7 @@ public class ItemStack {
             ClientVersion version,
             IRegistryHolder registryHolder
     ) {
-        this.type = type;
+        this.type = type == null ? ItemTypes.AIR : type;
         this.amount = amount;
         this.nbt = nbt;
         this.components = components;
@@ -107,6 +107,7 @@ public class ItemStack {
         this.registryHolder = registryHolder;
     }
 
+    @Deprecated
     public static ItemStack decode(NBT nbt, PacketWrapper<?> wrapper) {
         return decode(nbt, wrapper.getServerVersion().toClientVersion());
     }
@@ -136,6 +137,7 @@ public class ItemStack {
         return builder.build();
     }
 
+    @Deprecated
     public static NBT encode(PacketWrapper<?> wrapper, ItemStack itemStack) {
         return encodeForParticle(itemStack, wrapper.getServerVersion().toClientVersion());
     }
@@ -664,7 +666,7 @@ public class ItemStack {
             return this;
         }
 
-        public Builder nbt(NBTCompound nbt) {
+        public Builder nbt(@Nullable NBTCompound nbt) {
             this.nbt = nbt;
             return this;
         }

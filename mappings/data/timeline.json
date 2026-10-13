@@ -56,27 +56,14 @@
           },
           {
             "ticks": 13670,
-            "value": "#0f0f16"
+            "value": "#0c0c16"
           },
           {
             "ticks": 22330,
-            "value": "#0f0f16"
+            "value": "#161616"
           }
         ],
         "modifier": "multiply"
-      },
-      "minecraft:audio/firefly_bush_sounds": {
-        "keyframes": [
-          {
-            "ticks": 12600,
-            "value": 1
-          },
-          {
-            "ticks": 23401,
-            "value": 0
-          }
-        ],
-        "modifier": "or"
       },
       "minecraft:visual/sun_angle": {
         "keyframes": [
@@ -97,6 +84,19 @@
             0.759
           ]
         }
+      },
+      "minecraft:audio/firefly_bush_sounds": {
+        "keyframes": [
+          {
+            "ticks": 12600,
+            "value": 1
+          },
+          {
+            "ticks": 23401,
+            "value": 0
+          }
+        ],
+        "modifier": "or"
       },
       "minecraft:visual/sky_color": {
         "keyframes": [

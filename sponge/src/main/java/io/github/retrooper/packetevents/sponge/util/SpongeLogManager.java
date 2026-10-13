@@ -19,15 +19,19 @@
 package io.github.retrooper.packetevents.sponge.util;
 
 import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import io.github.retrooper.packetevents.sponge.PacketEventsPlugin;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.ComponentLike;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.Map;
 import java.util.logging.Level;
 
+@NullMarked
+@Deprecated(forRemoval = true)
 public class SpongeLogManager extends LogManager {
 
     private static final Map<java.util.logging.Level, org.apache.logging.log4j.Level> LEVEL_CONVERSION = Map.of(
@@ -49,8 +53,9 @@ public class SpongeLogManager extends LogManager {
     }
 
     @Override
-    protected void log(Level level, @Nullable NamedTextColor color, String message) {
-        String plainMessage = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
-        logger.log(LEVEL_CONVERSION.getOrDefault(level, org.apache.logging.log4j.Level.INFO), isPacketEvents ? plainMessage : "[packetevents] " + plainMessage);
+    public void log(Level level, ComponentLike component, @Nullable Throwable error) {
+        String plainMessage = AdventureSerializer.stringify(component);
+        org.apache.logging.log4j.Level log4jLevel = LEVEL_CONVERSION.getOrDefault(level, org.apache.logging.log4j.Level.INFO);
+        logger.log(log4jLevel, isPacketEvents ? plainMessage : "[packetevents] " + plainMessage, error);
     }
 }
