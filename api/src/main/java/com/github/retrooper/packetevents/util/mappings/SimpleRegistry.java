@@ -58,7 +58,7 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
         String nameStr = name.toString();
         this.typeMap.put(nameStr, instance);
         this.reverseTypeIdMap.put(nameStr, id);
-        if (id >= 0 && id < IdTable.MAX_ID) {
+        if (id >= -1 && id < IdTable.MAX_ID) {
             this.typeIdTable.put(0, id, instance);
         } else {
             if (this.typeIdOverflow == null) {

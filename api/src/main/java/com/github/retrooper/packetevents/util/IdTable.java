@@ -43,6 +43,9 @@ public final class IdTable<T> {
         this.table = new Object[rows][];
     }
 
+    /**
+     * Note: Index 0 of array parameter is id -1.
+     */
     public void put(int index, Object[] array) {
         this.assertMutable();
         this.resize(index);
@@ -51,18 +54,18 @@ public final class IdTable<T> {
 
     public void put(int index, int id, T val) {
         this.assertMutable();
-        if (id < 0) {
-            throw new IllegalArgumentException("negative id: " + id);
+        if (id < -1) {
+            throw new IllegalArgumentException("Negative id and not -1: " + id);
         }
         this.resize(index);
         Object[] row = this.table[index];
         if (row == null) {
-            this.table[index] = row = new Object[id + 1];
-        } else if (row.length <= id) {
+            this.table[index] = row = new Object[id + 2];
+        } else if (row.length <= id + 1) {
             this.table[index] = row = Arrays.copyOf(row,
-                    Math.max(id + 1, row.length + (row.length >> 1) + 1));
+                    Math.max(id + 2, row.length + (row.length >> 1) + 1));
         }
-        row[id] = val;
+        row[id + 1] = val;
     }
 
     public boolean putAll(int index, Map<Integer, ? extends T> values) {
@@ -76,16 +79,16 @@ public final class IdTable<T> {
         }
         int maxId = -1;
         for (Integer id : values.keySet()) {
-            if (id == null || id < 0 || id >= idLimit) {
+            if (id == null || id < -1 || id >= idLimit) {
                 throw new IllegalArgumentException("Values contains invalid id: " + id + " (limit: " + idLimit + ")");
             }
-            maxId = Math.max(maxId, id);
+            maxId = Math.max(maxId, id + 1);
         }
         Object[] row = new Object[maxId + 1];
         for (Map.Entry<Integer, ? extends T> entry : values.entrySet()) {
             Integer id = entry.getKey();
-            if (id != null && id >= 0 && id <= maxId) {
-                row[id] = entry.getValue();
+            if (id != null && id >= -1 && id <= maxId) {
+                row[id + 1] = entry.getValue();
             }
         }
         this.put(index, row);
@@ -93,6 +96,7 @@ public final class IdTable<T> {
     }
 
     /**
+     * Note: Index 0 of array parameter is id -1.<br/>
      * Unsafe operation, only use to fill with e.g. empty arrays!
      */
     public void fill(Object[] val) {
@@ -111,7 +115,7 @@ public final class IdTable<T> {
             return null;
         }
         Object[] arr = table[index];
-        return arr != null && id >= 0 && id < arr.length ? (T) arr[id] : null;
+        return arr != null && id >= -1 && id < arr.length ? (T) arr[id + 1] : null;
     }
 
     public boolean isMutable() {

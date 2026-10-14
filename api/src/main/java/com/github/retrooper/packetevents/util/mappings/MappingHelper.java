@@ -131,7 +131,7 @@ public class MappingHelper {
             nameMap.put(typeData.getName().toString(), type);
             // set by version-specific id
             int id = typeData.getId(version);
-            if (id >= 0 && id < IdTable.MAX_ID) {
+            if (id >= -1 && id < IdTable.MAX_ID) {
                 typeIdTable.put(index, id, type);
             } else {
                 Map<Integer, T> overflow = typeIdOverflow[index];
