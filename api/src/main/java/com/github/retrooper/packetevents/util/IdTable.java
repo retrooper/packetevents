@@ -18,17 +18,21 @@
 
 package com.github.retrooper.packetevents.util;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
-public class IdTable<T> {
+@NullMarked
+@ApiStatus.Internal
+public final class IdTable<T> {
 
     public static final int MAX_ID = 1 << 16;
 
-    private volatile Object[][] table;
+    private Object[] @Nullable [] table;
     private boolean mutable = true;
 
     public IdTable() {
@@ -67,14 +71,15 @@ public class IdTable<T> {
 
     public boolean putAll(int index, Map<Integer, ? extends T> values, int idLimit) {
         this.assertMutable();
+        if (values.isEmpty()) {
+            return false;
+        }
         int maxId = -1;
         for (Integer id : values.keySet()) {
-            if (id != null && id >= 0 && id < idLimit) {
-                maxId = Math.max(maxId, id);
+            if (id == null || id < 0 || id >= idLimit) {
+                throw new IllegalArgumentException("Values contains invalid id: " + id + " (limit: " + idLimit + ")");
             }
-        }
-        if (maxId < 0) {
-            return false;
+            maxId = Math.max(maxId, id);
         }
         Object[] row = new Object[maxId + 1];
         for (Map.Entry<Integer, ? extends T> entry : values.entrySet()) {
@@ -87,12 +92,15 @@ public class IdTable<T> {
         return true;
     }
 
+    /**
+     * Unsafe operation, only use to fill with e.g. empty arrays!
+     */
     public void fill(Object[] val) {
         this.assertMutable();
         Arrays.fill(this.table, val);
     }
 
-    public Object[] get(int index) {
+    public Object @Nullable [] get(int index) {
         return this.table[index];
     }
 
@@ -125,20 +133,20 @@ public class IdTable<T> {
     }
 
     private void assertMutable() {
-        if (!mutable) {
+        if (!this.mutable) {
             throw new IllegalStateException("table is immutable");
         }
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        IdTable<?> idTable = (IdTable<?>) o;
-        return Objects.deepEquals(table, idTable.table);
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null || getClass() != obj.getClass()) return false;
+        IdTable<?> idTable = (IdTable<?>) obj;
+        return Objects.deepEquals(this.table, idTable.table);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(table);
+        return Arrays.deepHashCode(this.table);
     }
 }
