@@ -35,6 +35,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetSocketAddress;
@@ -153,6 +154,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     }
 
     @Override
+    @NullUnmarked
     public <T> @UnknownNullability T getPlayer() {
         return (T) player;
     }

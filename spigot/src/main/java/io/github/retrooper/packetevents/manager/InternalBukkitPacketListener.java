@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -11,12 +12,16 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerSetCompression;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
+import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -24,6 +29,19 @@ import java.util.UUID;
 
 @ApiStatus.Internal
 public class InternalBukkitPacketListener extends com.github.retrooper.packetevents.manager.InternalPacketListener {
+
+    private @Nullable PacketEventsEncoder getEncoder(ProtocolPacketEvent event) {
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+        return injector.getEncoder((Channel) event.getUser().getChannel());
+    }
+
+    @Override
+    protected void handlePlayEnter(ProtocolPacketEvent event) {
+        PacketEventsEncoder encoder = this.getEncoder(event);
+        if (encoder != null) {
+            encoder.handledCompression = true; // stop handling compression
+        }
+    }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
@@ -36,6 +54,14 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
         } else if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             // try to update player reference again
             this.tryUpdatePlayerReference(event, event.getUser(), event.getUser().getUUID());
+        } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
+            WrapperLoginServerSetCompression packet = new WrapperLoginServerSetCompression(event);
+            if (packet.getThreshold() > 0) {
+                PacketEventsEncoder encoder = this.getEncoder(event);
+                if (encoder != null) {
+                    encoder.handleCompression = true; // start handling compression relocation
+                }
+            }
         }
     }
 

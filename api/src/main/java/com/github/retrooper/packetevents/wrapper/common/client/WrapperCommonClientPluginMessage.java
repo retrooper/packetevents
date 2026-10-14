@@ -4,8 +4,11 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 public abstract class WrapperCommonClientPluginMessage<T extends WrapperCommonClientPluginMessage<T>> extends PacketWrapper<T> {
+
+    protected static final int MAX_PAYLOAD_BYTES = Integer.getInteger("packetevents.max-custom-payload-bytes", 32767);
 
     protected String channelName;
     protected byte[] data;
