@@ -54,10 +54,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
      * @versions 26.3+
      */
     private RandomizationType randomizationType = RandomizationType.DEFAULT;
-    /**
-     * Raw particle type id from the packet on pre-1.20.5. Preserved so legacy
-     * duplicate mapping names (e.g. block at 37 and 38) round-trip correctly.
-     */
+    /** Raw type id from pre-1.20.5 packets. */
     private int legacyTypeId = -1;
 
     public WrapperPlayServerParticle(PacketSendEvent event) {

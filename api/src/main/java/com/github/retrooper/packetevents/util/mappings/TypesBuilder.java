@@ -208,9 +208,7 @@ public class TypesBuilder {
         }
     }
 
-    /**
-     * @return ordered short names by numeric id for array-style mappings, or null for map-style
-     */
+    /** Short names by id for array mappings, null for map mappings. */
     public @Nullable List<String> getOrderedEntries(ClientVersion version) {
         return this.orderedEntries == null ? null : this.orderedEntries.get(version);
     }
