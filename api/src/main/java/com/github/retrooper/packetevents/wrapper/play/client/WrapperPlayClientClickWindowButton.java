@@ -25,8 +25,11 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
+ * <p>
+ * Mojang name: ServerboundContainerButtonClickPacket
  */
 public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPlayClientClickWindowButton> {
+
     private int windowID;
     private int buttonID;
 
@@ -42,16 +45,30 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        // TODO this changed from a byte to a var int, which version?
-        this.windowID = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
-                ? this.readContainerId() : this.readVarInt();
-        this.buttonID = readByte();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            this.windowID = this.readContainerId();
+            this.buttonID = this.readVarInt();
+        } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.windowID = this.readVarInt();
+            this.buttonID = this.readVarInt();
+        } else {
+            this.windowID = this.readByte();
+            this.buttonID = this.readByte();
+        }
     }
 
     @Override
     public void write() {
-        this.writeContainerId(this.windowID);
-        writeByte(this.buttonID);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            this.writeContainerId(this.windowID);
+            this.writeVarInt(this.buttonID);
+        } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeVarInt(this.windowID);
+            this.writeVarInt(this.buttonID);
+        } else {
+            this.writeByte(this.windowID);
+            this.writeByte(this.buttonID);
+        }
     }
 
     @Override
