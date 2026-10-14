@@ -128,7 +128,7 @@ public class WrappedBlockState {
         // because AIR is a constant, preload all data for this into a separate mapping index
         String airName = AIR.getType().getMapped().getName().getKey();
         BY_STRING[AIR_MAPPING_INDEX] = Collections.singletonMap(airName, AIR);
-        BY_ID.put(AIR_MAPPING_INDEX, new WrappedBlockState[]{AIR}); // AIR's global id is 0
+        BY_ID.put(AIR_MAPPING_INDEX, 0, AIR); // AIR's global id is 0
         INTO_STRING[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, airName);
         INTO_ID[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, AIR.getGlobalId());
         DEFAULT_STATES[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR.getType(), AIR);

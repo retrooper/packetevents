@@ -43,13 +43,13 @@ public final class IdTable<T> {
         this.table = new Object[rows][];
     }
 
-    /**
-     * Note: Index 0 of array parameter is id -1.
-     */
     public void put(int index, Object[] array) {
         this.assertMutable();
         this.resize(index);
-        this.table[index] = array;
+        // array index 0 is index -1, so shift array parameter by one
+        Object[] newArray = new Object[array.length + 1];
+        System.arraycopy(array, 0, newArray, 1, array.length);
+        this.table[index] = newArray;
     }
 
     public void put(int index, int id, T val) {
@@ -91,7 +91,8 @@ public final class IdTable<T> {
                 row[id + 1] = entry.getValue();
             }
         }
-        this.put(index, row);
+        this.resize(index);
+        this.table[index] = row;
         return true;
     }
 
