@@ -54,10 +54,7 @@ public final class Attributes {
         return REGISTRY.getByName(normedName);
     }
 
-    /**
-     * Like {@link #getByName(String)}, but returns an unregistered attribute when the name
-     * is unknown so custom server attributes can round-trip without NPE on rewrite.
-     */
+    /** Like getByName, but returns an unregistered attribute for unknown names. */
     public static Attribute getByNameOrCreate(String name) {
         Attribute attribute = getByName(name);
         if (attribute != null) {
