@@ -46,12 +46,10 @@ public class ChunkReader_v1_8 implements ChunkReader {
             DimensionType dimensionType, BitSet chunkMask, BitSet secondaryChunkMask, boolean fullChunk,
             boolean forceSkyLight, boolean checkForSkyLight, int chunkSize, int arrayLength, PacketWrapper<?> wrapper
     ) {
-        int populatedSections = 0;
-        for (int index = 0; index < SECTION_COUNT; index++) {
-            if (chunkMask.get(index)) {
-                populatedSections++;
-            }
-        }
+        // just counting used bits in BitSet works because for <1.9 the
+        // chunk mask bitset is always 16 bits on network level
+        int chunkMaskRaw = !chunkMask.isEmpty() ? (int) chunkMask.toLongArray()[0] : 0;
+        int populatedSections = Integer.bitCount(chunkMaskRaw);
 
         int sectionDataLength = populatedSections * (BLOCK_DATA_LENGTH + LIGHT_DATA_LENGTH);
         int expectedWithoutSkyLight = sectionDataLength + (fullChunk ? BIOME_DATA_LENGTH : 0);
@@ -70,15 +68,20 @@ public class ChunkReader_v1_8 implements ChunkReader {
         ShortBuffer decodedBlocks = encodedBlocks == null ? null
                 : ByteBuffer.wrap(encodedBlocks).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
 
-        for (int index = 0; index < SECTION_COUNT; index++) {
-            if (chunkMask.get(index)) {
-                Chunk_v1_8 chunk = new Chunk_v1_8(skyLight);
-                chunks[index] = chunk;
-                ByteBufHelper.readBytes(wrapper.buffer, encodedBlocks);
-                short[] blocks = chunk.getBlocks().getData();
-                decodedBlocks.position(0);
-                decodedBlocks.get(blocks, 0, blocks.length);
+        // iterate through all present sections
+        for (int i = 0; chunkMaskRaw != 0; i++, chunkMaskRaw >>>= 1) {
+            if ((chunkMaskRaw & 1) == 0) {
+                continue; // not set for section
             }
+
+            Chunk_v1_8 chunk = new Chunk_v1_8(skyLight);
+            short[] blocks = chunk.getBlocks().getData();
+            // always not null, this only gets called if chunkMaskRaw != 0
+            assert decodedBlocks != null;
+            ByteBufHelper.readBytes(wrapper.buffer, encodedBlocks);
+            decodedBlocks.position(0);
+            decodedBlocks.get(blocks, 0, blocks.length);
+            chunks[i] = chunk;
         }
 
         for (int index = 0; index < SECTION_COUNT; index++) {
