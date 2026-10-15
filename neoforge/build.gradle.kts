@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import me.modmuss50.mpp.ModPublishExtension
 
 plugins {
     packetevents.`shadow-conventions`
@@ -53,14 +53,36 @@ neoForge {
 
 dependencies {
     // include dependencies
-    shadow(libs.bundles.adventure)
+    jarJar(libs.bundles.adventure)
     api(libs.adventure.text.logger.slf4j)
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
 }
 
-tasks.named<ShadowJar>("shadowJar") {
-    configurations = listOf(project.configurations["shadow"])
+tasks.jar {
+    destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
+    archiveFileName = "packetevents-${project.name}-${rootProject.ext["versionNoHash"]}.jar"
+    archiveClassifier = null
+
+    dependsOn(configurations["shadow"])
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from({
+        configurations["shadow"].map {
+            if (it.isDirectory) it else zipTree(it)
+        }
+    }) {
+        exclude("net/kyori/**")
+    }
+}
+
+tasks.shadowJar {
+    enabled = false
+}
+
+configure<ModPublishExtension> {
+    file = tasks.named<Jar>("jar").flatMap { it.archiveFile }
 }
 
 java {
