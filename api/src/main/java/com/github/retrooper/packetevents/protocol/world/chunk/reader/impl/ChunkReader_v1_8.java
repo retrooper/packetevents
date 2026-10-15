@@ -191,10 +191,8 @@ public class ChunkReader_v1_8 implements ChunkReader {
 
     @ApiStatus.Internal
     public static void writeChunkData(
-            PacketWrapper<?> wrapper, Chunk_v1_8[] chunks, byte[] biomes, int chunkMask, int dataLength
+            PacketWrapper<?> wrapper, Chunk_v1_8[] chunks, byte[] biomes, int chunkMask
     ) {
-        ensureWritable(wrapper, dataLength);
-
         int largestBlockDataLength = 0;
         for (int index = 0; index < chunks.length; index++) {
             if ((chunkMask & 1 << index) == 0) {

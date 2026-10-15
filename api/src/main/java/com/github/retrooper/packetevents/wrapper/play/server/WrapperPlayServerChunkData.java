@@ -352,7 +352,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             int dataLength = ChunkReader_v1_8.calculateDataLength(legacyChunks, biomes, mask);
             writeShort(mask);
             writeVarInt(dataLength);
-            ChunkReader_v1_8.writeChunkData(this, legacyChunks, biomes, mask, dataLength);
+            ChunkReader_v1_8.ensureWritable(this, dataLength);
+            ChunkReader_v1_8.writeChunkData(this, legacyChunks, biomes, mask);
             return;
         } else {
             NetworkChunkData data = ChunkReader_v1_7.chunksToData((Chunk_v1_7[]) chunks, column.getBiomeDataBytes());

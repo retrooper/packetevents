@@ -177,14 +177,13 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
     private void write_1_8() {
         boolean skylight = false;
         int[] masks = new int[this.chunks.length];
-        int[] dataLengths = new int[this.chunks.length];
         int totalDataLength = 0;
         for (int column = 0; column < this.chunks.length; column++) {
             Chunk_v1_8[] columnChunks = (Chunk_v1_8[]) this.chunks[column];
             byte[] biomes = this.biomeData[column];
             masks[column] = ChunkReader_v1_8.calculateChunkMask(columnChunks, biomes != null);
-            dataLengths[column] = ChunkReader_v1_8.calculateDataLength(columnChunks, biomes, masks[column]);
-            totalDataLength = Math.addExact(totalDataLength, dataLengths[column]);
+            int dataLength = ChunkReader_v1_8.calculateDataLength(columnChunks, biomes, masks[column]);
+            totalDataLength = Math.addExact(totalDataLength, dataLength);
             if (ChunkReader_v1_8.hasSkyLight(columnChunks, masks[column])) {
                 skylight = true;
             }
@@ -201,7 +200,7 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
         ChunkReader_v1_8.ensureWritable(this, totalDataLength);
         for (int column = 0; column < this.x.length; column++) {
             ChunkReader_v1_8.writeChunkData(this, (Chunk_v1_8[]) this.chunks[column],
-                    this.biomeData[column], masks[column], dataLengths[column]);
+                    this.biomeData[column], masks[column]);
         }
     }
 
