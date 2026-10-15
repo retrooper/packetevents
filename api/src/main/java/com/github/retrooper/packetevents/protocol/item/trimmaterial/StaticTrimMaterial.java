@@ -22,55 +22,64 @@ import com.github.retrooper.packetevents.protocol.item.armormaterial.ArmorMateri
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import net.kyori.adventure.key.KeyPattern;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * @versions 1.19.4+
+ */
 @NullMarked
 public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMaterial {
 
     private final String assetName;
+    private final ResourceLocation paletteId;
     private final @Nullable ItemType ingredient;
     private final float itemModelIndex;
     private final Map<ArmorMaterial, String> overrideArmorMaterials;
     private final Component description;
 
     public StaticTrimMaterial(
-            String assetName, @Nullable ItemType ingredient,
+            @KeyPattern.Value String assetName, @Nullable ItemType ingredient,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
-        this(null, assetName, ingredient, FALLBACK_ITEM_MODEL_INDEX, overrideArmorMaterials, description);
+        this(null, assetName, ResourceLocation.minecraft("trim/" + assetName),
+                ingredient, FALLBACK_ITEM_MODEL_INDEX, overrideArmorMaterials, description);
+    }
+
+    public StaticTrimMaterial(
+            @KeyPattern.Value String assetName, @Nullable ItemType ingredient, float itemModelIndex,
+            Map<ArmorMaterial, String> overrideArmorMaterials, Component description
+    ) {
+        this(null, assetName, ResourceLocation.minecraft("trim/" + assetName),
+                ingredient, itemModelIndex, overrideArmorMaterials, description);
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public StaticTrimMaterial(ResourceLocation paletteId, Component description) {
+        this(null, paletteId.getKey(), paletteId, null,
+                FALLBACK_ITEM_MODEL_INDEX, Collections.emptyMap(), description);
     }
 
     @ApiStatus.Internal
     public StaticTrimMaterial(
             @Nullable TypesBuilderData data,
-            String assetName, @Nullable ItemType ingredient,
-            Map<ArmorMaterial, String> overrideArmorMaterials, Component description
-    ) {
-        this(data, assetName, ingredient, FALLBACK_ITEM_MODEL_INDEX, overrideArmorMaterials, description);
-    }
-
-    public StaticTrimMaterial(
-            String assetName, @Nullable ItemType ingredient, float itemModelIndex,
-            Map<ArmorMaterial, String> overrideArmorMaterials, Component description
-    ) {
-        this(null, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description);
-    }
-
-    @ApiStatus.Internal
-    public StaticTrimMaterial(
-            @Nullable TypesBuilderData data,
-            String assetName, @Nullable ItemType ingredient, float itemModelIndex,
+            String assetName, ResourceLocation paletteId, @Nullable ItemType ingredient, float itemModelIndex,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
         super(data);
         this.assetName = assetName;
+        this.paletteId = paletteId;
         this.ingredient = ingredient;
         this.itemModelIndex = itemModelIndex;
         this.overrideArmorMaterials = overrideArmorMaterials;
@@ -79,13 +88,18 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
 
     @Override
     public TrimMaterial copy(@Nullable TypesBuilderData newData) {
-        return new StaticTrimMaterial(newData, this.assetName, this.ingredient, this.itemModelIndex,
-                this.overrideArmorMaterials, this.description);
+        return new StaticTrimMaterial(newData, this.assetName, this.paletteId, this.ingredient,
+                this.itemModelIndex, this.overrideArmorMaterials, this.description);
     }
 
     @Override
     public String getAssetName() {
         return this.assetName;
+    }
+
+    @Override
+    public ResourceLocation getPaletteId() {
+        return this.paletteId;
     }
 
     @ApiStatus.Obsolete
@@ -116,6 +130,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
         StaticTrimMaterial that = (StaticTrimMaterial) obj;
         if (Float.compare(that.itemModelIndex, this.itemModelIndex) != 0) return false;
         if (!this.assetName.equals(that.assetName)) return false;
+        if (!this.paletteId.equals(that.paletteId)) return false;
         if (!Objects.equals(this.ingredient, that.ingredient)) return false;
         if (!this.overrideArmorMaterials.equals(that.overrideArmorMaterials)) return false;
         return this.description.equals(that.description);
@@ -123,11 +138,11 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
+        return Objects.hash(this.assetName, this.paletteId, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
     }
 
     @Override
     public String toString() {
-        return "StaticTrimMaterial{assetName='" + this.assetName + '\'' + ", ingredient=" + this.ingredient + ", itemModelIndex=" + this.itemModelIndex + ", overrideArmorMaterials=" + this.overrideArmorMaterials + ", description=" + this.description + '}';
+        return "StaticTrimMaterial{assetName='" + this.assetName + '\'' + ", paletteId='" + this.paletteId + '\'' + ", ingredient=" + this.ingredient + ", itemModelIndex=" + this.itemModelIndex + ", overrideArmorMaterials=" + this.overrideArmorMaterials + ", description=" + this.description + '}';
     }
 }

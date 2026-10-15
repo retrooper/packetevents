@@ -25,9 +25,12 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
+ * Mojang name: ServerboundSignUpdatePacket
+ * <p>
  * This message is sent from the client to the server when the "Done" button is pushed after placing a sign.
  */
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
+
     private Vector3i blockPosition;
     private String[] textLines;
     private boolean isFrontText;
@@ -53,14 +56,18 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
             int z = readInt();
             this.blockPosition = new Vector3i(x, y, z);
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-            isFrontText = readBoolean();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)
+                && this.serverVersion.isOlderThan(ServerVersion.V_26_3)) {
+            this.isFrontText = this.readBoolean();
         } else {
-            isFrontText = true;
+            this.isFrontText = true;
         }
         textLines = new String[4];
         for (int i = 0; i < 4; i++) {
             this.textLines[i] = readString(384);
+        }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            this.isFrontText = this.readBoolean();
         }
     }
 
@@ -74,11 +81,15 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
             writeShort(blockPosition.y);
             writeInt(blockPosition.z);
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)
+                && this.serverVersion.isOlderThan(ServerVersion.V_26_3)) {
             writeBoolean(isFrontText);
         }
         for (int i = 0; i < 4; i++) {
             writeString(textLines[i]);
+        }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            this.writeBoolean(this.isFrontText);
         }
     }
 

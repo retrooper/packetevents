@@ -24,6 +24,8 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * A global palette that maps 1:1.
  */
@@ -31,7 +33,9 @@ package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 public class GlobalPalette implements Palette {
 
     // this is the amount of bits required to store the biggest state id number
-    public static final int BITS_PER_ENTRY = 15;
+    // TODO this needs to be version-specific, but requires major refactor
+    @ApiStatus.Internal
+    public static final int BITS_PER_ENTRY = 16;
 
     public static final GlobalPalette INSTANCE = new GlobalPalette();
 

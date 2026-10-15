@@ -54,13 +54,12 @@ public class StaticCowSoundVariant extends AbstractMappedEntity implements CowSo
     @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticCowSoundVariant)) return false;
-        if (!super.equals(obj)) return false;
         StaticCowSoundVariant that = (StaticCowSoundVariant) obj;
         return this.sounds.equals(that.sounds);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.sounds);
+        return Objects.hash(this.sounds);
     }
 }

@@ -24,12 +24,15 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ServerboundUseItemPacket
+ */
 public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUseItem> {
 
     private InteractionHand hand;
     private int sequence;
-    private float yaw; // yRot
-    private float pitch; // xRot
+    private float yaw;
+    private float pitch;
 
     public WrapperPlayClientUseItem(PacketReceiveEvent event) {
         super(event);

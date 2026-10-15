@@ -24,13 +24,16 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ServerboundMoveVehiclePacket
+ */
 public class WrapperPlayClientVehicleMove extends PacketWrapper<WrapperPlayClientVehicleMove> {
 
     private Vector3d position;
     private float yaw;
     private float pitch;
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     private boolean onGround;
 
@@ -102,10 +105,16 @@ public class WrapperPlayClientVehicleMove extends PacketWrapper<WrapperPlayClien
         this.pitch = pitch;
     }
 
+    /**
+     * @versions 1.21.4+
+     */
     public boolean isOnGround() {
         return this.onGround;
     }
 
+    /**
+     * @versions 1.21.4+
+     */
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
     }

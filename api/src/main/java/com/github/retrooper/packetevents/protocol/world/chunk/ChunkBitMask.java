@@ -26,10 +26,18 @@ public class ChunkBitMask {
     }
 
     public static BitSet readChunkMask(PacketWrapper<?> packet) {
+        if (packet.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            return BitSet.valueOf(packet.readByteArray());
+        }
         return BitSet.valueOf(readBitSetLongs(packet));
     }
 
     public static void writeChunkMask(PacketWrapper<?> packet, BitSet chunkMask) {
+        if (packet.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            packet.writeByteArray(chunkMask.toByteArray());
+            return;
+        }
+
         long[] longArray = chunkMask.toLongArray();
 
         if (packet.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {

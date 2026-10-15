@@ -30,7 +30,11 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
 
+/**
+ * Mojang name: ServerboundUseItemOnPacket
+ */
 public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<WrapperPlayClientPlayerBlockPlacement> {
+
     private InteractionHand interactionHand;
     private Vector3i blockPosition;
     private int faceId;

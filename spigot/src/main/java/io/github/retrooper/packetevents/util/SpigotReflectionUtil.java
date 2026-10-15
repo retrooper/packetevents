@@ -134,7 +134,7 @@ public final class SpigotReflectionUtil {
             NBT_ACCOUNTER_UNLIMITED_HEAP, CHUNK_CACHE_GET_IBLOCKACCESS, CHUNK_CACHE_GET_ICHUNKACCESS,
             IBLOCKACCESS_GET_BLOCK_DATA, CHUNK_GET_BLOCK_DATA, PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK, PLAYER_CHUNK_GET_CHUNK,
             LEGACY_DATA_WATCHER_WRITE_METHOD, CLIENTBOUND_SET_ENTITY_DATA_PACKET_WRITE_DATA_WATCHER_METHOD, GET_DATA_VALUE_FROM_DATA_ITEM_METHOD,
-            GET_TPS, REGISTRY_OPS_CREATE;
+            GET_TPS, REGISTRY_OPS_CREATE, GET_NEXT_ENTITY_ID;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR,
@@ -294,6 +294,7 @@ public final class SpigotReflectionUtil {
         GET_DATA_VALUE_FROM_DATA_ITEM_METHOD = Reflection.getMethod(DATA_WATCHER_ITEM_CLASS, DATA_WATCHER_VALUE_CLASS, 0);
         GET_TPS = Reflection.getMethod(Server.class, "getTPS");
         REGISTRY_OPS_CREATE = Reflection.getMethod(REGISTRY_OPS, REGISTRY_OPS, 0);
+        GET_NEXT_ENTITY_ID = Reflection.getMethod(SERVER_LEVEL_CLASS, "getNextEntityId");
     }
 
     private static void initFields() {
@@ -330,6 +331,9 @@ public final class SpigotReflectionUtil {
         ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
         if (ENTITY_ID_COUNTER == null) {
             ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
+        }
+        if (ENTITY_ID_COUNTER == null) {
+            ENTITY_ID_COUNTER = Reflection.getField(SERVER_LEVEL_CLASS, "ENTITY_COUNTER");
         }
     }
 
@@ -804,6 +808,19 @@ public final class SpigotReflectionUtil {
             return null;
         }
         return "{\"text\": \"" + message + "\"}";
+    }
+
+    public static int generateEntityId(World world) {
+        // use vanilla logic if available
+        if (GET_NEXT_ENTITY_ID != null) {
+            try {
+                Object level = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
+                return (int) GET_NEXT_ENTITY_ID.invoke(level);
+            } catch (ReflectiveOperationException exception) {
+                throw new RuntimeException("Failed to generate entity id: ", exception);
+            }
+        }
+        return generateEntityId();
     }
 
     public static int generateEntityId() {

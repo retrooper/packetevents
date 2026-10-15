@@ -18,15 +18,22 @@
 
 package com.github.retrooper.packetevents.protocol.world.damagetype;
 
+import com.github.retrooper.packetevents.protocol.util.CodecNameable;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import net.kyori.adventure.util.Index;
+import org.jspecify.annotations.NullMarked;
 
-public enum DeathMessageType {
+@NullMarked
+public enum DeathMessageType implements CodecNameable {
+
     DEFAULT("default"),
     FALL_VARIANTS("fall_variants"),
     INTENTIONAL_GAME_DESIGN("intentional_game_design");
 
     public static final Index<String, DeathMessageType> ID_INDEX = Index.create(DeathMessageType.class,
             DeathMessageType::getId);
+    public static final NbtCodec<DeathMessageType> CODEC = NbtCodecs.forEnum(values());
 
     private final String id;
 
@@ -35,6 +42,11 @@ public enum DeathMessageType {
     }
 
     public String getId() {
-        return id;
+        return this.id;
+    }
+
+    @Override
+    public String getCodecName() {
+        return this.id;
     }
 }

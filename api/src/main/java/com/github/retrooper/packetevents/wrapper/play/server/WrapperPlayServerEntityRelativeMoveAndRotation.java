@@ -21,16 +21,37 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.vector.vecdelta.LinearVecDelta;
+import com.github.retrooper.packetevents.protocol.vector.vecdelta.VecDelta;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * Mojang name: ClientboundMoveEntityPacket$PosRot
+ */
 public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrapper<WrapperPlayServerEntityRelativeMoveAndRotation> {
+
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private static final double MODERN_DELTA_DIVISOR = 4096.0;
     private static final double LEGACY_DELTA_DIVISOR = 32.0;
 
     private int entityID;
+    /**
+     * @versions 26.3+
+     */
+    private VecDelta delta;
+    /**
+     * @versions -26.2
+     */
     private double deltaX;
+    /**
+     * @versions -26.2
+     */
     private double deltaY;
+    /**
+     * @versions -26.2
+     */
     private double deltaZ;
     private float yaw;
     private float pitch;
@@ -40,6 +61,10 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
         super(event);
     }
 
+    /**
+     * @versions -26.2
+     */
+    @ApiStatus.Obsolete
     public WrapperPlayServerEntityRelativeMoveAndRotation(int entityID, double deltaX, double deltaY, double deltaZ,
                                                           float yaw, float pitch, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION);
@@ -50,45 +75,81 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;
+        // minimal backward compat
+        this.delta = new LinearVecDelta(deltaX, deltaY, deltaZ);
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public WrapperPlayServerEntityRelativeMoveAndRotation(int entityID, VecDelta delta, float yaw, float pitch, boolean onGround) {
+        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION);
+        this.entityID = entityID;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.onGround = onGround;
+        setDelta(delta);
     }
 
     @Override
     public void read() {
         entityID = readVarInt();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            deltaX = readShort() / MODERN_DELTA_DIVISOR;
-            deltaY = readShort() / MODERN_DELTA_DIVISOR;
-            deltaZ = readShort() / MODERN_DELTA_DIVISOR;
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            int properties = this.readVarInt();
+            this.delta = VecDelta.read(this, properties >>> 1);
+            this.onGround = (properties & 0b1) == 0b1;
+            // minimal backward compat
+            Vector3d totalDelta = this.delta.apply(Vector3d.zero());
+            this.deltaX = totalDelta.x;
+            this.deltaY = totalDelta.y;
+            this.deltaZ = totalDelta.z;
         } else {
-            deltaX = readByte() / LEGACY_DELTA_DIVISOR;
-            deltaY = readByte() / LEGACY_DELTA_DIVISOR;
-            deltaZ = readByte() / LEGACY_DELTA_DIVISOR;
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                this.deltaX = this.readShort() / MODERN_DELTA_DIVISOR;
+                this.deltaY = this.readShort() / MODERN_DELTA_DIVISOR;
+                this.deltaZ = this.readShort() / MODERN_DELTA_DIVISOR;
+            } else {
+                this.deltaX = this.readByte() / LEGACY_DELTA_DIVISOR;
+                this.deltaY = this.readByte() / LEGACY_DELTA_DIVISOR;
+                this.deltaZ = this.readByte() / LEGACY_DELTA_DIVISOR;
+            }
         }
         yaw = readByte() / ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
-        onGround = readBoolean();
+        if (this.serverVersion.isOlderThan(ServerVersion.V_26_3)) {
+            this.onGround = this.readBoolean();
+        }
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));
-            writeShort((short) (deltaY * MODERN_DELTA_DIVISOR));
-            writeShort((short) (deltaZ * MODERN_DELTA_DIVISOR));
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            VecDelta delta = this.getDelta();
+            this.writeVarInt((delta.getStepCount() << 1) | (this.onGround ? 1 : 0)); // properties
+            VecDelta.write(this, delta);
         } else {
-            writeByte((byte) (deltaX * LEGACY_DELTA_DIVISOR));
-            writeByte((byte) (deltaY * LEGACY_DELTA_DIVISOR));
-            writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                this.writeShort((short) (this.deltaX * MODERN_DELTA_DIVISOR));
+                this.writeShort((short) (this.deltaY * MODERN_DELTA_DIVISOR));
+                this.writeShort((short) (this.deltaZ * MODERN_DELTA_DIVISOR));
+            } else {
+                this.writeByte((byte) (this.deltaX * LEGACY_DELTA_DIVISOR));
+                this.writeByte((byte) (this.deltaY * LEGACY_DELTA_DIVISOR));
+                this.writeByte((byte) (this.deltaZ * LEGACY_DELTA_DIVISOR));
+            }
         }
         writeByte((int) (yaw * ROTATION_FACTOR));
         writeByte((int) (pitch * ROTATION_FACTOR));
-        writeBoolean(onGround);
+        if (this.serverVersion.isOlderThan(ServerVersion.V_26_3)) {
+            writeBoolean(onGround);
+        }
     }
 
     @Override
     public void copy(WrapperPlayServerEntityRelativeMoveAndRotation wrapper) {
         entityID = wrapper.entityID;
+        delta = wrapper.delta;
         deltaX = wrapper.deltaX;
         deltaY = wrapper.deltaY;
         deltaZ = wrapper.deltaZ;
@@ -105,27 +166,69 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
         this.entityID = entityID;
     }
 
+    /**
+     * @versions 26.3+
+     */
+    public VecDelta getDelta() {
+        if (this.delta == null) {
+            this.delta = new LinearVecDelta(this.deltaX, this.deltaY, this.deltaZ);
+        }
+        return this.delta;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public void setDelta(VecDelta delta) {
+        this.delta = delta;
+        Vector3d total = delta.apply(Vector3d.zero());
+        this.deltaX = total.x;
+        this.deltaY = total.y;
+        this.deltaZ = total.z;
+    }
+
+    /**
+     * @versions -26.2
+     */
     public double getDeltaX() {
         return deltaX;
     }
 
+    /**
+     * @versions -26.2
+     */
     public void setDeltaX(double deltaX) {
+        this.delta = null;
         this.deltaX = deltaX;
     }
 
+    /**
+     * @versions -26.2
+     */
     public double getDeltaY() {
         return deltaY;
     }
 
+    /**
+     * @versions -26.2
+     */
     public void setDeltaY(double deltaY) {
+        this.delta = null;
         this.deltaY = deltaY;
     }
 
+    /**
+     * @versions -26.2
+     */
     public double getDeltaZ() {
         return deltaZ;
     }
 
+    /**
+     * @versions -26.2
+     */
     public void setDeltaZ(double deltaZ) {
+        this.delta = null;
         this.deltaZ = deltaZ;
     }
 

@@ -71,6 +71,10 @@ public final class BlockEntityTypes {
     public static final BlockEntityType END_GATEWAY = define("end_gateway");
     public static final BlockEntityType COMMAND_BLOCK = define("command_block");
     public static final BlockEntityType SHULKER_BOX = define("shulker_box");
+    /**
+     * @versions -26.1.2
+     */
+    @ApiStatus.Obsolete
     public static final BlockEntityType BED = define("bed");
     public static final BlockEntityType CONDUIT = define("conduit");
     public static final BlockEntityType BARREL = define("barrel");
@@ -116,6 +120,11 @@ public final class BlockEntityTypes {
      * @versions 1.21.9+
      */
     public static final BlockEntityType COPPER_GOLEM_STATUE = define("copper_golem_statue");
+
+    /**
+     * @versions 26.2+
+     */
+    public static final BlockEntityType POTENT_SULFUR = define("potent_sulfur");
 
     /**
      * Returns an immutable view of the block entity types.

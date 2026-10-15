@@ -20,10 +20,12 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackCodec;
 import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 
@@ -31,6 +33,9 @@ import java.util.Objects;
 
 @NullMarked
 public class ParticleItemStackData extends ParticleData implements LegacyConvertible {
+
+    private static final NbtCodec<ItemStack> PRE_26_1_ITEM_CODEC = ItemStackCodec.CODEC
+            .withAlternative(ItemStackCodec.INLINE_CODEC);
 
     private ItemStack itemStack;
 
@@ -62,13 +67,17 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
 
     public static ParticleItemStackData decode(NBTCompound compound, ClientVersion version) {
         String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "item" : "value";
-        ItemStack stack = ItemStack.decode(compound.getTagOrThrow(key), version);
+        NbtCodec<ItemStack> codec = version.isNewerThanOrEquals(ClientVersion.V_26_1)
+                ? ItemStackCodec.TEMPLATE_CODEC : PRE_26_1_ITEM_CODEC;
+        ItemStack stack = compound.getOrThrow(key, codec, PacketWrapper.createDummyWrapper(version));
         return new ParticleItemStackData(stack);
     }
 
     public static void encode(ParticleItemStackData data, ClientVersion version, NBTCompound compound) {
         String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "item" : "value";
-        compound.setTag(key, ItemStack.encodeForParticle(data.itemStack, version));
+        NbtCodec<ItemStack> codec = version.isNewerThanOrEquals(ClientVersion.V_26_1)
+                ? ItemStackCodec.TEMPLATE_CODEC : PRE_26_1_ITEM_CODEC;
+        compound.set(key, data.itemStack, codec, PacketWrapper.createDummyWrapper(version));
     }
 
     @Override

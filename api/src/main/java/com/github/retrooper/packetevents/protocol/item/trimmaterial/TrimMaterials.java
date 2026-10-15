@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import net.kyori.adventure.key.KeyPattern;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -35,6 +36,9 @@ import java.util.Map;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.TextColor.color;
 
+/**
+ * @versions 1.19.4+
+ */
 public final class TrimMaterials {
 
     private static final VersionedRegistry<TrimMaterial> REGISTRY = new VersionedRegistry<>("trim_material");
@@ -43,7 +47,7 @@ public final class TrimMaterials {
     }
 
     @ApiStatus.Internal
-    public static TrimMaterial define(String key, ItemType ingredient, float itemModelIndex, int color) {
+    public static TrimMaterial define(@KeyPattern.Value String key, ItemType ingredient, float itemModelIndex, int color) {
         // darken own armor material - if present
         Map<ArmorMaterial, String> overrideArmorMaterials = new HashMap<>(2);
         String armorMaterialId = ResourceLocation.minecraft(key).toString();
@@ -58,11 +62,14 @@ public final class TrimMaterials {
 
     @ApiStatus.Internal
     public static TrimMaterial define(
-            String key, String assetName, ItemType ingredient, float itemModelIndex,
+            String key, @KeyPattern.Value String assetName, ItemType ingredient, float itemModelIndex,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
-        return REGISTRY.define(key, data ->
-                new StaticTrimMaterial(data, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description));
+        return REGISTRY.define(key, data -> {
+            ResourceLocation paletteId = ResourceLocation.minecraft("trim/" + assetName);
+            return new StaticTrimMaterial(data, assetName, paletteId, ingredient,
+                    itemModelIndex, overrideArmorMaterials, description);
+        });
     }
 
     public static VersionedRegistry<TrimMaterial> getRegistry() {
@@ -77,7 +84,6 @@ public final class TrimMaterials {
         return REGISTRY.getById(version, id);
     }
 
-    // Added in 1.19.4
     public static final TrimMaterial AMETHYST = define("amethyst", ItemTypes.AMETHYST_SHARD, 1f, 0x9A5CC6);
     public static final TrimMaterial COPPER = define("copper", ItemTypes.COPPER_INGOT, 0.5f, 0xB4684D);
     public static final TrimMaterial DIAMOND = define("diamond", ItemTypes.DIAMOND, 0.8f, 0x6EECD2);
@@ -89,7 +95,9 @@ public final class TrimMaterials {
     public static final TrimMaterial QUARTZ = define("quartz", ItemTypes.QUARTZ, 0.1f, 0xE3D4C4);
     public static final TrimMaterial REDSTONE = define("redstone", ItemTypes.REDSTONE, 0.4f, 0x971607);
 
-    // added with 1.21.4
+    /**
+     * @versions 1.21.4+
+     */
     public static final TrimMaterial RESIN = define("resin", ItemTypes.RESIN_BRICK, 0.11f, 0xFC7812);
 
     /**

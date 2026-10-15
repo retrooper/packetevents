@@ -46,7 +46,7 @@ public class WrapperPlayServerAcknowledgePlayerDigging extends PacketWrapper<Wra
     public void read() {
         blockPosition = readBlockPosition();
         blockID = readVarInt();
-        action = DiggingAction.getById(readVarInt());
+        action = DiggingAction.getById(serverVersion, readVarInt());
         successful = readBoolean();
     }
 
@@ -54,7 +54,7 @@ public class WrapperPlayServerAcknowledgePlayerDigging extends PacketWrapper<Wra
     public void write() {
         writeBlockPosition(blockPosition);
         writeVarInt(blockID);
-        writeVarInt(action.getId());
+        writeVarInt(action.getId(serverVersion));
         writeBoolean(successful);
     }
 

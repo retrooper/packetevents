@@ -78,7 +78,7 @@ public abstract class ProtocolManagerAbstract implements ProtocolManager {
     @Override
     public void receivePacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
         } else {
             ((ByteBuf) byteBuf).release();
         }

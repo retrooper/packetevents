@@ -227,11 +227,11 @@ public class SpongeChannelInjector implements ChannelInjector {
         }
     }
 
-    private PacketEventsEncoder getEncoder(Channel channel) {
+    public PacketEventsEncoder getEncoder(Channel channel) {
         return (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
     }
 
-    private PacketEventsDecoder getDecoder(Channel channel) {
+    public PacketEventsDecoder getDecoder(Channel channel) {
          return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
     }
 

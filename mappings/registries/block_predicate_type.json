@@ -1,0 +1,20 @@
+{
+  "V_26_3": [
+    "matching_blocks",
+    "matching_block_tag",
+    "matching_fluids",
+    "matching_biomes",
+    "has_sturdy_face",
+    "solid",
+    "replaceable",
+    "would_survive",
+    "inside_world_bounds",
+    "any_of",
+    "all_of",
+    "not",
+    "true",
+    "unobstructed",
+    "height_range",
+    "volume_match"
+  ]
+}

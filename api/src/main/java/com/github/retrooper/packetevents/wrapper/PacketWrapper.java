@@ -300,7 +300,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         this.clientVersion = clientVersion;
     }
 
-    public ServerVersion getServerVersion() {
+    public final ServerVersion getServerVersion() {
         return serverVersion;
     }
 
@@ -452,6 +452,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (size > maxSize) {
             throw new RuntimeException(size + " elements exceeded max size of: " + maxSize);
         }
+        this.checkElementCount(size);
 
         Map<K, V> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
@@ -1166,6 +1167,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         FilterMaskType type = FilterMaskType.getById(readVarInt());
         switch (type) {
             case PARTIALLY_FILTERED:
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                    BitSet bitSet = BitSet.valueOf(this.readByteArray());
+                    return new FilterMask(bitSet);
+                }
                 return new FilterMask(readBitSet());
             case PASS_THROUGH:
                 return FilterMask.PASS_THROUGH;
@@ -1179,7 +1184,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     public void writeFilterMask(FilterMask filterMask) {
         writeVarInt(filterMask.getType().getId());
         if (filterMask.getType() == FilterMaskType.PARTIALLY_FILTERED) {
-            writeBitSet(filterMask.getMask());
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                this.writeByteArray(filterMask.getMask().toByteArray());
+            } else {
+                this.writeBitSet(filterMask.getMask());
+            }
         }
     }
 
@@ -1373,9 +1382,18 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
     }
 
+    private int checkElementCount(int count) {
+        int readableBytes = ByteBufHelper.readableBytes(this.buffer);
+        if (count > readableBytes) {
+            throw new IllegalStateException("Collection with size " + count
+                    + " is bigger than allowed " + readableBytes);
+        }
+        return count;
+    }
+
     public <K, C extends Collection<K>> C readCollection(IntFunction<C> function, Reader<K> reader) {
-        int size = this.readVarInt();
-        return _readCollection(function, reader, size);
+        int size = this.checkElementCount(this.readVarInt());
+        return readFixedCollection(function, reader, size);
     }
 
     public <K, C extends Collection<K>> C readCollection(IntFunction<C> function, Reader<K> reader, int maxSize) {
@@ -1383,10 +1401,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (size > maxSize) {
             throw new RuntimeException(size + " elements exceeded max size of: " + maxSize);
         }
-        return _readCollection(function, reader, size);
+        return readFixedCollection(function, reader, this.checkElementCount(size));
     }
 
-    private <K, C extends Collection<K>> C _readCollection(IntFunction<C> function, Reader<K> reader, int size) {
+    public  <K, C extends Collection<K>> C readFixedCollection(IntFunction<C> function, Reader<K> reader, int size) {
         Collection<K> collection = function.apply(size);
         for (int i = 0; i < size; ++i) {
             collection.add(reader.apply(this));
@@ -1433,7 +1451,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     @SuppressWarnings("unchecked") // not unchecked
     public <K> K[] readArray(Reader<K> reader, Class<K> clazz) {
-        int length = this.readVarInt();
+        int length = this.checkElementCount(this.readVarInt());
         K[] array = (K[]) Array.newInstance(clazz, length);
         for (int i = 0; i < length; i++) {
             array[i] = reader.apply(this);
@@ -1446,6 +1464,20 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         for (K element : array) {
             writer.accept(this, element);
         }
+    }
+
+    public <K> void writeFixedCollection(Collection<K> list, Writer<K> writer) {
+        for (K key : list) {
+            writer.accept(this, key);
+        }
+    }
+
+    public <K> List<K> readFixedList(Reader<K> reader, int size) {
+        return this.readFixedCollection(ArrayList::new, reader, size);
+    }
+
+    public <K> void writeFixedList(List<K> list, Writer<K> writer) {
+        this.writeFixedCollection(list,writer);
     }
 
     public <Z extends Enum<?>> Z readEnum(Class<Z> clazz) {

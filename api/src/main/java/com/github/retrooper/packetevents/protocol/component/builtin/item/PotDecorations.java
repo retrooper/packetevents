@@ -18,9 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -30,13 +34,20 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 
+/**
+ * @versions 1.20.5+
+ */
 public class PotDecorations {
 
-    private @Nullable ItemType back;
-    private @Nullable ItemType left;
-    private @Nullable ItemType right;
-    private @Nullable ItemType front;
+    private @Nullable ItemStack back;
+    private @Nullable ItemStack left;
+    private @Nullable ItemStack right;
+    private @Nullable ItemStack front;
 
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
     private PotDecorations(Queue<Optional<ItemType>> items) {
         this(
                 items.isEmpty() ? null : items.remove().orElse(null),
@@ -46,11 +57,32 @@ public class PotDecorations {
         );
     }
 
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
     public PotDecorations(
             @Nullable ItemType back,
             @Nullable ItemType left,
             @Nullable ItemType right,
             @Nullable ItemType front
+    ) {
+        this(
+                back != null ? ItemStack.builder().type(back).build() : null,
+                left != null ? ItemStack.builder().type(left).build() : null,
+                right != null ? ItemStack.builder().type(right).build() : null,
+                front != null ? ItemStack.builder().type(front).build() : null
+        );
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public PotDecorations(
+            @Nullable ItemStack back,
+            @Nullable ItemStack left,
+            @Nullable ItemStack right,
+            @Nullable ItemStack front
     ) {
         this.back = back;
         this.left = left;
@@ -58,64 +90,165 @@ public class PotDecorations {
         this.front = front;
     }
 
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
     private List<Optional<ItemType>> asList() {
         return Arrays.asList(
-                Optional.ofNullable(this.back),
-                Optional.ofNullable(this.left),
-                Optional.ofNullable(this.right),
-                Optional.ofNullable(this.front)
+                Optional.ofNullable(this.back).map(ItemStack::getType),
+                Optional.ofNullable(this.left).map(ItemStack::getType),
+                Optional.ofNullable(this.right).map(ItemStack::getType),
+                Optional.ofNullable(this.front).map(ItemStack::getType)
         );
     }
 
-    private static Optional<ItemType> readItem(PacketWrapper<?> wrapper) {
-        ItemType type = wrapper.readMappedEntity(ItemTypes::getById);
-        return type == ItemTypes.BRICK ? Optional.empty() : Optional.of(type);
-    }
-
     public static PotDecorations read(PacketWrapper<?> wrapper) {
-        Queue<Optional<ItemType>> items = wrapper.<Optional<ItemType>, Queue<Optional<ItemType>>>
-                readCollection(ArrayDeque::new, PotDecorations::readItem);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            return new PotDecorations(
+                    wrapper.readOptional(ItemStackSerialization::readTemplate),
+                    wrapper.readOptional(ItemStackSerialization::readTemplate),
+                    wrapper.readOptional(ItemStackSerialization::readTemplate),
+                    wrapper.readOptional(ItemStackSerialization::readTemplate)
+            );
+        }
+        Queue<Optional<ItemType>> items = wrapper.readCollection(ArrayDeque::new, ew -> {
+            ItemType type = wrapper.readMappedEntity(ItemTypes.getRegistry());
+            return type == ItemTypes.BRICK ? Optional.empty() : Optional.of(type);
+        });
         return new PotDecorations(items);
     }
 
-    private static void writeItem(PacketWrapper<?> wrapper, Optional<ItemType> type) {
-        wrapper.writeMappedEntity(type.orElse(ItemTypes.BRICK));
-    }
-
     public static void write(PacketWrapper<?> wrapper, PotDecorations decorations) {
-        wrapper.writeList(decorations.asList(), PotDecorations::writeItem);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            wrapper.writeOptional(decorations.back, ItemStackSerialization::writeTemplate);
+            wrapper.writeOptional(decorations.left, ItemStackSerialization::writeTemplate);
+            wrapper.writeOptional(decorations.right, ItemStackSerialization::writeTemplate);
+            wrapper.writeOptional(decorations.front, ItemStackSerialization::writeTemplate);
+        } else {
+            wrapper.writeList(decorations.asList(), (ew, type) ->
+                    ew.writeMappedEntity(type.orElse(ItemTypes.BRICK)));
+        }
     }
 
-    public @Nullable ItemType getBack() {
+    /**
+     * @versions 26.3+
+     */
+    public @Nullable ItemStack getBackStack() {
         return this.back;
     }
 
-    public void setBack(@Nullable ItemType back) {
+    /**
+     * @versions 26.3+
+     */
+    public void setBackStack(@Nullable ItemStack back) {
         this.back = back;
     }
 
-    public @Nullable ItemType getLeft() {
+    /**
+     * @versions 26.3+
+     */
+    public @Nullable ItemStack getLeftStack() {
         return this.left;
     }
 
-    public void setLeft(@Nullable ItemType left) {
+    /**
+     * @versions 26.3+
+     */
+    public void setLeftStack(@Nullable ItemStack left) {
         this.left = left;
     }
 
-    public @Nullable ItemType getRight() {
+    /**
+     * @versions 26.3+
+     */
+    public @Nullable ItemStack getRightStack() {
         return this.right;
     }
 
-    public void setRight(@Nullable ItemType right) {
+    /**
+     * @versions 26.3+
+     */
+    public void setRightStack(@Nullable ItemStack right) {
         this.right = right;
     }
 
-    public @Nullable ItemType getFront() {
+    /**
+     * @versions 26.3+
+     */
+    public @Nullable ItemStack getFrontStack() {
         return this.front;
     }
 
-    public void setFront(@Nullable ItemType front) {
+    /**
+     * @versions 26.3+
+     */
+    public void setFrontStack(@Nullable ItemStack front) {
         this.front = front;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public @Nullable ItemType getBack() {
+        return this.back != null ? this.back.getType() : null;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public void setBack(@Nullable ItemType back) {
+        this.back = back != null ? ItemStack.builder().type(back).build() : null;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public @Nullable ItemType getLeft() {
+        return this.left != null ? this.left.getType() : null;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public void setLeft(@Nullable ItemType left) {
+        this.left = left != null ? ItemStack.builder().type(left).build() : null;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public @Nullable ItemType getRight() {
+        return this.right != null ? this.right.getType() : null;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public void setRight(@Nullable ItemType right) {
+        this.right = right != null ? ItemStack.builder().type(right).build() : null;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public @Nullable ItemType getFront() {
+        return this.front != null ? this.front.getType() : null;
+    }
+
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
+    public void setFront(@Nullable ItemType front) {
+        this.front = front != null ? ItemStack.builder().type(front).build() : null;
     }
 
     @Override

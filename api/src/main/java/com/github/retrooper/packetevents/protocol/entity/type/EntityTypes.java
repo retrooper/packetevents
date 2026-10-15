@@ -426,6 +426,22 @@ public final class EntityTypes {
      * @versions 1.21.11+
      */
     public static final EntityType ZOMBIE_NAUTILUS = define("zombie_nautilus", ABSTRACT_NAUTILUS);
+    /**
+     * @versions 26.2+
+     */
+    public static final EntityType SULFUR_CUBE = define("sulfur_cube", ABSTRACT_AGEABLE);
+    /**
+     * @versions 26.3+
+     */
+    public static final EntityType CUSHION = define("cushion", ABSTRACT_HANGING);
+    /**
+     * @versions 26.3+
+     */
+    public static final EntityType POPLAR_BOAT = define("poplar_boat", BOAT);
+    /**
+     * @versions 26.3+
+     */
+    public static final EntityType POPLAR_CHEST_BOAT = define("poplar_chest_boat", CHEST_BOAT);
 
     /**
      * Returns an immutable view of the entity types.
