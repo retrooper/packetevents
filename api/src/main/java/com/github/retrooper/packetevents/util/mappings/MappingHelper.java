@@ -133,6 +133,16 @@ public class MappingHelper {
                 typeIds[index] = idMap = new HashMap<>();
             }
             idMap.put(typeData.getId(version), type);
+            // one name can map to several legacy ids, register all of them
+            List<String> ordered = builder.getOrderedEntries(version);
+            if (ordered != null) {
+                String key = typeData.getName().getKey();
+                for (int i = 0; i < ordered.size(); i++) {
+                    if (key.equals(ordered.get(i))) {
+                        idMap.put(i, type);
+                    }
+                }
+            }
         }
     }
 
