@@ -152,7 +152,7 @@ public class ChunkReader_v1_8 implements ChunkReader {
         int chunkMask = 0;
         for (int index = 0; index < chunks.length; index++) {
             Chunk_v1_8 chunk = chunks[index];
-            if (chunk != null && (!fullChunk || !chunk.isEmpty())) {
+            if (chunk != null && (fullChunk || !chunk.isEmpty())) {
                 chunkMask |= 1 << index;
             }
         }
@@ -163,7 +163,7 @@ public class ChunkReader_v1_8 implements ChunkReader {
     public static int calculateDataLength(Chunk_v1_8[] chunks, byte[] biomes, int chunkMask) {
         int length = biomes == null ? 0 : biomes.length;
         for (int index = 0; index < chunks.length; index++) {
-            if ((chunkMask & 1 << index) != 0) {
+            if ((chunkMask & (1 << index)) != 0) {
                 Chunk_v1_8 chunk = chunks[index];
                 length += chunk.getBlocks().getData().length * Short.BYTES;
                 length += chunk.getBlockLight().getData().length;
@@ -178,7 +178,11 @@ public class ChunkReader_v1_8 implements ChunkReader {
     @ApiStatus.Internal
     public static boolean hasSkyLight(Chunk_v1_8[] chunks, int chunkMask) {
         for (int index = 0; index < chunks.length; index++) {
-            if ((chunkMask & 1 << index) != 0 && chunks[index].getSkyLight() != null) {
+            if ((chunkMask & (1 << index)) == 0) {
+                continue;
+            }
+            Chunk_v1_8 chunk = chunks[index];
+            if (chunk != null && chunk.getSkyLight() != null) {
                 return true;
             }
         }
@@ -193,9 +197,13 @@ public class ChunkReader_v1_8 implements ChunkReader {
 
         int largestBlockDataLength = 0;
         for (int index = 0; index < chunks.length; index++) {
-            if ((chunkMask & 1 << index) != 0) {
+            if ((chunkMask & 1 << index) == 0) {
+                continue;
+            }
+            Chunk_v1_8 chunk = chunks[index];
+            if (chunk != null) {
                 largestBlockDataLength = Math.max(largestBlockDataLength,
-                        chunks[index].getBlocks().getData().length * Short.BYTES);
+                        chunk.getBlocks().getData().length * Short.BYTES);
             }
         }
 
@@ -203,23 +211,28 @@ public class ChunkReader_v1_8 implements ChunkReader {
         ShortBuffer blockData = encodedBlocks == null ? null
                 : ByteBuffer.wrap(encodedBlocks).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
         for (int index = 0; index < chunks.length; index++) {
-            if ((chunkMask & 1 << index) != 0) {
-                short[] blocks = chunks[index].getBlocks().getData();
+            if ((chunkMask & 1 << index) == 0) {
+                continue;
+            }
+            Chunk_v1_8 chunk = chunks[index];
+            if (chunk != null) {
+                short[] blocks = chunk.getBlocks().getData();
+                assert blockData != null; // always not null, largestBlockDataLength should always be > 0 in this case
                 blockData.position(0);
                 blockData.put(blocks, 0, blocks.length);
                 ByteBufHelper.writeBytes(wrapper.buffer, encodedBlocks, 0, blocks.length * Short.BYTES);
             }
         }
 
-        for (int index = 0; index < chunks.length; index++) {
-            if ((chunkMask & 1 << index) != 0) {
-                ByteBufHelper.writeBytes(wrapper.buffer, chunks[index].getBlockLight().getData());
+        for (Chunk_v1_8 chunk : chunks) {
+            if (chunk != null) {
+                ByteBufHelper.writeBytes(wrapper.buffer, chunk.getBlockLight().getData());
             }
         }
 
-        for (int index = 0; index < chunks.length; index++) {
-            if ((chunkMask & 1 << index) != 0 && chunks[index].getSkyLight() != null) {
-                ByteBufHelper.writeBytes(wrapper.buffer, chunks[index].getSkyLight().getData());
+        for (Chunk_v1_8 chunk : chunks) {
+            if (chunk != null && chunk.getSkyLight() != null) {
+                ByteBufHelper.writeBytes(wrapper.buffer, chunk.getSkyLight().getData());
             }
         }
 
