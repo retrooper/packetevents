@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.util.crypto;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.crypto.BadPaddingException;
@@ -94,6 +95,25 @@ public class MinecraftEncryptionUtil {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePublic(encodedKeySpec);
         } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Generates the RSA key pair corresponding to the specified client version.
+     *
+     * @param clientVersion The client version for which to generate the key pair
+     * @return The generated key pair
+     */
+    public static KeyPair generateKeyPair(ClientVersion clientVersion) {
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            if (clientVersion.isOlderThanOrEquals(ClientVersion.V_26_3)) {
+                generator.initialize(1024);
+            }
+            return generator.generateKeyPair();
+        } catch (NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             return null;
         }
