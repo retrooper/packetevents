@@ -241,11 +241,12 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        List<String> handlerNames = ctx.pipeline().names();
-        int compressIndex = handlerNames.indexOf("compress");
+        if (ctx.pipeline().get("compress") == null) return false;
+        List<String> names = ctx.pipeline().names(); // Readonly copy of encoder names
+        int compressIndex = names.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = handlerNames.indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = names.indexOf(PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
         if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
