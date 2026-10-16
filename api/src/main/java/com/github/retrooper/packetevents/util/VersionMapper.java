@@ -28,6 +28,7 @@ public class VersionMapper {
 
     private final ClientVersion[] versions;
     private final ClientVersion[] reversedVersions;
+    private final int[] indexByVersionOrdinal;
 
     public VersionMapper(ClientVersion... versions) {
         this.versions = versions.clone();
@@ -36,6 +37,12 @@ public class VersionMapper {
         this.reversedVersions = new ClientVersion[this.versions.length];
         for (int i = this.versions.length - 1, j = 0; i >= 0; i--, j++) {
             this.reversedVersions[j] = this.versions[i];
+        }
+
+        ClientVersion[] allVersions = ClientVersion.values();
+        this.indexByVersionOrdinal = new int[allVersions.length];
+        for (ClientVersion version : allVersions) {
+            this.indexByVersionOrdinal[version.ordinal()] = this.computeIndex(version);
         }
     }
 
@@ -57,6 +64,10 @@ public class VersionMapper {
     }
 
     public int getIndex(ClientVersion version) {
+        return this.indexByVersionOrdinal[version.ordinal()];
+    }
+
+    private int computeIndex(ClientVersion version) {
         int index = reversedVersions.length - 1;
         for (ClientVersion v : reversedVersions) {
             if (version.isNewerThanOrEquals(v)) {
