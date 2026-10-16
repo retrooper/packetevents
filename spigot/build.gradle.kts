@@ -14,11 +14,11 @@ repositories {
 }
 
 dependencies {
+    api(project(":api"))
+    api(project(":netty-common"))
+
     compileOnly(libs.netty)
-    shadow(libs.bundles.adventure)
-    compileShadowOnly(libs.bstats.bukkit)
-    shadow(project(":api", "shadow"))
-    shadow(project(":netty-common"))
+    implementation(libs.bstats.bukkit)
 
     compileOnly(libs.paper)
     compileOnly(libs.via.version)
