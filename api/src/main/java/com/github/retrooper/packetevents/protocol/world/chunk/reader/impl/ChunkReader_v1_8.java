@@ -152,7 +152,7 @@ public class ChunkReader_v1_8 implements ChunkReader {
         int chunkMask = 0;
         for (int index = 0; index < chunks.length; index++) {
             Chunk_v1_8 chunk = chunks[index];
-            if (chunk != null && (fullChunk || !chunk.isEmpty())) {
+            if (chunk != null && (!fullChunk || !chunk.isEmpty())) {
                 chunkMask |= 1 << index;
             }
         }
@@ -222,13 +222,21 @@ public class ChunkReader_v1_8 implements ChunkReader {
             }
         }
 
-        for (Chunk_v1_8 chunk : chunks) {
+        for (int index = 0; index < chunks.length; index++) {
+            if ((chunkMask & 1 << index) == 0) {
+                continue;
+            }
+            Chunk_v1_8 chunk = chunks[index];
             if (chunk != null) {
                 ByteBufHelper.writeBytes(wrapper.buffer, chunk.getBlockLight().getData());
             }
         }
 
-        for (Chunk_v1_8 chunk : chunks) {
+        for (int index = 0; index < chunks.length; index++) {
+            if ((chunkMask & 1 << index) == 0) {
+                continue;
+            }
+            Chunk_v1_8 chunk = chunks[index];
             if (chunk != null && chunk.getSkyLight() != null) {
                 ByteBufHelper.writeBytes(wrapper.buffer, chunk.getSkyLight().getData());
             }
