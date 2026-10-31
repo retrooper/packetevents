@@ -158,6 +158,7 @@ public final class ParticleTypes {
     public static final ParticleType<ParticleData> FIREWORK = define("firework");
     public static final ParticleType<ParticleData> FISHING = define("fishing");
     public static final ParticleType<ParticleData> FLAME = define("flame");
+    public static final ParticleType<ParticleData> FOOTSTEP = define("footstep");
     public static final ParticleType<ParticleData> SCULK_SOUL = define("sculk_soul");
     public static final ParticleType<ParticleSculkChargeData> SCULK_CHARGE = define("sculk_charge",
             ParticleSculkChargeData::read, ParticleSculkChargeData::write,
