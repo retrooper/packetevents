@@ -44,6 +44,10 @@ public class Chunk_v1_8 implements BaseChunk {
     }
 
     public NibbleArray3d getBlockLight() {
+        // Create block light array if needed, as block light is not optional in 1.8.9
+        if (this.blocklight == null) {
+            this.blocklight = new NibbleArray3d(4096);
+        }
         return this.blocklight;
     }
 
