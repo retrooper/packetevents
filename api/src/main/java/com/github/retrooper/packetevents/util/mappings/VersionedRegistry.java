@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityBuilder;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.IdTable;
 import com.github.retrooper.packetevents.util.MapUtil;
 import com.github.retrooper.packetevents.util.VersionRange;
 import org.jetbrains.annotations.ApiStatus;
@@ -47,7 +48,8 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     private final ClientVersion[] extraSteps;
 
     private final Map<String, T>[] typeNames;
-    private final Map<Integer, T>[] typeIds;
+    private final Map<Integer, T> @Nullable [] typeIds;
+    private final IdTable<T> typeIdTable;
     private final Set<T> entries = new HashSet<>();
 
     public VersionedRegistry(String registry) {
@@ -80,6 +82,7 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
         int versions = this.typesBuilder.getVersionMapper().size();
         this.typeNames = new Map[versions];
         this.typeIds = new Map[versions];
+        this.typeIdTable = new IdTable<>(versions);
     }
 
     @ApiStatus.Internal
@@ -96,7 +99,8 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     public <Z extends T> Z define(String name, VersionRange range, Function<TypesBuilderData, Z> builder) {
         TypesBuilderData typeData = this.typesBuilder.define(name, range);
         Z instance = builder.apply(typeData);
-        MappingHelper.registerMapping(this.typesBuilder, this.typeNames, this.typeIds, typeData, instance);
+        MappingHelper.registerMapping(this.typesBuilder, this.typeNames,
+                this.typeIdTable, this.typeIds, typeData, instance);
         return instance;
     }
 
@@ -143,6 +147,8 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
                 }
             }
         }
+
+        this.typeIdTable.immutable();
     }
 
     @Override
@@ -173,7 +179,12 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     @Override
     public @Nullable T getById(ClientVersion version, int id) {
         int index = this.typesBuilder.getDataIndex(version);
-        return this.typeIds[index].get(id);
+        T byId = this.typeIdTable.lookup(index, id);
+        if (byId != null) {
+            return byId;
+        }
+        Map<Integer, T> overflow = this.typeIds[index];
+        return overflow != null ? overflow.get(id) : null;
     }
 
     @Override
