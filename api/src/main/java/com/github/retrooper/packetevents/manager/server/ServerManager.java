@@ -45,7 +45,14 @@ public interface ServerManager {
      * This tells packetevents, if a registry should be cached or read again. On
      * backend servers with global registries, this may be a constant value. On
      * proxy servers with per-server registries, this may be a value which depends
-     * on the current server the {@link User} is on.
+     * on the backend server the {@link User} is receiving registries from (during a
+     * server switch, the server being connected to rather than the current one).
+     * <p>
+     * A cached registry is only reused if the received registry data equals the data it
+     * was created from; otherwise it gets read again and replaces the cached entry. Cache
+     * entries are not removed on their own, so the value should be stable for a backend
+     * server: a value which is never returned again keeps its entry for the lifetime of
+     * the process.
      *
      * @param user    the {@link User} for which the registry gets read
      * @param version the version the packet is for
