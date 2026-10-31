@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     compileOnlyApi(libs.netty)
-    implementation(project(":api"))
+    api(project(":api"))
 }

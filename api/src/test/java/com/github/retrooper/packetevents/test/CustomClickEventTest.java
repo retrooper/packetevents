@@ -18,19 +18,28 @@
 
 package com.github.retrooper.packetevents.test;
 
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTEnd;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.test.base.BaseDummyAPITest;
-import com.github.retrooper.packetevents.util.adventure.*;
+import com.github.retrooper.packetevents.util.adventure.AdventureNBTSerializer;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.github.retrooper.packetevents.util.adventure.AdventureSupportUtil;
+import com.github.retrooper.packetevents.util.adventure.NbtTagHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.serializer.gson.BackwardCompatUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class CustomClickEventTest extends BaseDummyAPITest {
 
@@ -38,7 +47,7 @@ public class CustomClickEventTest extends BaseDummyAPITest {
     @DisplayName("Test custom click event payload preservation during serialization")
     public void testCustomClickEventPayloadSerialization() {
         // Only test if Adventure 4.22.0 is available
-        if (!BackwardCompatUtil.IS_4_22_0_OR_NEWER) {
+        if (!AdventureSupportUtil.HAS_PAYLOAD) {
             LOGGER.info("Skipping custom click event test - Adventure 4.22.0 required");
             return;
         }
@@ -56,7 +65,7 @@ public class CustomClickEventTest extends BaseDummyAPITest {
 
         // Serialize to NBT
         AdventureNBTSerializer serializer = AdventureSerializer.serializer(ClientVersion.V_1_21_6).nbt();
-        PacketWrapper < ? > wrapper = PacketWrapper.createDummyWrapper(ClientVersion.V_1_21_6);
+        PacketWrapper<?> wrapper = PacketWrapper.createDummyWrapper(ClientVersion.V_1_21_6);
         NBT serialized = serializer.serialize(originalComponent, wrapper);
 
         // Verify the serialized NBT contains the payload
@@ -96,7 +105,7 @@ public class CustomClickEventTest extends BaseDummyAPITest {
 
         // Verify the deserialized component has the click event
         assertNotNull(deserialized.clickEvent(), "Click event should be present after deserialization");
-        assertEquals(ClickEvent.Action.CUSTOM, deserialized.clickEvent().action());
+        assertEquals("custom", deserialized.clickEvent().action().toString());
 
         // Verify the payload is preserved
         ClickEvent.Payload payload = deserialized.clickEvent().payload();
@@ -126,7 +135,7 @@ public class CustomClickEventTest extends BaseDummyAPITest {
     @DisplayName("Test custom click event without payload")
     public void testCustomClickEventWithoutPayload() {
         // Only test if Adventure 4.22.0 is available
-        if (!BackwardCompatUtil.IS_4_22_0_OR_NEWER) {
+        if (!AdventureSupportUtil.HAS_PAYLOAD) {
             LOGGER.info("Skipping custom click event test - Adventure 4.22.0 required");
             return;
         }
@@ -142,7 +151,7 @@ public class CustomClickEventTest extends BaseDummyAPITest {
 
         // Serialize to NBT
         AdventureNBTSerializer serializer = AdventureSerializer.serializer(ClientVersion.V_1_21_6).nbt();
-        PacketWrapper < ? > wrapper = PacketWrapper.createDummyWrapper(ClientVersion.V_1_21_6);
+        PacketWrapper<?> wrapper = PacketWrapper.createDummyWrapper(ClientVersion.V_1_21_6);
         NBT serialized = serializer.serialize(originalComponent, wrapper);
 
         // Verify the serialized NBT
@@ -164,6 +173,6 @@ public class CustomClickEventTest extends BaseDummyAPITest {
 
         // Verify the deserialized component has the click event
         assertNotNull(deserialized.clickEvent(), "Click event should be present after deserialization");
-        assertEquals(ClickEvent.Action.CUSTOM, deserialized.clickEvent().action());
+        assertEquals("custom", deserialized.clickEvent().action().toString());
     }
 }
