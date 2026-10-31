@@ -29,8 +29,6 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 public class StateType {
 
     public static final NbtCodec<Mapped> MAPPED_CODEC = NbtCodecs.forRegistry(StateTypes.getRegistry());
@@ -134,27 +132,6 @@ public class StateType {
     @Override
     public String toString() {
         return getName();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StateType stateType = (StateType) o;
-        return Float.compare(blastResistance, stateType.blastResistance) == 0
-                && Float.compare(hardness, stateType.hardness) == 0
-                && isSolid == stateType.isSolid
-                && isBlocking == stateType.isBlocking
-                && isAir == stateType.isAir
-                && requiresCorrectTool == stateType.requiresCorrectTool
-                && exceedsCube == stateType.exceedsCube
-                && Objects.equals(getName(), stateType.getName())
-                && materialType == stateType.materialType;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, exceedsCube, materialType);
     }
 
     public final class Mapped extends AbstractMappedEntity {
