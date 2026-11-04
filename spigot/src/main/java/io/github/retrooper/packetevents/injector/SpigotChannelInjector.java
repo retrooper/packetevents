@@ -88,6 +88,19 @@ public class SpigotChannelInjector implements ChannelInjector {
         return false;
     }
 
+    public boolean findConnectionChannelsList() {
+        Object serverConnection = SpigotReflectionUtil.getMinecraftServerConnectionInstance();
+        if (serverConnection == null) {
+            return false;
+        }
+        int listIndex = SpigotReflectionUtil.findListIndexByElementType(serverConnection.getClass(), ChannelFuture.class);
+        if (listIndex == -1) {
+            return false;
+        }
+        connectionChannelsListIndex = listIndex;
+        return true;
+    }
+
     @Override
     public void inject() {
         Object serverConnection = SpigotReflectionUtil.getMinecraftServerConnectionInstance();
