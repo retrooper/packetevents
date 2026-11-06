@@ -120,6 +120,13 @@ public class SpigotPacketEventsBuilder {
 
                     //Server hasn't bound to the port yet.
                     lateBind = !injector.isServerBound();
+                    // The list of connection channels can still be found by its type. Wrapping it now injects into
+                    // the server channel as soon as the server adds it to that list after binding, instead of on the
+                    // first tick, by which time clients may already be logging in through channels we never saw
+                    // (kicked for failing to inject).
+                    if (lateBind && injector.findConnectionChannelsList()) {
+                        lateBind = false;
+                    }
                     //If late-bind is enabled, we will inject a bit later.
                     if (!lateBind) {
                         injector.inject();
