@@ -34,6 +34,7 @@ public class StaticInstrument extends AbstractMappedEntity implements Instrument
     private final Sound sound;
     private final float useSeconds;
     private final float range;
+    private final int durabilityDamage;
     private final Component description;
 
     @Deprecated // useDuration changed from ticks to seconds in 1.21.2
@@ -42,21 +43,34 @@ public class StaticInstrument extends AbstractMappedEntity implements Instrument
     }
 
     public StaticInstrument(Sound sound, float useSeconds, float range, Component description) {
-        this(null, sound, useSeconds, range, description);
+        this(sound, useSeconds, range, 0, description);
+    }
+
+    public StaticInstrument(Sound sound, float useSeconds, float range, int durabilityDamage, Component description) {
+        this(null, sound, useSeconds, range, durabilityDamage, description);
     }
 
     @ApiStatus.Internal
     public StaticInstrument(@Nullable TypesBuilderData data, Sound sound, float useSeconds, float range, Component description) {
+        this(data, sound, useSeconds, range, 0, description);
+    }
+
+    @ApiStatus.Internal
+    public StaticInstrument(
+            @Nullable TypesBuilderData data, Sound sound, float useSeconds,
+            float range, int durabilityDamage, Component description
+    ) {
         super(data);
         this.sound = sound;
         this.useSeconds = useSeconds;
         this.range = range;
+        this.durabilityDamage = durabilityDamage;
         this.description = description;
     }
 
     @Override
     public Instrument copy(@Nullable TypesBuilderData newData) {
-        return new StaticInstrument(newData, this.sound, this.useSeconds, this.range, this.description);
+        return new StaticInstrument(newData, this.sound, this.useSeconds, this.range, this.durabilityDamage, this.description);
     }
 
     @Override
@@ -75,6 +89,11 @@ public class StaticInstrument extends AbstractMappedEntity implements Instrument
     }
 
     @Override
+    public int getDurabilityDamage() {
+        return this.durabilityDamage;
+    }
+
+    @Override
     public Component getDescription() {
         return this.description;
     }
@@ -86,12 +105,13 @@ public class StaticInstrument extends AbstractMappedEntity implements Instrument
         StaticInstrument that = (StaticInstrument) obj;
         if (this.useSeconds != that.useSeconds) return false;
         if (Float.compare(that.range, this.range) != 0) return false;
+        if (this.durabilityDamage != that.durabilityDamage) return false;
         if (!this.sound.equals(that.sound)) return false;
         return this.description.equals(that.description);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(this.sound, this.useSeconds, this.range, this.description);
+        return Objects.hash(this.sound, this.useSeconds, this.range, this.durabilityDamage, this.description);
     }
 }

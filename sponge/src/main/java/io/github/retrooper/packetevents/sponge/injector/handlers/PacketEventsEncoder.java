@@ -35,6 +35,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -105,7 +106,14 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         promise.addListener(p -> this.promise = oldPromise);
 
         this.promise = promise;
-        super.write(ctx, msg, promise);
+
+        try {
+            super.write(ctx, msg, promise);
+        } catch (EncoderException e) {
+            if (!ExceptionUtil.isException(e, CancelPacketException.class)) throw e;
+
+            promise.trySuccess();
+        }
     }
 
 

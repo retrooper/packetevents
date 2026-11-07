@@ -24,8 +24,6 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Objects;
-
 @NullMarked
 public abstract class AbstractMappedEntity implements MappedEntity {
 
@@ -77,7 +75,7 @@ public abstract class AbstractMappedEntity implements MappedEntity {
     @Override
     public int hashCode() {
         if (this.data != null) {
-            return Objects.hash(this.getClass(), this.data.getName());
+            return (31 + this.getClass().hashCode()) * 31 + this.data.getName().hashCode();
         } else if (this instanceof DeepComparableEntity) {
             return ((DeepComparableEntity) this).deepHashCode();
         }

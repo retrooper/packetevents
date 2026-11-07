@@ -154,7 +154,17 @@ public class StateType {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, exceedsCube, materialType);
+        int result = 1;
+        result = 31 * result + Objects.hashCode(getName());
+        result = 31 * result + Float.hashCode(blastResistance);
+        result = 31 * result + Float.hashCode(hardness);
+        result = 31 * result + Boolean.hashCode(isSolid);
+        result = 31 * result + Boolean.hashCode(isBlocking);
+        result = 31 * result + Boolean.hashCode(isAir);
+        result = 31 * result + Boolean.hashCode(requiresCorrectTool);
+        result = 31 * result + Boolean.hashCode(exceedsCube);
+        result = 31 * result + Objects.hashCode(materialType);
+        return result;
     }
 
     public final class Mapped extends AbstractMappedEntity {

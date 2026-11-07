@@ -47,8 +47,10 @@ public class ServerConnectionInitializer {
         PacketEventsDecoder decoder = new PacketEventsDecoder(user);
         PacketEventsEncoder encoder = new PacketEventsEncoder(user);
         addChannelHandlers(channel, decoder, encoder);
-        channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
         PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
+        // Register the user before the close listener: if the channel is already closed, the listener runs
+        // immediately and must find the user, or the entry stays in the user map forever.
+        channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
     }
 
     public static void destroyChannel(Channel channel) {

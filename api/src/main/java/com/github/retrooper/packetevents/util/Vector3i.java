@@ -28,8 +28,6 @@ import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.Objects;
-
 /**
  * 3D int Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -222,7 +220,7 @@ public class Vector3i {
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, z);
+        return ((31 + x) * 31 + y) * 31 + z;
     }
 
     public Vector3d toVector3d() {
