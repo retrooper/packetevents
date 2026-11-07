@@ -37,6 +37,7 @@ include("fabric")
 include("fabric-common")
 include("fabric-official")
 include("fabric-intermediary")
+include("neoforge")
 // Patch modules
 include(":patch:adventure-text-serializer-gson")
 include(":patch:adventure-text-serializer-legacy")
