@@ -94,14 +94,11 @@ public class InternalPacketListener extends PacketListenerAbstract {
         else if (event.getPacketType() == PacketType.Configuration.Server.REGISTRY_DATA) {
             WrapperConfigServerRegistryData packet = new WrapperConfigServerRegistryData(event);
 
-            // Registries can reference ones sent after them, don't resolve those against the previous server's
-            user.clearOutdatedRegistries();
-
-            if (packet.getElements() != null) { // 1.20.2 to 1.20.5
-                SynchronizedRegistriesHandler.handleRegistry(user, packet,
-                        packet.getRegistryKey(), packet.getElements());
+            if (packet.getElements() != null) { // since 1.20.5
+                // Registries can reference ones sent after them, so wait for all of them like the client does
+                user.addPendingRegistry(packet.getRegistryKey(), packet.getElements());
             }
-            if (packet.getRegistryData() != null) { // since 1.20.5
+            if (packet.getRegistryData() != null) { // 1.20.2 to 1.20.5
                 SynchronizedRegistriesHandler.handleLegacyRegistries(user, packet, packet.getRegistryData());
             }
         }
@@ -153,8 +150,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
             user.setDecoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Play.Client.CONFIGURATION_ACK) {
             user.setDecoderState(ConnectionState.CONFIGURATION);
-            // The client keeps its registries if the server doesn't send new ones
-            user.markRegistriesOutdated();
         } else if (event.getPacketType() == PacketType.Configuration.Client.CONFIGURATION_END_ACK) {
             user.setDecoderState(ConnectionState.PLAY);
         }

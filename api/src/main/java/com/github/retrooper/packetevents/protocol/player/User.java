@@ -40,7 +40,9 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
+import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle;
@@ -54,6 +56,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,7 +74,7 @@ public class User implements IRegistryHolder {
 
     private DimensionType dimensionType = DimensionTypes.OVERWORLD;
     private final Map<ResourceLocation, IRegistry<?>> registries = new ConcurrentHashMap<>();
-    private boolean registriesOutdated;
+    private final Map<ResourceLocation, List<RegistryElement>> pendingRegistries = new HashMap<>();
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -93,20 +98,19 @@ public class User implements IRegistryHolder {
     }
 
     @ApiStatus.Internal
-    public void markRegistriesOutdated() {
-        this.registriesOutdated = true;
-    }
-
-    @ApiStatus.Internal
-    public void clearOutdatedRegistries() {
-        if (this.registriesOutdated) {
-            this.registriesOutdated = false;
-            this.registries.clear();
-        }
+    public void addPendingRegistry(ResourceLocation registryKey, List<RegistryElement> elements) {
+        this.pendingRegistries.computeIfAbsent(registryKey, key -> new ArrayList<>()).addAll(elements);
     }
 
     @ApiStatus.Internal
     public void finalizeRegistries(PacketWrapper<?> wrapper) {
+        // the client keeps its registries if the server doesn't send new ones
+        if (!this.pendingRegistries.isEmpty()) {
+            this.registries.clear();
+            SynchronizedRegistriesHandler.handleRegistries(this, wrapper, this.pendingRegistries);
+            this.pendingRegistries.clear();
+        }
+
         // do some resolving stuff for registry entries which may
         // reference the same registry they are in
         for (IRegistry<?> registry : this.registries.values()) {
