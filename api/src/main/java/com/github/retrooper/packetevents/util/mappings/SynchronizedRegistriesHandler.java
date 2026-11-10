@@ -95,10 +95,13 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -160,6 +163,22 @@ public final class SynchronizedRegistriesHandler {
         return REGISTRY_KEYS.get(registryKey);
     }
 
+    /**
+     * Drops cached synchronized registries whose cache key matches the given filter, from every registry.
+     * <p>
+     * A cache entry is only replaced when registry data with different contents arrives for the same key,
+     * so platforms whose cache keys can become unreachable (e.g. a proxy backend server being unregistered)
+     * should call this, as cached registries are otherwise kept for the lifetime of the process. Users keep
+     * the registries they already received, so this only causes the next lookup with that key to decode again.
+     *
+     * @param keyFilter returns true for each cache key to drop
+     */
+    public static void invalidateSyncedRegistries(Predicate<Object> keyFilter) {
+        for (RegistryEntry<?> entry : REGISTRY_KEYS.values()) {
+            entry.invalidateSyncedRegistries(keyFilter);
+        }
+    }
+
     public static void handleRegistry(
             User user, PacketWrapper<?> wrapper,
             ResourceLocation registryName,
@@ -185,8 +204,7 @@ public final class SynchronizedRegistriesHandler {
             if (FORCE_PER_USER_REGISTRIES || cacheKey == null) {
                 syncedRegistry = registryData.createFromElements(elements, wrapper); // no caching
             } else {
-                syncedRegistry = registryData.computeSyncedRegistry(cacheKey, () ->
-                        registryData.createFromElements(elements, wrapper));
+                syncedRegistry = registryData.computeSyncedRegistry(cacheKey, elements, wrapper);
             }
             user.putRegistry(syncedRegistry);
         } catch (Exception exception) {
@@ -257,8 +275,9 @@ public final class SynchronizedRegistriesHandler {
         // each registry may have a synchronized registry cache, for convenience and enhanced performance
         //
         // the key to this cache depends on the platform - it may be a constant value for bukkit servers
-        // or some backend server related value for proxy servers
-        private final Map<Object, SimpleRegistry<T>> syncedRegistries = new ConcurrentHashMap<>(2);
+        // or some backend server related value for proxy servers; every entry remembers the elements it
+        // was decoded from, so it is only reused for identical registry data
+        private final Map<Object, CachedRegistry<T>> syncedRegistries = new ConcurrentHashMap<>();
 
         public RegistryEntry(
                 IRegistry<T> baseRegistry,
@@ -283,13 +302,57 @@ public final class SynchronizedRegistriesHandler {
         }
 
         public @Nullable SimpleRegistry<T> getSyncedRegistry(Object key) {
-            return this.syncedRegistries.get(key);
+            CachedRegistry<T> cached = this.syncedRegistries.get(key);
+            return cached != null ? cached.registry : null;
         }
 
+        /**
+         * Returns the registry cached for the key, or computes and caches it if absent.
+         * <p>
+         * This doesn't know which registry data the supplied registry was created from, so the entry it
+         * caches will be replaced by the next call to {@link #computeSyncedRegistry(Object, List, PacketWrapper)}
+         * for this key.
+         */
         @SuppressWarnings("unchecked")
         public SimpleRegistry<T> computeSyncedRegistry(Object key, Supplier<SimpleRegistry<?>> registry) {
             return this.syncedRegistries.computeIfAbsent(key,
-                    $ -> (SimpleRegistry<T>) registry.get());
+                    $ -> new CachedRegistry<>(null, null, (SimpleRegistry<T>) registry.get())).registry;
+        }
+
+        /**
+         * Returns the registry cached for the key if it was created from registry elements equal to the given
+         * ones for the same version; otherwise creates it from the given elements and replaces the cached entry.
+         * <p>
+         * Comparing the elements makes the cache safe against the registry data behind a key changing, e.g. a
+         * proxy backend server being restarted at the same address with a different datapack.
+         */
+        public SimpleRegistry<T> computeSyncedRegistry(Object key, List<RegistryElement> elements, PacketWrapper<?> wrapper) {
+            ClientVersion version = wrapper.getServerVersion().toClientVersion();
+            CachedRegistry<T> cached = this.syncedRegistries.get(key);
+            if (cached != null && cached.matches(version, elements)) {
+                return cached.registry; // fast path, without locking
+            }
+            // decode outside of any map lock, as decoding may be slow and keys of other
+            // servers may share a hash bin with this key
+            CachedRegistry<T> decoded = new CachedRegistry<>(version, copyElements(elements),
+                    this.createFromElements(elements, wrapper));
+            return this.syncedRegistries.merge(key, decoded, (current, $) ->
+                    // keep an entry another thread cached for the same registry data in the meantime
+                    current.matches(version, elements) ? current : decoded).registry;
+        }
+
+        private static List<RegistryElement> copyElements(List<RegistryElement> elements) {
+            // copy nbt data, as packet listeners may modify it after it has been cached
+            List<RegistryElement> copy = new ArrayList<>(elements.size());
+            for (RegistryElement element : elements) {
+                NBT data = element.getData();
+                copy.add(new RegistryElement(element.getId(), data != null ? data.copy() : null));
+            }
+            return Collections.unmodifiableList(copy);
+        }
+
+        public void invalidateSyncedRegistries(Predicate<Object> keyFilter) {
+            this.syncedRegistries.keySet().removeIf(keyFilter);
         }
 
         private void handleElement(
@@ -350,6 +413,29 @@ public final class SynchronizedRegistriesHandler {
 
         public ResourceLocation getRegistryKey() {
             return this.baseRegistry.getRegistryKey();
+        }
+    }
+
+    private static final class CachedRegistry<T extends MappedEntity> {
+
+        // null if unknown, which never matches
+        private final @Nullable ClientVersion version;
+        private final @Nullable List<RegistryElement> elements;
+        private final SimpleRegistry<T> registry;
+
+        private CachedRegistry(
+                @Nullable ClientVersion version,
+                @Nullable List<RegistryElement> elements,
+                SimpleRegistry<T> registry
+        ) {
+            this.version = version;
+            this.elements = elements;
+            this.registry = registry;
+        }
+
+        private boolean matches(ClientVersion version, List<RegistryElement> elements) {
+            // registry elements compare their ids and nbt data deeply
+            return this.version == version && this.elements != null && this.elements.equals(elements);
         }
     }
 }
