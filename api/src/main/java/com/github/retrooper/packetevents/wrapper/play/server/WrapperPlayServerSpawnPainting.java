@@ -23,10 +23,16 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Direction;
 import com.github.retrooper.packetevents.protocol.world.PaintingType;
+import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant;
+import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariants;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,7 +40,7 @@ import java.util.UUID;
 public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlayServerSpawnPainting> {
     private int entityId;
     private UUID uuid;
-    private @Nullable PaintingType type;
+    private @Nullable PaintingVariant variant;
     private Vector3i position;
     private Direction direction;
 
@@ -42,19 +48,31 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         super(event);
     }
 
+    @Deprecated
     public WrapperPlayServerSpawnPainting(int entityId, Vector3i position, Direction direction) {
-        this(entityId, new UUID(0L, 0L), null, position, direction);
+        this(entityId, new UUID(0L, 0L), (PaintingVariant) null, position, direction);
     }
 
+    @Deprecated
     public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, Vector3i position, Direction direction) {
-        this(entityId, uuid, null, position, direction);
+        this(entityId, uuid, (PaintingVariant) null, position, direction);
     }
 
+    @Deprecated
     public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, @Nullable PaintingType type, Vector3i position, Direction direction) {
         super(PacketType.Play.Server.SPAWN_PAINTING);
         this.entityId = entityId;
         this.uuid = uuid;
-        this.type = type;
+        this.variant = type != null ? paintingTypeToVariant(type) : null;
+        this.position = position;
+        this.direction = direction;
+    }
+
+    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, @Nullable PaintingVariant variant, Vector3i position, Direction direction) {
+        super(PacketType.Play.Server.SPAWN_PAINTING);
+        this.entityId = entityId;
+        this.uuid = uuid;
+        this.variant = variant;
         this.position = position;
         this.direction = direction;
     }
@@ -68,9 +86,10 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
             this.uuid = new UUID(0L, 0L);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.type = PaintingType.getById(readVarInt());
+            this.variant = readMappedEntity(PaintingVariants.getRegistry());
         } else {
-            this.type = PaintingType.getByTitle(readString(13));
+            PaintingType oldType = PaintingType.getByTitle(readString(13));
+            this.variant = oldType != null ? paintingTypeToVariant(oldType) : null;
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.position = readBlockPosition();
@@ -94,9 +113,10 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
             writeUUID(this.uuid);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeVarInt(this.type.getId());
+            writeMappedEntity(Objects.requireNonNull(this.variant, "variant must be set"));
         } else {
-            writeString(this.type.getTitle(), 13);
+            PaintingVariant v = Objects.requireNonNull(this.variant, "variant must be set");
+            writeString(variantToPaintingType(v).getTitle(), 13);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             long positionVector = this.position.getSerializedPosition(this.serverVersion);
@@ -117,7 +137,7 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     public void copy(WrapperPlayServerSpawnPainting wrapper) {
         this.entityId = wrapper.entityId;
         this.uuid = wrapper.uuid;
-        this.type = wrapper.type;
+        this.variant = wrapper.variant;
         this.position = wrapper.position;
         this.direction = wrapper.direction;
     }
@@ -138,12 +158,22 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         this.uuid = uuid;
     }
 
-    public Optional<PaintingType> getType() {
-        return Optional.ofNullable(type);
+    public PaintingVariant getVariant() {
+        return variant;
     }
 
+    public void setVariant(PaintingVariant variant) {
+        this.variant = variant;
+    }
+
+    @Deprecated
+    public Optional<PaintingType> getType() {
+        return Optional.ofNullable(variant != null ? variantToPaintingType(variant) : null);
+    }
+
+    @Deprecated
     public void setType(@Nullable PaintingType type) {
-        this.type = type;
+        this.variant = type != null ? paintingTypeToVariant(type) : null;
     }
 
     public Vector3i getPosition() {
@@ -160,5 +190,35 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
 
     public void setDirection(Direction direction) {
         this.direction = direction;
+    }
+
+    // internal helpers
+
+    private static final Map<String, PaintingType> REGISTRY_KEY_TO_TYPE;
+
+    static {
+        Map<String, PaintingType> map = new HashMap<>();
+        for (PaintingType type : PaintingType.values()) {
+            map.put(enumNameToRegistryKey(type), type);
+        }
+        REGISTRY_KEY_TO_TYPE = Collections.unmodifiableMap(map);
+    }
+
+    @Nullable
+    private static PaintingType variantToPaintingType(PaintingVariant variant) {
+        if (variant == null) return null;
+        return REGISTRY_KEY_TO_TYPE.get(variant.getName().getKey());
+    }
+
+    private static PaintingVariant paintingTypeToVariant(PaintingType type) {
+        return PaintingVariants.getByName(enumNameToRegistryKey(type));
+    }
+
+    private static String enumNameToRegistryKey(PaintingType type) {
+        // PIG_SCENE -> "pig_scene" but the registry key is "pigscene"
+        if (type == PaintingType.PIG_SCENE) {
+            return "pigscene";
+        }
+        return type.name().toLowerCase();
     }
 }
