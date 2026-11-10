@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.connection.ServerChannelHandler;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
@@ -33,6 +34,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
@@ -226,6 +228,52 @@ public class SpigotChannelInjector implements ChannelInjector {
             decoder.user.getProfile().setName(((Player) player).getName());
             decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
         }
+    }
+
+    @Override
+    public void reinject(Object ch) {
+        Channel channel = (Channel) ch;
+        if (FakeChannelUtil.isFakeChannel(channel) || !channel.isOpen() || PacketEvents.getAPI().isTerminated()) {
+            return;
+        }
+
+        // Resolved here rather than on the event loop, since the caller is usually on a server thread
+        Player player = findPlayer(channel);
+        channel.eventLoop().execute(() -> {
+            if (!channel.isOpen() || isInjected(channel)) return;
+
+            try {
+                // A pipeline holding only one of the two would reject the re-add as a duplicate name
+                removeHandler(channel, PacketEvents.DECODER_NAME);
+                removeHandler(channel, PacketEvents.ENCODER_NAME);
+
+                User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+                if (user == null) {
+                    ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
+                } else {
+                    ServerConnectionInitializer.relocateHandlers(channel, null, user);
+                }
+
+                if (player != null) setPlayer(channel, player);
+            } catch (Exception e) {
+                PacketEvents.getAPI().getLogManager().severe("Failed to re-inject channel " + channel, e);
+            }
+        });
+    }
+
+    private static @Nullable Player findPlayer(Channel channel) {
+        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+        if (user != null && user.getUUID() != null) return Bukkit.getPlayer(user.getUUID());
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (SpigotReflectionUtil.getChannel(player) == channel) return player;
+        }
+
+        return null;
+    }
+
+    private static void removeHandler(Channel channel, String name) {
+        if (channel.pipeline().get(name) != null) channel.pipeline().remove(name);
     }
 
     /**
