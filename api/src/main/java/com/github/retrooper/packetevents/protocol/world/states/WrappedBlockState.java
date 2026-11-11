@@ -1582,6 +1582,9 @@ public class WrappedBlockState {
     public boolean isFluid() {
         StateType block = this.getType();
         return block == StateTypes.WATER || block == StateTypes.LAVA
+                // always hold water, without a waterlogged property
+                || block == StateTypes.BUBBLE_COLUMN || block == StateTypes.KELP || block == StateTypes.KELP_PLANT
+                || block == StateTypes.SEAGRASS || block == StateTypes.TALL_SEAGRASS
                 || this.hasProperty(StateValue.WATERLOGGED) && this.isWaterlogged();
     }
 

@@ -452,6 +452,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (size > maxSize) {
             throw new RuntimeException(size + " elements exceeded max size of: " + maxSize);
         }
+        this.checkElementCount(size);
 
         Map<K, V> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
@@ -1381,8 +1382,17 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
     }
 
+    private int checkElementCount(int count) {
+        int readableBytes = ByteBufHelper.readableBytes(this.buffer);
+        if (count > readableBytes) {
+            throw new IllegalStateException("Collection with size " + count
+                    + " is bigger than allowed " + readableBytes);
+        }
+        return count;
+    }
+
     public <K, C extends Collection<K>> C readCollection(IntFunction<C> function, Reader<K> reader) {
-        int size = this.readVarInt();
+        int size = this.checkElementCount(this.readVarInt());
         return readFixedCollection(function, reader, size);
     }
 
@@ -1391,7 +1401,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (size > maxSize) {
             throw new RuntimeException(size + " elements exceeded max size of: " + maxSize);
         }
-        return readFixedCollection(function, reader, size);
+        return readFixedCollection(function, reader, this.checkElementCount(size));
     }
 
     public  <K, C extends Collection<K>> C readFixedCollection(IntFunction<C> function, Reader<K> reader, int size) {
@@ -1441,7 +1451,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     @SuppressWarnings("unchecked") // not unchecked
     public <K> K[] readArray(Reader<K> reader, Class<K> clazz) {
-        int length = this.readVarInt();
+        int length = this.checkElementCount(this.readVarInt());
         K[] array = (K[]) Array.newInstance(clazz, length);
         for (int i = 0; i < length; i++) {
             array[i] = reader.apply(this);

@@ -44,12 +44,8 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!(msg instanceof ByteBuf in)) {
+        if (!(msg instanceof ByteBuf in) || !in.isReadable()) {
             ctx.write(msg, promise);
-            return;
-        }
-        if (!in.isReadable()) {
-            in.release();
             return;
         }
 
@@ -57,6 +53,9 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
                 this.user, this.player, in, false, this.side);
         if (in.isReadable()) {
             ctx.write(in, promise);
+        } else {
+            in.release();
+            promise.setSuccess();
         }
     }
 }

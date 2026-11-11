@@ -66,6 +66,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -123,7 +124,7 @@ public final class SpigotReflectionUtil {
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
             GET_MOB_EFFECT_LIST_ID_METHOD, GET_MOB_EFFECT_LIST_BY_ID_METHOD, GET_ITEM_ID_METHOD, GET_ITEM_BY_ID_METHOD,
-            GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD, GET_ENTITY_BY_ID_METHOD,
+            GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD, GET_ENTITY_BY_ID_METHOD, GET_ENTITY_BY_UUID_LEVEL_ENTITY_GETTER_METHOD, GET_ENTITY_BY_UUID_METHOD,
             CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY, BUKKIT_PARTICLE_TO_NMS_ENUM_PARTICLE, NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE,
             READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
@@ -153,6 +154,7 @@ public final class SpigotReflectionUtil {
 
     //Cache entities right after we request/find them for faster search.
     public static Map<Integer, Entity> ENTITY_ID_CACHE = new MapMaker().weakValues().makeMap();
+    public static Map<UUID, Entity> ENTITY_UUID_CACHE = new MapMaker().weakValues().makeMap();
 
     private static void initConstructors() {
         Class<?> itemClass = NMS_IMATERIAL_CLASS != null ? NMS_IMATERIAL_CLASS : NMS_ITEM_CLASS;
@@ -189,6 +191,7 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
             GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, ENTITY_ACCESS_CLASS, 0, int.class);
+            GET_ENTITY_BY_UUID_LEVEL_ENTITY_GETTER_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, ENTITY_ACCESS_CLASS, 0, UUID.class);
         }
         if (DIMENSION_MANAGER_CLASS != null) {
             GET_DIMENSION_KEY = Reflection.getMethod(LEVEL_CLASS, "getTypeKey", 0);
@@ -203,6 +206,7 @@ public final class SpigotReflectionUtil {
         if (GET_ENTITY_BY_ID_METHOD == null) {
             GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(SERVER_LEVEL_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
         }
+        GET_ENTITY_BY_UUID_METHOD = Reflection.getMethodExact(SERVER_LEVEL_CLASS, "getEntity", NMS_ENTITY_CLASS, UUID.class);
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             BUKKIT_PARTICLE_TO_NMS_ENUM_PARTICLE = Reflection.getMethod(CRAFT_PARTICLE_CLASS, "toNMS", NMS_ENUM_PARTICLE_CLASS);
@@ -1113,45 +1117,57 @@ public final class SpigotReflectionUtil {
     }
 
     private static @Nullable Entity getEntityByIdWithWorldUnsafe(World world, int id) {
-        if (world == null) {
-            return null;
-        }
-        Entity cachedEntity = ENTITY_ID_CACHE.getOrDefault(id, null);
-        if (cachedEntity != null) {
-            return cachedEntity;
-        }
         try {
-            Object serverLevel = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
-            Object nmsEntity;
-            //On 1.17 we need this to bypass
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
-                ReflectionObject reflectObj = PAPER_ENTITY_LOOKUP_LEGACY
-                        ? new ReflectionObject(serverLevel, SERVER_LEVEL_CLASS)
-                        : new ReflectionObject(serverLevel, LEVEL_CLASS);
-                Object levelEntityGetter;
-                if (PAPER_ENTITY_LOOKUP_EXISTS) {
-                    levelEntityGetter = reflectObj.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
-                } else {
-                    Object entitySectionManager = reflectObj.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
-                    ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
-                    levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
-                }
-                nmsEntity = GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD.invoke(levelEntityGetter, id);
-            } else {
-                nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(serverLevel, id);
-            }
-            if (nmsEntity == null) {
-                return null;
-            }
-            Entity entity = getBukkitEntity(nmsEntity);
-            if (entity == null) {
-                return null;
-            }
-            ENTITY_ID_CACHE.put(id, entity);
-            return entity;
+            return getEntityWithWorldUnsafe(world, id, ENTITY_ID_CACHE, GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD, GET_ENTITY_BY_ID_METHOD);
         } catch (IllegalAccessException | InvocationTargetException exception) {
             throw new RuntimeException("Error while looking up entity by id " + id + " in " + world, exception);
         }
+    }
+
+    private static @Nullable Entity getEntityByUUIDWithWorldUnsafe(World world, UUID uuid) {
+        try {
+            return getEntityWithWorldUnsafe(world, uuid, ENTITY_UUID_CACHE, GET_ENTITY_BY_UUID_LEVEL_ENTITY_GETTER_METHOD, GET_ENTITY_BY_UUID_METHOD);
+        } catch (IllegalAccessException | InvocationTargetException exception) {
+            throw new RuntimeException("Error while looking up entity by uuid " + uuid + " in " + world, exception);
+        }
+    }
+
+    private static <T> @Nullable Entity getEntityWithWorldUnsafe(World world, T type, Map<T, Entity> entityCache, Method getEntityLevelEntityGetterMethod, Method getEntityMethod) throws IllegalAccessException, InvocationTargetException {
+        if (world == null) {
+            return null;
+        }
+        Entity cachedEntity = entityCache.getOrDefault(type, null);
+        if (cachedEntity != null) {
+            return cachedEntity;
+        }
+        Object serverLevel = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
+        Object nmsEntity;
+        //On 1.17 we need this to bypass
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            ReflectionObject reflectObj = PAPER_ENTITY_LOOKUP_LEGACY
+                    ? new ReflectionObject(serverLevel, SERVER_LEVEL_CLASS)
+                    : new ReflectionObject(serverLevel, LEVEL_CLASS);
+            Object levelEntityGetter;
+            if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                levelEntityGetter = reflectObj.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
+            } else {
+                Object entitySectionManager = reflectObj.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+                ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
+                levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+            }
+            nmsEntity = getEntityLevelEntityGetterMethod.invoke(levelEntityGetter, type);
+        } else {
+            nmsEntity = getEntityMethod.invoke(serverLevel, type);
+        }
+        if (nmsEntity == null) {
+            return null;
+        }
+        Entity entity = getBukkitEntity(nmsEntity);
+        if (entity == null) {
+            return null;
+        }
+        entityCache.put(type, entity);
+        return entity;
     }
 
     /**
@@ -1185,6 +1201,29 @@ public final class SpigotReflectionUtil {
     @Deprecated
     public static @Nullable Entity getEntityById(int entityID) {
         return getEntityById(null, entityID);
+    }
+
+    /**
+     * Get the entity by the uuid.
+     *
+     * @deprecated Please resort to {@link SpigotConversionUtil#getEntityByUUID(World, int)} since the reflection util is not API.
+     */
+    @Deprecated
+    public static @Nullable Entity getEntityByUUID(@Nullable World origin, UUID uuid) {
+        if (origin != null) {
+            Entity e = getEntityByUUIDWithWorldUnsafe(origin, uuid);
+            if (e != null) {
+                return e;
+            }
+        }
+        //They specified the wrong world
+        for (World world : Bukkit.getWorlds()) {
+            Entity entity = getEntityByUUIDWithWorldUnsafe(world, uuid);
+            if (entity != null) {
+                return entity;
+            }
+        }
+        return null;
     }
 
     public static List<Entity> getEntityList(World world) {
