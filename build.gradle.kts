@@ -17,12 +17,7 @@ description = rootProject.name
 version = "${ext["fullVersion"]}${ext[if (ext["snapshot"] == true) "versionMetaWithHash" else "versionMeta"]}"
 
 tasks {
-    val taskSubModules: (String) -> Array<Task> = { task ->
-        subprojects.filterNot { it.path == ":patch" }.map { it.tasks[task] }.toTypedArray()
-    }
-
     register<Delete>("clean") {
-        dependsOn(*taskSubModules("clean"))
         delete(rootProject.layout.buildDirectory)
     }
 
