@@ -277,6 +277,18 @@ public class ItemStack {
         );
     }
 
+    public ItemStack deepCopy() {
+        if (this.isEmpty()) {
+            return EMPTY;
+        }
+        return new ItemStack(
+                this.type, this.amount,
+                this.nbt == null ? null : this.nbt.copy(),
+                this.components == null ? null : this.components.deepCopy(this.version),
+                this.legacyData, this.version, this.registryHolder
+        );
+    }
+
     @Nullable
     public NBTCompound getNBT() {
         return nbt;
