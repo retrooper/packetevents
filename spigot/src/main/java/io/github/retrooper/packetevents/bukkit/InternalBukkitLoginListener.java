@@ -41,6 +41,9 @@ public class InternalBukkitLoginListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent event) {
+        if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
+            return;
+        }
         PacketEventsAPI<?> api = PacketEvents.getAPI();
         User user = api.getPlayerManager().getUser(event.getPlayer());
         if (user != null) {
