@@ -69,6 +69,7 @@ public class User implements IRegistryHolder {
 
     private DimensionType dimensionType = DimensionTypes.OVERWORLD;
     private final Map<ResourceLocation, IRegistry<?>> registries = new ConcurrentHashMap<>();
+    private boolean registriesOutdated;
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -89,6 +90,19 @@ public class User implements IRegistryHolder {
     @ApiStatus.Internal
     public void putRegistry(IRegistry<?> registry) {
         this.registries.put(registry.getRegistryKey(), registry);
+    }
+
+    @ApiStatus.Internal
+    public void markRegistriesOutdated() {
+        this.registriesOutdated = true;
+    }
+
+    @ApiStatus.Internal
+    public void clearOutdatedRegistries() {
+        if (this.registriesOutdated) {
+            this.registriesOutdated = false;
+            this.registries.clear();
+        }
     }
 
     @ApiStatus.Internal
