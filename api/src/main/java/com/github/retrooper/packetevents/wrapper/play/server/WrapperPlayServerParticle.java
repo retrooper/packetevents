@@ -54,6 +54,8 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
      * @versions 26.3+
      */
     private RandomizationType randomizationType = RandomizationType.DEFAULT;
+    /** Raw type id from pre-1.20.5 packets. */
+    private int legacyTypeId = -1;
 
     public WrapperPlayServerParticle(PacketSendEvent event) {
         super(event);
@@ -117,7 +119,12 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             particleType = ParticleTypes.getByName("minecraft:" + particleName);
         } else if (!v1205) {
             particleTypeId = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) ? readVarInt() : readInt();
+            this.legacyTypeId = particleTypeId;
             particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
+            if (particleType == null) {
+                throw new IllegalStateException("Unknown particle type id " + particleTypeId
+                        + " for " + serverVersion.toClientVersion());
+            }
         }
         longDistance = readBoolean();
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_4)) {
@@ -164,7 +171,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeString(particle.getType().getName().getKey(), 64);
         } else if (this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
-            int id = this.particle.getType().getId(this.serverVersion.toClientVersion());
+            int id = this.legacyTypeId >= 0
+                    ? this.legacyTypeId
+                    : this.particle.getType().getId(this.serverVersion.toClientVersion());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
                 writeVarInt(id);
             } else {
@@ -199,7 +208,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
                 ((ParticleType<ParticleData>) this.particle.getType()).writeData(this, this.particle.getData());
             } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-                int id = this.particle.getType().getId(this.serverVersion.toClientVersion());
+                int id = this.legacyTypeId >= 0
+                        ? this.legacyTypeId
+                        : this.particle.getType().getId(this.serverVersion.toClientVersion());
                 LegacyParticleData legacyData = this.particle.getData() instanceof LegacyConvertible
                         ? ((LegacyConvertible) this.particle.getData()).toLegacy(this.serverVersion.toClientVersion())
                         : LegacyParticleData.nullValue(id);
@@ -218,6 +229,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.particleCount = wrapper.particleCount;
         this.alwaysShow = wrapper.alwaysShow;
         this.randomizationType = wrapper.randomizationType;
+        this.legacyTypeId = wrapper.legacyTypeId;
     }
 
     public Particle<?> getParticle() {
@@ -226,6 +238,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
 
     public void setParticle(Particle<?> particle) {
         this.particle = particle;
+        this.legacyTypeId = -1;
     }
 
     public boolean isLongDistance() {
