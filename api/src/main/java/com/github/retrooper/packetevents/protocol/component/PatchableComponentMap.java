@@ -19,8 +19,10 @@
 package com.github.retrooper.packetevents.protocol.component;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -44,7 +46,7 @@ public class PatchableComponentMap implements IComponentMap {
     private final IRegistryHolder registries;
 
     public PatchableComponentMap(StaticComponentMap base) {
-        this(base.delegate, new HashMap<>(), base.registries);
+        this(base.delegate, new HashMap<>(), base.registries, true);
     }
 
     @Deprecated
@@ -56,7 +58,7 @@ public class PatchableComponentMap implements IComponentMap {
             StaticComponentMap base,
             Map<ComponentType<?>, Optional<?>> patches
     ) {
-        this(base.delegate, patches, base.registries);
+        this(base.delegate, patches, base.registries, true);
     }
 
     @Deprecated
@@ -68,7 +70,7 @@ public class PatchableComponentMap implements IComponentMap {
     }
 
     public PatchableComponentMap(StaticComponentMap base, IRegistryHolder registries) {
-        this(base.delegate, new HashMap<>(), registries);
+        this(base.delegate, new HashMap<>(), registries, true);
     }
 
     public PatchableComponentMap(Map<ComponentType<?>, ?> base, IRegistryHolder registries) {
@@ -80,7 +82,7 @@ public class PatchableComponentMap implements IComponentMap {
             Map<ComponentType<?>, Optional<?>> patches,
             IRegistryHolder registries
     ) {
-        this(base.delegate, patches, registries);
+        this(base.delegate, patches, registries, true);
     }
 
     public PatchableComponentMap(
@@ -88,7 +90,22 @@ public class PatchableComponentMap implements IComponentMap {
             Map<ComponentType<?>, Optional<?>> patches,
             IRegistryHolder registries
     ) {
-        this.base = Collections.unmodifiableMap(new HashMap<>(base));
+        this(base, patches, registries, false);
+    }
+
+    /**
+     * @param trustedBase whether {@code base} is already immutable and may be referenced directly.
+     *                    Only ever true for maps sourced from a {@link StaticComponentMap}, which
+     *                    already wraps its own defensive copy. Copying again here would allocate a
+     *                    fresh map for every item stack read off the wire.
+     */
+    private PatchableComponentMap(
+            Map<ComponentType<?>, ?> base,
+            Map<ComponentType<?>, Optional<?>> patches,
+            IRegistryHolder registries,
+            boolean trustedBase
+    ) {
+        this.base = trustedBase ? base : Collections.unmodifiableMap(new HashMap<>(base));
         this.patches = patches;
         this.registries = registries;
     }
@@ -133,11 +150,11 @@ public class PatchableComponentMap implements IComponentMap {
                             + expectedReaderIndex + ", got reader index " + readerIndex);
                 }
             }
-            // set component value in component patch-map
-            components.set((ComponentType<Object>) type, value);
+            // store the patch in the patch-map exactly as it arrived
+            components.patches.put(type, Optional.ofNullable(value));
         }
         for (int i = 0; i < absentCount; i++) {
-            components.unset(wrapper.readMappedEntity(ComponentTypes.getRegistry()));
+            components.patches.put(wrapper.readMappedEntity(ComponentTypes.getRegistry()), Optional.empty());
         }
 
         return components;
@@ -233,13 +250,46 @@ public class PatchableComponentMap implements IComponentMap {
     @Override
     public PatchableComponentMap withRegistries(IRegistryHolder registries) {
         if (this.registries != registries) {
-            return new PatchableComponentMap(this.base, this.patches, this.registries);
+            return new PatchableComponentMap(this.base, new HashMap<>(this.patches), registries, true);
         }
         return this;
     }
 
     public PatchableComponentMap copy() {
-        return new PatchableComponentMap(this.base, new HashMap<>(this.patches), this.registries);
+        return new PatchableComponentMap(this.base, new HashMap<>(this.patches), this.registries, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PatchableComponentMap deepCopy(ClientVersion version) {
+        if (this.patches.isEmpty()) {
+            return new PatchableComponentMap(this.base, new HashMap<>(), this.registries, true);
+        }
+
+        Map<ComponentType<?>, Optional<?>> copiedPatches = new HashMap<>(this.patches.size());
+        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        try {
+            PacketWrapper<?> wrapper = PacketWrapper.createDummyWrapper(version);
+            wrapper.buffer = buffer;
+            wrapper.setRegistryHolder(this.registries);
+
+            for (Map.Entry<ComponentType<?>, Optional<?>> patch : this.patches.entrySet()) {
+                Optional<?> value = patch.getValue();
+                if (!value.isPresent()) {
+                    copiedPatches.put(patch.getKey(), value); // empty optionals are immutable
+                    continue;
+                }
+
+                ComponentType<Object> type = (ComponentType<Object>) patch.getKey();
+                ByteBufHelper.clear(buffer);
+                type.write(wrapper, value.get());
+                Object copiedValue = type.read(wrapper);
+                // a null result means this type has no wire codec; keep sharing the value
+                copiedPatches.put(type, copiedValue != null ? Optional.of(copiedValue) : value);
+            }
+        } finally {
+            ByteBufHelper.release(buffer);
+        }
+        return new PatchableComponentMap(this.base, copiedPatches, this.registries, true);
     }
 
     @Deprecated

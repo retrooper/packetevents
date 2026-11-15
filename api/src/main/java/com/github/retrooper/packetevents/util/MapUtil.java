@@ -43,7 +43,7 @@ public final class MapUtil {
         } else if (o1 instanceof DeepComparableEntity) {
             return ((DeepComparableEntity) o1).deepEquals(o2);
         } else if (o2 instanceof DeepComparableEntity) {
-            return ((DeepComparableEntity) o2).deepEquals(o2);
+            return ((DeepComparableEntity) o2).deepEquals(o1);
         } else {
             return Objects.equals(o1, o2);
         }
