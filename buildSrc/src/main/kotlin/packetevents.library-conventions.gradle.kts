@@ -53,7 +53,7 @@ tasks {
 
     processResources {
         inputs.property("version", project.version)
-        filesMatching(listOf("plugin.yml", "bungee.yml", "velocity-plugin.json", "fabric.mod.json")) {
+        filesMatching(listOf("plugin.yml", "bungee.yml", "velocity-plugin.json", "fabric.mod.json", "META-INF/neoforge.mods.toml")) {
             expand("version" to project.version)
         }
     }

@@ -63,6 +63,12 @@ jobs:
           name: fabric-build
           path: build/libs/packetevents-fabric-*.jar
 
+      - name: Upload build artifacts neoforge
+        uses: actions/upload-artifact@v7
+        with:
+          name: neoforge-build
+          path: build/libs/packetevents-neoforge-*.jar
+
       - name: Upload build artifacts sponge
         uses: actions/upload-artifact@v7
         with:
