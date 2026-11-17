@@ -18,12 +18,14 @@
 
 package com.github.retrooper.packetevents.protocol.item;
 
+import com.github.retrooper.packetevents.binary.BinaryBuffer;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -125,6 +127,35 @@ public final class ItemStackSerialization {
         return ItemStack.builder().type(type).amount(amount)
                 .nbt(nbt).legacyData(legacyData)
                 .wrapper(wrapper).build();
+    }
+
+    /**
+     * Migration of {@link ItemStackSerialization#readLegacy}
+     */
+    private static ItemStack readLegacyBinary(
+            BinaryBuffer buffer,
+            ServerVersion serverVersion,
+            IRegistryHolder registryHolder
+    ) {
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
+        if (v1_13_2 && !buffer.read(BinaryBuffer.BOOLEAN)) {
+            return ItemStack.EMPTY;
+        }
+        int typeId = v1_13_2 ? buffer.read(BinaryBuffer.VAR_INT) : buffer.read(BinaryBuffer.SHORT);
+        if (typeId < 0 && !v1_13_2) { // 1.13.2 doesn't have this logic
+            return ItemStack.EMPTY;
+        }
+
+        ClientVersion version = serverVersion.toClientVersion();
+        ItemType type = ItemTypes.getRegistry().getByIdOrThrow(version, typeId);
+        int amount = buffer.read(BinaryBuffer.BYTE);
+        int legacyData = v1_13_2 ? -1 : buffer.read(BinaryBuffer.SHORT);
+        NBTCompound nbt = buffer.read(BinaryBuffer.NBT);
+        return ItemStack.builder().type(type).amount(amount)
+                .nbt(nbt).legacyData(legacyData)
+                .version(version)
+                .registryHolder(registryHolder)
+                .build();
     }
 
     /**
