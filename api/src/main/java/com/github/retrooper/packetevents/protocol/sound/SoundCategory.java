@@ -41,5 +41,4 @@ public enum SoundCategory {
     public static SoundCategory fromId(int id) {
         return VALUES[id];
     }
-
 }
