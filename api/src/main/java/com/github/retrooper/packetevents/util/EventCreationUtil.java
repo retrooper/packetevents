@@ -20,12 +20,27 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.event.simple.*;
+import com.github.retrooper.packetevents.event.simple.PacketConfigReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketConfigSendEvent;
+import com.github.retrooper.packetevents.event.simple.PacketHandshakeReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketHandshakeSendEvent;
+import com.github.retrooper.packetevents.event.simple.PacketLoginReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketLoginSendEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.event.simple.PacketStatusReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketStatusSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jetbrains.annotations.ApiStatus;
 
-public class EventCreationUtil {
+@ApiStatus.Internal
+public final class EventCreationUtil {
+
+    private EventCreationUtil() {
+    }
+
     public static PacketReceiveEvent createReceiveEvent(Object channel, User user, Object player, Object buffer,
                                                         boolean autoProtocolTranslation) throws PacketProcessException {
         return createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, user.getDecoderState());

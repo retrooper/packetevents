@@ -60,11 +60,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class User implements IRegistryHolder {
 
+    private ConnectionState serverDecoderState;
+    private ConnectionState clientDecoderState;
+    private ConnectionState serverEncoderState;
+    private ConnectionState clientEncoderState;
+
     private final Object channel;
-    private ConnectionState decoderState;
-    private ConnectionState preViaDecoderState;
-    private ConnectionState encoderState;
-    private ConnectionState preViaEncoderState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
     private int entityId = -1;
@@ -72,14 +73,18 @@ public class User implements IRegistryHolder {
     private DimensionType dimensionType = DimensionTypes.OVERWORLD;
     private final Map<ResourceLocation, IRegistry<?>> registries = new ConcurrentHashMap<>();
 
-    public User(Object channel,
-                ConnectionState connectionState, ClientVersion clientVersion,
-                UserProfile profile) {
+    public User(
+            Object channel,
+            ConnectionState connectionState,
+            ClientVersion clientVersion,
+            UserProfile profile
+    ) {
+        this.serverDecoderState = connectionState;
+        this.clientDecoderState = connectionState;
+        this.serverEncoderState = connectionState;
+        this.clientEncoderState = connectionState;
+
         this.channel = channel;
-        this.decoderState = connectionState;
-        this.preViaDecoderState = connectionState;
-        this.encoderState = connectionState;
-        this.preViaEncoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
     }
@@ -127,8 +132,8 @@ public class User implements IRegistryHolder {
      */
     @ApiStatus.Obsolete
     public ConnectionState getConnectionState() throws IllegalStateException {
-        ConnectionState decoderState = this.decoderState;
-        ConnectionState encoderState = this.encoderState;
+        ConnectionState decoderState = this.serverDecoderState;
+        ConnectionState encoderState = this.serverEncoderState;
         if (decoderState != encoderState) {
             throw new IllegalStateException("Can't get common connection state: " + decoderState + " != " + encoderState);
         }
@@ -139,50 +144,56 @@ public class User implements IRegistryHolder {
     public void setConnectionState(ConnectionState connectionState) {
         this.setDecoderState(connectionState);
         this.setEncoderState(connectionState);
-        this.setPreViaDecoderState(connectionState);
-        this.setPreViaEncoderState(connectionState);
+        this.setClientDecoderState(connectionState);
+        this.setClientEncoderState(connectionState);
     }
 
     public ConnectionState getDecoderState() {
-        return this.decoderState;
+        return this.serverDecoderState;
     }
 
-    public ConnectionState getPreViaDecoderState() {
-        return this.preViaDecoderState;
+    /**
+     * Gets the state the current client-versioned decoder handler is in (used for e.g. pre-ViaVersion injection).
+     */
+    public ConnectionState getClientDecoderState() {
+        return this.clientDecoderState;
     }
 
     @ApiStatus.Internal
-    public void setPreViaDecoderState(ConnectionState preViaDecoderState) {
-        this.preViaDecoderState = preViaDecoderState;
+    public void setClientDecoderState(ConnectionState clientDecoderState) {
+        this.clientDecoderState = clientDecoderState;
         PacketEvents.getAPI().getLogManager().debug(
-                "Transitioned " + this.getName() + "'s previa decoder into " + preViaDecoderState + " state!");
+                "Transitioned " + this.getName() + "'s client decoder into " + clientDecoderState + " state!");
     }
 
     @ApiStatus.Internal
     public void setDecoderState(ConnectionState decoderState) {
-        this.decoderState = decoderState;
+        this.serverDecoderState = decoderState;
         PacketEvents.getAPI().getLogManager().debug(
                 "Transitioned " + this.getName() + "'s decoder into " + decoderState + " state!");
     }
 
     public ConnectionState getEncoderState() {
-        return this.encoderState;
+        return this.serverEncoderState;
     }
 
-    public ConnectionState getPreViaEncoderState() {
-        return this.preViaEncoderState;
+    /**
+     * Gets the state the current client-versioned encoder handler is in (used for e.g. pre-ViaVersion injection).
+     */
+    public ConnectionState getClientEncoderState() {
+        return this.clientEncoderState;
     }
 
     @ApiStatus.Internal
-    public void setPreViaEncoderState(ConnectionState preViaEncoderState) {
-        this.preViaEncoderState = preViaEncoderState;
+    public void setClientEncoderState(ConnectionState clientEncoderState) {
+        this.clientEncoderState = clientEncoderState;
         PacketEvents.getAPI().getLogManager().debug(
-                "Transitioned " + this.getName() + "'s previa encoder into " + preViaEncoderState + " state!");
+                "Transitioned " + this.getName() + "'s client encoder into " + clientEncoderState + " state!");
     }
 
     @ApiStatus.Internal
     public void setEncoderState(ConnectionState encoderState) {
-        this.encoderState = encoderState;
+        this.serverEncoderState = encoderState;
         PacketEvents.getAPI().getLogManager().debug(
                 "Transitioned " + this.getName() + "'s encoder into " + encoderState + " state!");
     }

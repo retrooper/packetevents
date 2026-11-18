@@ -43,6 +43,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * open a pull request on GitHub and describe your case.
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public class EventContainer {
 
     //Using a ConcurrentHashMap is faster and more secure here, compared to Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class))
@@ -67,7 +68,6 @@ public class EventContainer {
     public void callEvent(PacketEvent event) {
         callEvent(event, null);
     }
-
 
     /**
      * Call the PacketEvent.

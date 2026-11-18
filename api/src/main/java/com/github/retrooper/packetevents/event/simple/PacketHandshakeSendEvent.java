@@ -19,7 +19,7 @@ public class PacketHandshakeSendEvent extends PacketSendEvent {
             @UnknownNullability Object player, Object rawByteBuf,
             boolean autoProtocolTranslation
     ) throws PacketProcessException {
-        this(channel, user, player, rawByteBuf, autoProtocolTranslation, user.getEncoderState());
+        super(channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
     public PacketHandshakeSendEvent(

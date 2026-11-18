@@ -65,10 +65,10 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
             // Without ViaVersion we still need to call previa listeners from the normal handler
             if (this.preVia == PreViaState.FALLBACK) {
                 PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
-                        false, user.getPreViaDecoderState());
+                        false, user.getClientDecoderState());
             }
 
-            ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? user.getPreViaDecoderState() : user.getDecoderState();
+            ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? user.getClientDecoderState() : user.getDecoderState();
             PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
                     this.preVia != PreViaState.PRE_VIA, connectionState);
 

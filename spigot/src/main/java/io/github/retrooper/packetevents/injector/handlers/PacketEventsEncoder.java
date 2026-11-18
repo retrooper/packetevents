@@ -148,7 +148,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? this.user.getPreViaEncoderState() : this.user.getEncoderState();
+            ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? this.user.getClientEncoderState() : this.user.getEncoderState();
             this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.preVia != PreViaState.PRE_VIA, connectionState, this.promise);
 
             // check if the packet got canceled
@@ -161,7 +161,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             // Without ViaVersion we still need to call previa listeners from the normal handler
             if (this.preVia == PreViaState.FALLBACK) {
                 this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
-                        false, this.user.getPreViaEncoderState(), this.promise);
+                        false, this.user.getClientEncoderState(), this.promise);
             }
 
             if (needsRecompression) {
@@ -272,7 +272,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
         //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
         boolean decompress = false;
-        if (preVia != PreViaState.PRE_VIA || !user.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10)) {
+        if (preVia != PreViaState.PRE_VIA || user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_8)) {
             decompress(ctx, buffer, buffer);
             decompress = true;
         }

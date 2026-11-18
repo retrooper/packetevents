@@ -12,7 +12,7 @@ import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHands
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Keeps the raw client-side state used by previa handlers separate from the normal server state.
+ * Keeps the raw client-side state used by client-versioned handlers separate from the normal server state.
  */
 @ApiStatus.Internal
 public class ClientVersionInternalListener extends PacketListenerAbstract {
@@ -33,16 +33,15 @@ public class ClientVersionInternalListener extends PacketListenerAbstract {
             WrapperHandshakingClientHandshake packet = new WrapperHandshakingClientHandshake(event);
             user.setClientVersion(packet.getClientVersion());
             ConnectionState state = packet.getNextConnectionState();
-            user.setPreViaDecoderState(state);
-            user.setPreViaEncoderState(state);
+            user.setClientDecoderState(state);
+            user.setClientEncoderState(state);
         } else if (event.getPacketType() == PacketType.Login.Client.LOGIN_SUCCESS_ACK) {
-            user.setPreViaDecoderState(ConnectionState.CONFIGURATION);
+            user.setClientDecoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Play.Client.CONFIGURATION_ACK) {
-            user.setPreViaDecoderState(ConnectionState.CONFIGURATION);
+            user.setClientDecoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Configuration.Client.CONFIGURATION_END_ACK) {
-            user.setPreViaDecoderState(ConnectionState.PLAY);
+            user.setClientDecoderState(ConnectionState.PLAY);
         }
-        System.out.println("PRE VIA " + event.getPacketType() + " " + event.getServerVersion());
     }
 
     @Override
@@ -50,15 +49,15 @@ public class ClientVersionInternalListener extends PacketListenerAbstract {
         User user = event.getUser();
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             if (event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
-                user.setPreViaEncoderState(ConnectionState.CONFIGURATION);
+                user.setClientEncoderState(ConnectionState.CONFIGURATION);
             } else {
-                user.setPreViaEncoderState(ConnectionState.PLAY);
-                user.setPreViaDecoderState(ConnectionState.PLAY);
+                user.setClientEncoderState(ConnectionState.PLAY);
+                user.setClientDecoderState(ConnectionState.PLAY);
             }
         } else if (event.getPacketType() == PacketType.Play.Server.CONFIGURATION_START) {
-            user.setPreViaEncoderState(ConnectionState.CONFIGURATION);
+            user.setClientEncoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Configuration.Server.CONFIGURATION_END) {
-            user.setPreViaEncoderState(ConnectionState.PLAY);
+            user.setClientEncoderState(ConnectionState.PLAY);
         }
     }
 }
