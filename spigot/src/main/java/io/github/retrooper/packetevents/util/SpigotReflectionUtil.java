@@ -61,6 +61,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -728,7 +730,35 @@ public final class SpigotReflectionUtil {
             }
         }
 
+        // Nobody is connected yet (e.g. injecting before a late bind), so find the list by its declared type
+        // instead of assuming its position
+        int listIndex = findListIndexByElementType(getMinecraftServerConnectionInstance().getClass(), NETWORK_MANAGER_CLASS);
+        if (listIndex != -1) {
+            return serverConnectionWrapper.readList(listIndex);
+        }
         return (List<Object>) serverConnectionWrapper.readObject(1, List.class);
+    }
+
+    public static int findListIndexByElementType(Class<?> owner, Class<?> elementClass) {
+        int listIndex = 0;
+        for (Field field : owner.getDeclaredFields()) {
+            if (field.getType() != List.class) {
+                continue;
+            }
+            try {
+                Type genericType = field.getGenericType();
+                if (genericType instanceof ParameterizedType) {
+                    Type elementType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                    if (elementType instanceof Class && elementClass.isAssignableFrom((Class<?>) elementType)) {
+                        return listIndex;
+                    }
+                }
+            } catch (RuntimeException | LinkageError ignored) {
+                // malformed or unresolvable generic signature, this field can't be matched by its type
+            }
+            listIndex++;
+        }
+        return -1;
     }
 
     public static Object convertBukkitServerToNMSServer(Server server) {
