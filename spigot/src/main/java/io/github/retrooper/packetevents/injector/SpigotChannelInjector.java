@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
+import io.github.retrooper.packetevents.injector.connection.PacketHandlerRelocation;
+import io.github.retrooper.packetevents.injector.connection.PacketHandlerRelocation.Slot;
 import io.github.retrooper.packetevents.injector.connection.ServerChannelHandler;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
@@ -48,8 +50,6 @@ public class SpigotChannelInjector implements ChannelInjector {
     public final Set<Channel> injectedConnectionChannels = new HashSet<>();
     public List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
-    // Written when a client-versioned listener is registered, read from netty event loops while
-    // channels are initialized.
     private volatile boolean preViaVersionActivated = false;
 
     public void updatePlayer(User user, Object player) {
@@ -255,25 +255,17 @@ public class SpigotChannelInjector implements ChannelInjector {
      * @return may return null if the channel is closed already or not initialized yet
      */
     public @Nullable PacketEventsEncoder getEncoder(Channel channel) {
-        return (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
-    }
-
-    /**
-     * @return the client-versioned encoder, or null if none was injected into the channel
-     */
-    public @Nullable PacketEventsEncoder getPreViaEncoder(Channel channel) {
-        return (PacketEventsEncoder) channel.pipeline().get(
-                ServerConnectionInitializer.PRE_VIA_PREFIX + PacketEvents.ENCODER_NAME);
+        return (PacketEventsEncoder) channel.pipeline().get(Slot.NORMAL.encoderName());
     }
 
     public void setCompressionEnabled(Channel channel) {
         PacketEventsEncoder encoder = this.getEncoder(channel);
         if (encoder != null) {
-            encoder.handleCompression = true;
+            encoder.relocateOnCompression = true;
         }
-        PacketEventsEncoder preViaEncoder = this.getPreViaEncoder(channel);
+        PacketEventsEncoder preViaEncoder = (PacketEventsEncoder) channel.pipeline().get(Slot.PRE_VIA.encoderName());
         if (preViaEncoder != null) {
-            preViaEncoder.handleCompression = true;
+            preViaEncoder.relocateOnCompression = true;
         }
     }
 
@@ -281,7 +273,7 @@ public class SpigotChannelInjector implements ChannelInjector {
      * @return may return null if the channel is closed already or not initialized yet
      */
     public @Nullable PacketEventsDecoder getDecoder(Channel channel) {
-        return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        return (PacketEventsDecoder) channel.pipeline().get(Slot.NORMAL.decoderName());
     }
 
     @Override
@@ -298,13 +290,12 @@ public class SpigotChannelInjector implements ChannelInjector {
             this.preViaVersionActivated = true;
             this.injectNetworkManagers(channel -> {
                 User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
-                if (user != null) {
-                    // pre-viaversion has just been activated, try to initialize pre-via handlers
-                    ServerConnectionInitializer.relocateHandlers(channel, user, true);
-                    // ensure normal encoder/decoders know about pre-via state, otherwise packets may be duplicated
-                    ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME)).preVia = PreViaState.NORMAL;
-                    ((PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME)).preVia = PreViaState.NORMAL;
+                if (user == null) {
+                    return;
                 }
+                // pre-viaversion has just been activated, initialize pre-via handlers
+                PacketHandlerRelocation.inject(channel, user, Slot.NORMAL, PreViaState.NORMAL);
+                PacketHandlerRelocation.inject(channel, user, Slot.PRE_VIA, PreViaState.PRE_VIA);
             });
         }
     }
@@ -314,15 +305,25 @@ public class SpigotChannelInjector implements ChannelInjector {
             User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
             if (user != null) {
                 // ensure normal encoder/decoders know about pre-via state, otherwise packets may be duplicated
-                ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME)).preVia = PreViaState.FALLBACK;
-                ((PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME)).preVia = PreViaState.FALLBACK;
+                PacketHandlerRelocation.inject(channel, user, Slot.NORMAL, PreViaState.FALLBACK);
             }
         });
     }
 
     public enum PreViaState {
-        PRE_VIA,
+        /**
+         * The packet is in server version and is dispatched to the regular listeners.
+         */
         NORMAL,
+        /**
+         * The packet is in client version and is dispatched to client-versioned listeners.
+         */
+        PRE_VIA,
+        /**
+         * The packet is in server version, but is additionally dispatched to client-versioned
+         * listeners. Used when client-versioned listeners are registered without ViaVersion
+         * being available.
+         */
         FALLBACK,
     }
 }

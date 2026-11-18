@@ -39,7 +39,7 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
     protected void handlePlayEnter(ProtocolPacketEvent event) {
         PacketEventsEncoder encoder = this.getEncoder(event);
         if (encoder != null) {
-            encoder.handledCompression = true; // stop handling compression
+            encoder.compressionHandled = true; // stop handling compression
         }
     }
 

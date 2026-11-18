@@ -21,41 +21,21 @@ package io.github.retrooper.packetevents.injector.connection;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
-import io.github.retrooper.packetevents.injector.SpigotChannelInjector.PreViaState;
-import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
-import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
+import io.github.retrooper.packetevents.injector.connection.PacketHandlerRelocation.Slot;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelPipeline;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
-
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @NullMarked
 @ApiStatus.Internal
 public final class ServerConnectionInitializer {
-
-    public static final String PRE_VIA_PREFIX = "pre-";
-
-    private static final String VIAVERSION_ENCODER_NAME = "via-encoder";
-    private static final String VIAVERSION_DECODER_NAME = "via-decoder";
-    private static final String MINECRAFT_DECOMPRESS_NAME = "decompress";
-    private static final String MINECRAFT_COMPRESS_NAME = "compress";
-    private static final String MINECRAFT_DECODER_NAME = "decoder";
-    private static final String MINECRAFT_ENCODER_NAME = "encoder";
-    private static final String MINECRAFT_INBOUND_CONFIG_NAME = "inbound_config";
-    private static final String MINECRAFT_OUTBOUND_CONFIG_NAME = "outbound_config";
-    private static final String MINECRAFT_SPLITTER_NAME = "splitter";
 
     private ServerConnectionInitializer() {
     }
@@ -86,7 +66,7 @@ public final class ServerConnectionInitializer {
              * We can, of course, wait for them to be handled, but this complexes the algorithm.
              * Taken the above into account, here we just drop all unhandled connections.
              */
-            if (channel.pipeline().get(MINECRAFT_SPLITTER_NAME) == null) {
+            if (channel.pipeline().get(PacketHandlerRelocation.SPLITTER_NAME) == null) {
                 channel.close();
                 return;
             }
@@ -98,10 +78,10 @@ public final class ServerConnectionInitializer {
                 return;
             }
 
-            relocateHandlers(channel, user, false);
+            PacketHandlerRelocation.inject(channel, user, Slot.NORMAL);
             SpigotChannelInjector injector = (SpigotChannelInjector) packetevents.getInjector();
             if (injector.isPreViaVersionActivated()) {
-                relocateHandlers(channel, user, true);
+                PacketHandlerRelocation.inject(channel, user, Slot.PRE_VIA);
             }
 
             packetevents.getProtocolManager().setUser(channel, user);
@@ -113,115 +93,18 @@ public final class ServerConnectionInitializer {
 
     public static void destroyHandlers(Object ch) {
         Channel channel = (Channel) ch;
-        if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
-            channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        removeHandler(channel, Slot.NORMAL.decoderName(), "decoder");
+        removeHandler(channel, Slot.NORMAL.encoderName(), "encoder");
+        // Only injected when client-versioned listeners were registered, so silently ignore absence.
+        PacketHandlerRelocation.remove(channel, Slot.PRE_VIA);
+    }
+
+    private static void removeHandler(Channel channel, String handlerName, String description) {
+        if (channel.pipeline().get(handlerName) != null) {
+            channel.pipeline().remove(handlerName);
         } else {
-            PacketEvents.getAPI().getLogManager().warn("Could not find decoder handler in channel pipeline!");
+            PacketEvents.getAPI().getLogManager().warn(
+                    "Could not find " + description + " handler in channel pipeline!");
         }
-
-        if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
-            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-        } else {
-            PacketEvents.getAPI().getLogManager().warn("Could not find encoder handler in channel pipeline!");
-        }
-    }
-
-    public static void relocateHandlers(Channel ctx, User user, boolean preVia) {
-        try {
-            PacketEventsAPI<?> packetevents = PacketEvents.getAPI();
-
-            if (packetevents.getSettings().isDebugEnabled()) {
-                packetevents.getLogManager().debug("Pre relocate, preVia: " + preVia + ", " + ctx.pipeline().names());
-            }
-
-            String encoderName = preVia ? PRE_VIA_PREFIX + PacketEvents.ENCODER_NAME : PacketEvents.ENCODER_NAME;
-            String decoderName = preVia ? PRE_VIA_PREFIX + PacketEvents.DECODER_NAME : PacketEvents.DECODER_NAME;
-
-            // Determine where we WANT to be.
-            String targetDecoderName;
-            String targetEncoderName;
-            if (preVia) {
-                targetEncoderName = VIAVERSION_ENCODER_NAME;
-                targetDecoderName = VIAVERSION_DECODER_NAME;
-            } else {
-                List<String> handlers = ctx.pipeline().names();
-                targetDecoderName = handlers.contains(MINECRAFT_INBOUND_CONFIG_NAME) ? MINECRAFT_INBOUND_CONFIG_NAME : MINECRAFT_DECODER_NAME;
-                targetEncoderName = handlers.contains(MINECRAFT_OUTBOUND_CONFIG_NAME) ? MINECRAFT_OUTBOUND_CONFIG_NAME : MINECRAFT_ENCODER_NAME;
-            }
-
-            PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().get(decoderName);
-            PacketEventsEncoder encoder;
-
-            // if anyone registered pre-via listeners and no viaversion is available, we need to tell our normal handlers
-            // to call events twice as otherwise the pre-via listener would never be called
-            PreViaState preViaState = packetevents.getEventManager().hasClientVersionedListeners() && !ViaVersionUtil.isAvailable()
-                    ? PreViaState.FALLBACK : (preVia ? PreViaState.PRE_VIA : PreViaState.NORMAL);
-
-            if (decoder != null) {
-                // check whether we actually need to relocate
-                if (handlersAlreadyRelocated(ctx.pipeline(), decoderName, targetDecoderName, encoderName, targetEncoderName)) {
-                    return;
-                }
-                encoder = new PacketEventsEncoder((PacketEventsEncoder) ctx.pipeline().remove(encoderName));
-                decoder = new PacketEventsDecoder((PacketEventsDecoder) ctx.pipeline().remove(decoderName));
-                // ensure pre-via state is up-to-date
-                encoder.preVia = preViaState;
-                decoder.preVia = preViaState;
-            } else {
-                // no decoder means we haven't made handlers for the user yet
-                encoder = new PacketEventsEncoder(user, preViaState);
-                decoder = new PacketEventsDecoder(user, preViaState);
-            }
-
-            if (packetevents.getSettings().isDebugEnabled()) {
-                packetevents.getLogManager().debug("After remove, preVia: " + preVia + ", " + ctx.pipeline().names());
-            }
-
-            ctx.pipeline()
-                    .addBefore(targetDecoderName, decoderName, decoder)
-                    .addBefore(targetEncoderName, encoderName, encoder);
-
-            if (packetevents.getSettings().isDebugEnabled()) {
-                packetevents.getLogManager().debug("After add, preVia: " + preVia + ", " + ctx.pipeline().names());
-            }
-        } catch (NoSuchElementException ex) {
-            String handlers = ChannelHelper.pipelineHandlerNamesAsString(ctx);
-            throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
-        }
-    }
-
-    /**
-     * Checks if 'myHandler' exists and is currently at a lower index (upstream) than 'targetHandler'.
-     */
-    private static boolean isBefore(List<String> handlers, String myHandler, String targetHandler) {
-        // just do one iteration and check which handler we encounter first,
-        // but account for target handler just not existing
-        boolean foundMe = false;
-        for (String handler : handlers) {
-            if (handler.equals(myHandler)) {
-                foundMe = true;
-            } else if (handler.equals(targetHandler)) {
-                return foundMe;
-            }
-        }
-        // can't find either, return same as if final handler is our target
-        return foundMe;
-    }
-
-    private static boolean handlersAlreadyRelocated(
-            ChannelPipeline pipeline,
-            String decoderName, String targetDecoderName,
-            String encoderName, String targetEncoderName
-    ) {
-        // ensure we're still before our target
-        List<String> handlers = pipeline.names();
-        if (!isBefore(handlers, decoderName, targetDecoderName)
-                || !isBefore(handlers, encoderName, targetEncoderName)) {
-            return false;
-        }
-
-        // ensure we're not too far before our target (i.e. after compress/decompress) as otherwise we would only catch compressed packets
-        return (!handlers.contains(MINECRAFT_DECOMPRESS_NAME) || isBefore(handlers, MINECRAFT_DECOMPRESS_NAME, decoderName))
-                && (!handlers.contains(MINECRAFT_COMPRESS_NAME) || isBefore(handlers, MINECRAFT_COMPRESS_NAME, encoderName));
     }
 }

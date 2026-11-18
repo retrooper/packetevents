@@ -23,19 +23,16 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector.PreViaState;
-import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
+import io.github.retrooper.packetevents.injector.connection.PacketHandlerRelocation;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
-import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -48,13 +45,11 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
-import java.util.List;
 import java.util.Queue;
 
 @ApiStatus.Internal
 public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
-    public static final Object COMPRESSION_ENABLED_EVENT = paperCompressionEnabledEvent();
     private static final boolean NETTY_4_1_0;
 
     static {
@@ -73,8 +68,8 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public Player player;
     public PreViaState preVia;
 
-    public boolean handleCompression;
-    public boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
+    public boolean relocateOnCompression;
+    public boolean compressionHandled = PacketHandlerRelocation.COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
@@ -88,8 +83,8 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public PacketEventsEncoder(PacketEventsEncoder encoder) {
         this.user = encoder.user;
         this.player = encoder.player;
-        this.handleCompression = encoder.handleCompression;
-        this.handledCompression = encoder.handledCompression;
+        this.relocateOnCompression = encoder.relocateOnCompression;
+        this.compressionHandled = encoder.compressionHandled;
         this.promise = encoder.promise;
         this.hold = encoder.hold;
         this.preVia = encoder.preVia;
@@ -146,7 +141,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         this.promise = promise;
 
         if (msg instanceof ByteBuf) {
-            boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, (ByteBuf) msg);
+            boolean needsRecompression = this.maybeRelocateForCompression(ctx, (ByteBuf) msg);
             ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? this.user.getClientEncoderState() : this.user.getEncoderState();
             this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
                     this.preVia != PreViaState.PRE_VIA, connectionState, this.preVia == PreViaState.PRE_VIA, this.promise);
@@ -158,7 +153,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
                 return; // abort handling
             }
 
-            // Without ViaVersion we still need to call previa listeners from the normal handler
+            // no viaversion present, still call fallback handlers
             if (this.preVia == PreViaState.FALLBACK) {
                 this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
                         false, this.user.getClientEncoderState(), true, this.promise);
@@ -172,7 +167,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             }
 
             if (needsRecompression) {
-                this.compress(ctx, (ByteBuf) msg);
+                PacketHandlerRelocation.compressBuffer(ctx, (ByteBuf) msg);
             }
         }
 
@@ -232,61 +227,14 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         super.exceptionCaught(ctx, cause);
     }
 
-    private static Object paperCompressionEnabledEvent() {
-        try {
-            final Class<?> eventClass = Class.forName("io.papermc.paper.network.ConnectionEvent");
-            return eventClass.getDeclaredField("COMPRESSION_THRESHOLD_SET").get(null);
-        } catch (final ReflectiveOperationException e) {
-            return null;
+    private boolean maybeRelocateForCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
+        if (this.compressionHandled || !this.relocateOnCompression
+                || !PacketHandlerRelocation.isCompressionEnabled(ctx.pipeline())) {
+            return false;
         }
-    }
-
-    private void compress(ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
-        ChannelHandler compressor = ctx.pipeline().get("compress");
-        ByteBuf temp = ctx.alloc().buffer();
-        try {
-            if (compressor != null) {
-                CustomPipelineUtil.callEncode(compressor, ctx, input, temp);
-            }
-        } finally {
-            input.clear().writeBytes(temp);
-            temp.release();
-        }
-    }
-
-    private void decompress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output) throws InvocationTargetException {
-        ChannelHandler decompressor = ctx.pipeline().get("decompress");
-        if (decompressor != null) {
-            ByteBuf temp = (ByteBuf) CustomPipelineUtil.callDecode(decompressor, ctx, input).get(0);
-            try {
-                output.clear().writeBytes(temp);
-            } finally {
-                temp.release();
-            }
-        }
-    }
-
-    private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        List<String> handlerNames = ctx.pipeline().names();
-        int compressIndex = handlerNames.indexOf("compress");
-        if (compressIndex == -1) return false;
-        handledCompression = true;
-        int peEncoderIndex = handlerNames.indexOf((preVia == PreViaState.PRE_VIA ? ServerConnectionInitializer.PRE_VIA_PREFIX : "") + PacketEvents.ENCODER_NAME);
-        if (peEncoderIndex == -1) return false;
-
-        if (compressIndex <= peEncoderIndex) return false;
-
-        //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
-        //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
-        boolean decompress = false;
-        if (preVia != PreViaState.PRE_VIA || user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_8)) {
-            decompress(ctx, buffer, buffer);
-            decompress = true;
-        }
-
-        //Let us relocate and no longer deal with compression.
-        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, preVia == PreViaState.PRE_VIA);
-        return decompress;
+        this.compressionHandled = true;
+        return PacketHandlerRelocation.relocateForCompression(
+                ctx, this.user, PacketHandlerRelocation.slotOf(this.preVia), buffer);
     }
 
     private static final class QueuedMessage {
