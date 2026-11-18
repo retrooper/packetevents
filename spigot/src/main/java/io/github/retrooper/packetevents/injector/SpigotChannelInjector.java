@@ -48,6 +48,8 @@ public class SpigotChannelInjector implements ChannelInjector {
     public final Set<Channel> injectedConnectionChannels = new HashSet<>();
     public List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
+    // Written when a client-versioned listener is registered, read from netty event loops while
+    // channels are initialized.
     private volatile boolean preViaVersionActivated = false;
 
     public void updatePlayer(User user, Object player) {
@@ -254,6 +256,25 @@ public class SpigotChannelInjector implements ChannelInjector {
      */
     public @Nullable PacketEventsEncoder getEncoder(Channel channel) {
         return (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+    }
+
+    /**
+     * @return the client-versioned encoder, or null if none was injected into the channel
+     */
+    public @Nullable PacketEventsEncoder getPreViaEncoder(Channel channel) {
+        return (PacketEventsEncoder) channel.pipeline().get(
+                ServerConnectionInitializer.PRE_VIA_PREFIX + PacketEvents.ENCODER_NAME);
+    }
+
+    public void setCompressionEnabled(Channel channel) {
+        PacketEventsEncoder encoder = this.getEncoder(channel);
+        if (encoder != null) {
+            encoder.handleCompression = true;
+        }
+        PacketEventsEncoder preViaEncoder = this.getPreViaEncoder(channel);
+        if (preViaEncoder != null) {
+            preViaEncoder.handleCompression = true;
+        }
     }
 
     /**

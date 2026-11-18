@@ -154,7 +154,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             // check if the packet got canceled
             if (!((ByteBuf) msg).isReadable()) {
                 ReferenceCountUtil.release(msg);
-                promise.trySuccess();
+                promise.trySuccess(); // TODO how to properly handle this?
                 return; // abort handling
             }
 
@@ -271,7 +271,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = handlerNames.indexOf((preVia == PreViaState.PRE_VIA ? "pre-" : "") + PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = handlerNames.indexOf((preVia == PreViaState.PRE_VIA ? ServerConnectionInitializer.PRE_VIA_PREFIX : "") + PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
 
         if (compressIndex <= peEncoderIndex) return false;

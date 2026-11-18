@@ -45,6 +45,8 @@ import java.util.NoSuchElementException;
 @ApiStatus.Internal
 public final class ServerConnectionInitializer {
 
+    public static final String PRE_VIA_PREFIX = "pre-";
+
     private static final String VIAVERSION_ENCODER_NAME = "via-encoder";
     private static final String VIAVERSION_DECODER_NAME = "via-decoder";
     private static final String MINECRAFT_DECOMPRESS_NAME = "decompress";
@@ -132,8 +134,8 @@ public final class ServerConnectionInitializer {
                 packetevents.getLogManager().debug("Pre relocate, preVia: " + preVia + ", " + ctx.pipeline().names());
             }
 
-            String encoderName = preVia ? "pre-" + PacketEvents.ENCODER_NAME : PacketEvents.ENCODER_NAME;
-            String decoderName = preVia ? "pre-" + PacketEvents.DECODER_NAME : PacketEvents.DECODER_NAME;
+            String encoderName = preVia ? PRE_VIA_PREFIX + PacketEvents.ENCODER_NAME : PacketEvents.ENCODER_NAME;
+            String decoderName = preVia ? PRE_VIA_PREFIX + PacketEvents.DECODER_NAME : PacketEvents.DECODER_NAME;
 
             // Determine where we WANT to be.
             String targetDecoderName;
@@ -157,7 +159,7 @@ public final class ServerConnectionInitializer {
 
             if (decoder != null) {
                 // check whether we actually need to relocate
-                if (handlersAlreadyRelocated(ctx.pipeline(), preVia, decoderName, targetDecoderName, encoderName, targetEncoderName)) {
+                if (handlersAlreadyRelocated(ctx.pipeline(), decoderName, targetDecoderName, encoderName, targetEncoderName)) {
                     return;
                 }
                 encoder = new PacketEventsEncoder((PacketEventsEncoder) ctx.pipeline().remove(encoderName));
@@ -207,7 +209,7 @@ public final class ServerConnectionInitializer {
     }
 
     private static boolean handlersAlreadyRelocated(
-            ChannelPipeline pipeline, boolean preVia,
+            ChannelPipeline pipeline,
             String decoderName, String targetDecoderName,
             String encoderName, String targetEncoderName
     ) {
@@ -218,12 +220,8 @@ public final class ServerConnectionInitializer {
             return false;
         }
 
-        if (!preVia) {
-            // ensure we're not too far before our target (i.e. after compress/decompress) as otherwise we would only catch compressed packets
-            return (!handlers.contains(MINECRAFT_DECOMPRESS_NAME) || isBefore(handlers, MINECRAFT_DECOMPRESS_NAME, decoderName))
-                    && (!handlers.contains(MINECRAFT_COMPRESS_NAME) || isBefore(handlers, MINECRAFT_COMPRESS_NAME, encoderName));
-        }
-
-        return true;
+        // ensure we're not too far before our target (i.e. after compress/decompress) as otherwise we would only catch compressed packets
+        return (!handlers.contains(MINECRAFT_DECOMPRESS_NAME) || isBefore(handlers, MINECRAFT_DECOMPRESS_NAME, decoderName))
+                && (!handlers.contains(MINECRAFT_COMPRESS_NAME) || isBefore(handlers, MINECRAFT_COMPRESS_NAME, encoderName));
     }
 }

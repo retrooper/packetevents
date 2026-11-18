@@ -57,10 +57,9 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
         } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
             WrapperLoginServerSetCompression packet = new WrapperLoginServerSetCompression(event);
             if (packet.getThreshold() > 0) {
-                PacketEventsEncoder encoder = this.getEncoder(event);
-                if (encoder != null) {
-                    encoder.handleCompression = true; // start handling compression relocation
-                }
+                // start handling compression relocation (both normal and client-versioned handlers)
+                SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+                injector.setCompressionEnabled((Channel) event.getUser().getChannel());
             }
         }
     }
