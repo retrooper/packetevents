@@ -19,35 +19,43 @@
 package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
-import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.injector.connection.PacketHandlerRelocation.Slot;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
-import java.util.NoSuchElementException;
+@NullMarked
+@ApiStatus.Internal
+public final class ServerConnectionInitializer {
 
+    private ServerConnectionInitializer() {
+    }
 
-public class ServerConnectionInitializer {
+    @Deprecated
+    public static void initChannel(Object ch, ConnectionState state) {
+        initChannel((Channel) ch, state);
+    }
 
-    public static void initChannel(Object ch, ConnectionState connectionState) {
-        Channel channel = (Channel) ch;
+    public static void initChannel(Channel channel, ConnectionState state) {
         if (FakeChannelUtil.isFakeChannel(channel)) {
             return;
         }
-        User user = new User(channel, connectionState, null, new UserProfile(null, null));
+        User user = new User(channel, state, null, new UserProfile(null, null));
 
-        if (connectionState == ConnectionState.PLAY) {
+        PacketEventsAPI<?> packetevents = PacketEvents.getAPI();
+        if (state == ConnectionState.PLAY) {
             // Player connected before ViaVersion init, therefore the player is server version (mostly true except 1.7 servers)
-            user.setClientVersion(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
-            PacketEvents.getAPI().getLogManager().warn("Late injection detected, we missed packets so some functionality may break!");
+            user.setClientVersion(packetevents.getServerManager().getVersion().toClientVersion());
+            packetevents.getLogManager().warn("Late injection detected for " + user.getUUID() + ", we missed packets so some functionality may break!");
         }
 
         synchronized (channel) {
@@ -58,21 +66,25 @@ public class ServerConnectionInitializer {
              * We can, of course, wait for them to be handled, but this complexes the algorithm.
              * Taken the above into account, here we just drop all unhandled connections.
              */
-            if (channel.pipeline().get("splitter") == null) {
+            if (channel.pipeline().get(PacketHandlerRelocation.SPLITTER_NAME) == null) {
                 channel.close();
                 return;
             }
 
             UserConnectEvent connectEvent = new UserConnectEvent(user);
-            PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
+            packetevents.getEventManager().callEvent(connectEvent);
             if (connectEvent.isCancelled()) {
                 channel.unsafe().closeForcibly();
                 return;
             }
 
-            relocateHandlers(channel, null, user);
+            SpigotChannelInjector injector = (SpigotChannelInjector) packetevents.getInjector();
+            if (injector.isPreViaVersionActivated()) {
+                PacketHandlerRelocation.inject(channel, user, Slot.PRE_VIA);
+            }
+            PacketHandlerRelocation.inject(channel, user, Slot.NORMAL);
 
-            PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
+            packetevents.getProtocolManager().setUser(channel, user);
             // Register the user before the close listener: if the channel is already closed, the listener runs
             // immediately and must find the user, or the entry stays in the user map forever.
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
@@ -81,47 +93,18 @@ public class ServerConnectionInitializer {
 
     public static void destroyHandlers(Object ch) {
         Channel channel = (Channel) ch;
-        if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
-            channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        } else {
-            PacketEvents.getAPI().getLogManager().warn("Could not find decoder handler in channel pipeline!");
-        }
-
-        if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
-            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-        } else {
-            PacketEvents.getAPI().getLogManager().warn("Could not find encoder handler in channel pipeline!");
-        }
+        removeHandler(channel, Slot.NORMAL.decoderName(), "decoder");
+        removeHandler(channel, Slot.NORMAL.encoderName(), "encoder");
+        // Only injected when client-versioned listeners were registered, so silently ignore absence.
+        PacketHandlerRelocation.remove(channel, Slot.PRE_VIA);
     }
 
-    public static void relocateHandlers(Channel ctx, PacketEventsDecoder decoder, User user) {
-        // Decoder == null means we haven't made handlers for the user yet
-        try {
-            ChannelHandler encoder;
-            if (decoder != null) {
-                // This patches a bug where PE 2.0 handlers keep jumping behind one another causing a stackoverflow
-                if (decoder.hasBeenRelocated) return;
-                // Make sure we only relocate because of compression once
-                decoder.hasBeenRelocated = true;
-                decoder = (PacketEventsDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-                encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
-                decoder = new PacketEventsDecoder(decoder);
-                encoder = new PacketEventsEncoder(encoder);
-            } else {
-                encoder = new PacketEventsEncoder(user);
-                decoder = new PacketEventsDecoder(user);
-            }
-            // We are targeting the encoder and decoder since we don't want to target specific plugins
-            // (ProtocolSupport has changed its handler name in the past)
-            // I don't like the hacks required for compression but that's on vanilla, we can't fix it.
-            // TODO: i think this will only work for server-side packetevents?
-            String decoderName = ctx.pipeline().names().contains("inbound_config") ? "inbound_config" : "decoder";
-            ctx.pipeline().addBefore(decoderName, PacketEvents.DECODER_NAME, decoder);
-            String encoderName = ctx.pipeline().names().contains("outbound_config") ? "outbound_config" : "encoder";
-            ctx.pipeline().addBefore(encoderName, PacketEvents.ENCODER_NAME, encoder);
-        } catch (NoSuchElementException ex) {
-            String handlers = ChannelHelper.pipelineHandlerNamesAsString(ctx);
-            throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
+    private static void removeHandler(Channel channel, String handlerName, String description) {
+        if (channel.pipeline().get(handlerName) != null) {
+            channel.pipeline().remove(handlerName);
+        } else {
+            PacketEvents.getAPI().getLogManager().warn(
+                    "Could not find " + description + " handler in channel pipeline!");
         }
     }
 }

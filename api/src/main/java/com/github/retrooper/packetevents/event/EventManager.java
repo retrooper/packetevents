@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2026 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,169 +18,134 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-
-/**
- * Class for event managing. Implements both, internal and API methods.
- *
- * @author retrooper
- * @author ShadowOfHeaven (optimization)
- * @apiNote It is highly recommended to register the event listeners at server start-up,
- * without frequent modifications during runtime, since this class needs to recalculate all of
- * its event listeners during any modifications. In other words, it assumes that reads (events fired)
- * greatly outnumber writes (listeners modifications). If your case requires frequent listener modifications,
- * open a pull request on GitHub and describe your case.
- *
- */
-
+@NullMarked
+@ApiStatus.NonExtendable
 public class EventManager {
 
-    //Using a ConcurrentHashMap is faster and more secure here, compared to Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class))
-    //This is mainly due to:
-    //1. On each modification Collections.synchronizedMap synchronizes the whole Map object, while ConcurrentHashMap only it's internal, currently modified Node
-    //2. ConcurrentHashMap won't fail in a multi-thread environment, while Collections.synchronizedMap is said to have a lot of potential problems,
-    //being a generalized method for synchronization
-    private final Map<PacketListenerPriority, Set<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
-    //Since reads greatly outnumber writes, create an array for the best possible iteration time
-    //Updated as a whole on writes, no index modifications are allowed
-    private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
-
+    protected final EventContainer serverListeners = new Container();
+    protected final EventContainer clientListeners = new Container();
 
     /**
-     * Call the PacketEvent.
-     * This method processes the event on all the registered dynamic packet event listeners.
-     * The {@link PacketListenerPriority#LOWEST} prioritized listeners will be processing first,
-     * the {@link PacketListenerPriority#MONITOR} will be processing last and can
-     * be the final decider whether the event has been cancelled or not.
-     *
-     * @param event {@link PacketEvent}
+     * @see EventContainer#callEvent(PacketEvent)
      */
-    public void callEvent(PacketEvent event) {
-        callEvent(event, null);
-    }
-
-
-    /**
-     * Call the PacketEvent.
-     * This method processes the event on all the registered dynamic packet event listeners.
-     * The {@link PacketListenerPriority#LOWEST} prioritized listeners will be processing first,
-     * the {@link PacketListenerPriority#MONITOR} will be processing last and can
-     * be the final decider whether the event has been cancelled or not.
-     *
-     * @param event                  {@link PacketEvent}
-     * @param postCallListenerAction The action to be run after all the listeners have finished processing
-     */
-    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
-        for (PacketListenerCommon listener : listeners) {
-            try {
-                event.call(listener);
-            } catch (Exception t) {
-                // ignore handshake exceptions
-                if (t.getClass() != InvalidHandshakeException.class && (t.getCause() == null || t.getCause().getClass() != InvalidHandshakeException.class)) {
-                    PacketEvents.getAPI().getLogManager().warn("PacketEvents caught an unhandled exception while calling your listener.", t);
-                }
-            }
-            if (postCallListenerAction != null) {
-                postCallListenerAction.run();
-            }
-        }
-        // For performance reasons, we don't want to re-encode the packet if it's not needed.
-        if (event instanceof ProtocolPacketEvent && !((ProtocolPacketEvent) event).needsReEncode()) {
-            ((ProtocolPacketEvent) event).setLastUsedWrapper(null);
-        }
+    @ApiStatus.Internal
+    public final void callEvent(PacketEvent event) {
+        this.callEvent(event, null);
     }
 
     /**
-     * Register the dynamic packet event listener.
-     *
-     * @param listener {@link PacketListenerCommon}
-     * @param priority {@link PacketListenerPriority}
+     * @see EventContainer#callEvent(PacketEvent, Runnable)
+     */
+    @ApiStatus.Internal
+    public final void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
+        // call in both containers by default
+        this.serverListeners.callEvent(event, postCallListenerAction);
+        this.clientListeners.callEvent(event, postCallListenerAction);
+    }
+
+    /**
+     * @see EventContainer#callEvent(PacketEvent, Runnable)
+     */
+    @ApiStatus.Internal
+    public final void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction, boolean clientListeners) {
+        EventContainer container = clientListeners ? this.clientListeners : this.serverListeners;
+        container.callEvent(event, postCallListenerAction);
+    }
+
+    /**
+     * @see EventContainer#registerListener(PacketListener, PacketListenerPriority)
      */
     public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority);
-        return registerListener(packetListenerAbstract);
+        return this.registerListener(listener.asAbstract(priority));
     }
 
     /**
-     * Register the dynamic packet event listener.
-     *
-     * @param listener {@link PacketListenerCommon}
+     * @see EventContainer#registerListener(PacketListenerCommon)
      */
     public PacketListenerCommon registerListener(PacketListenerCommon listener) {
-        this.registerListenerNoRecalculation(listener);
-        this.recalculateListeners();
-        return listener;
+        EventContainer container = listener.isPreVia() || listener.useClientVersion() ? this.clientListeners : this.serverListeners;
+        return container.registerListener(listener);
     }
 
     /**
-     * Register multiple dynamic packet event listeners with one method.
-     *
-     * @param listeners {@link PacketListenerCommon}
+     * @see EventContainer#registerListeners(PacketListenerCommon...)
      */
     public PacketListenerCommon[] registerListeners(PacketListenerCommon... listeners) {
+        boolean clientMut = false;
+        boolean serverMut = false;
         for (PacketListenerCommon listener : listeners) {
-            this.registerListenerNoRecalculation(listener);
+            if (listener.isPreVia() || listener.useClientVersion()) {
+                this.clientListeners.registerListenerNoRecalculation(listener);
+                clientMut = true;
+            } else {
+                this.serverListeners.registerListenerNoRecalculation(listener);
+                serverMut = true;
+            }
         }
-        this.recalculateListeners();
+        if (clientMut) {
+            this.clientListeners.recalculateListeners();
+        }
+        if (serverMut) {
+            this.serverListeners.recalculateListeners();
+        }
         return listeners;
     }
 
+    /**
+     * @see EventContainer#unregisterListener(PacketListenerCommon)
+     */
     public void unregisterListener(PacketListenerCommon listener) {
-        if (this.unregisterListenerNoRecalculation(listener)) this.recalculateListeners();
+        EventContainer container = listener.isPreVia() || listener.useClientVersion() ? this.clientListeners : this.serverListeners;
+        container.unregisterListener(listener);
     }
-
-    public void unregisterListeners(PacketListenerCommon... listeners) {
-        boolean modified = false;
-        for (PacketListenerCommon listener : listeners) {
-            modified |= this.unregisterListenerNoRecalculation(listener);//OR - at least one of these needs to be true to return true, meaning the boolean will permanently stay true if once set so
-        }
-        if (modified) this.recalculateListeners();
-    }
-
 
     /**
-     * Unregister all dynamic packet event listeners.
+     * @see EventContainer#unregisterListeners(PacketListenerCommon...)
      */
-    public void unregisterAllListeners() {
-        this.listenersMap.clear();
-        synchronized (this) {//like booky10 said, the synchronization is necessary here
-            this.listeners = new PacketListenerCommon[0];
-        }
-    }
-
-    //Needs to be synchronized in order to avoid race conditions (for example where the 'listeners' variable
-    //is overridden by its non-up-to-date value, simply because it finished a bit later than the most recent update)
-    private void recalculateListeners() {
-        synchronized (this) {
-            List<PacketListenerCommon> list = new ArrayList<>();
-            //adds from LOWEST to MONITOR, so in the correct order
-            for (PacketListenerPriority priority : PacketListenerPriority.values()) {
-                Set<PacketListenerCommon> set = this.listenersMap.get(priority);
-                if (set != null) list.addAll(set);
+    public void unregisterListeners(PacketListenerCommon... listeners) {
+        boolean clientMut = false;
+        boolean serverMut = false;
+        for (PacketListenerCommon listener : listeners) {
+            if (listener.isPreVia() || listener.useClientVersion()) {
+                this.clientListeners.unregisterListenerNoRecalculation(listener);
+                clientMut = true;
+            } else {
+                this.serverListeners.unregisterListenerNoRecalculation(listener);
+                serverMut = true;
             }
-            this.listeners = list.toArray(new PacketListenerCommon[0]);
+        }
+        if (clientMut) {
+            this.clientListeners.recalculateListeners();
+        }
+        if (serverMut) {
+            this.serverListeners.recalculateListeners();
         }
     }
 
-    //Internal registration methods, specifically separated for lesser overhead when registering an array of Listeners
-
-    private void registerListenerNoRecalculation(PacketListenerCommon listener) {
-        Set<PacketListenerCommon> listenerSet = this.listenersMap.computeIfAbsent(listener.getPriority(), p -> new CopyOnWriteArraySet<>());
-        listenerSet.add(listener);
+    @ApiStatus.Internal
+    public boolean hasClientVersionedListeners() {
+        return !this.clientListeners.isEmpty();
     }
 
-    //Returns true if the listener was removed, so a modification occurred
-    private boolean unregisterListenerNoRecalculation(PacketListenerCommon listener) {
-        Set<PacketListenerCommon> listenerSet = this.listenersMap.get(listener.getPriority());
-        return listenerSet != null && listenerSet.remove(listener);
+    @ApiStatus.Internal
+    public void unregisterAllListeners() {
+        this.serverListeners.unregisterAllListeners();
+        this.clientListeners.unregisterAllListeners();
+    }
+
+    @ApiStatus.OverrideOnly
+    protected void handleNewListener(EventContainer container, PacketListenerCommon listener) {
+    }
+
+    private final class Container extends EventContainer {
+
+        @Override
+        protected void handleNewListener(PacketListenerCommon listener) {
+            EventManager.this.handleNewListener(this, listener);
+        }
     }
 }

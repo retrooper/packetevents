@@ -36,4 +36,8 @@ public interface ViaVersionAccessor {
     Class<?> getBukkitDecodeHandlerClass();
 
     Class<?> getBukkitEncodeHandlerClass();
+
+    String getEncoderName();
+
+    String getDecoderName();
 }

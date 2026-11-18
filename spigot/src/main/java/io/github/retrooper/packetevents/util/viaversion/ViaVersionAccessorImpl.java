@@ -108,4 +108,14 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     public Class<?> getBukkitEncodeHandlerClass() {
         return BukkitEncodeHandler.class;
     }
+
+    @Override
+    public String getEncoderName() {
+        return Via.getManager().getInjector().getEncoderName();
+    }
+
+    @Override
+    public String getDecoderName() {
+        return Via.getManager().getInjector().getDecoderName();
+    }
 }
