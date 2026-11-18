@@ -30,25 +30,33 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class BukkitEventManager extends EventManager {
 
+    private final Object listenerLock = new Object();
+
     public BukkitEventManager() {
     }
 
     @Override
     protected void handleNewListener(EventContainer container, PacketListenerCommon listener) {
-        if (container != this.clientListeners || !container.isEmpty()) {
+        if (container != this.clientListeners) {
             return; // useless
         } else if (listener instanceof ClientVersionInternalListener) {
             return; // don't inject pre-via if this is only our internal listener
         }
 
-        // register internal listener first
-        this.clientListeners.registerListener(new ClientVersionInternalListener());
+        synchronized (this.listenerLock) {
+            if (!container.isEmpty()) {
+                return; // already activated
+            }
 
-        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        if (ViaVersionUtil.isAvailable()) {
-            injector.activatePreViaVersion();
-        } else {
-            injector.setPreViaFallback();
+            // register internal listener first
+            this.clientListeners.registerListener(new ClientVersionInternalListener());
+
+            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+            if (ViaVersionUtil.isAvailable()) {
+                injector.activatePreViaVersion();
+            } else {
+                injector.setPreViaFallback();
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 public final class ViaVersionUtil {
 
@@ -83,6 +84,16 @@ public final class ViaVersionUtil {
 
     public static Class<?> getBukkitEncodeHandlerClass() {
         return getViaVersionAccessor().getBukkitEncodeHandlerClass();
+    }
+
+    public static @Nullable String getEncoderName() {
+        ViaVersionAccessor accessor = getViaVersionAccessor();
+        return accessor != null ? accessor.getEncoderName() : null;
+    }
+
+    public static @Nullable String getDecoderName() {
+        ViaVersionAccessor accessor = getViaVersionAccessor();
+        return accessor != null ? accessor.getDecoderName() : null;
     }
 }
 

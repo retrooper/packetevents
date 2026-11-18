@@ -42,6 +42,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 @ApiStatus.Internal
@@ -50,7 +51,7 @@ public class SpigotChannelInjector implements ChannelInjector {
     public final Set<Channel> injectedConnectionChannels = new HashSet<>();
     public List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
-    private volatile boolean preViaVersionActivated = false;
+    private final AtomicBoolean preViaVersionActivated = new AtomicBoolean();
 
     public void updatePlayer(User user, Object player) {
         Object channel = user.getChannel();
@@ -282,28 +283,34 @@ public class SpigotChannelInjector implements ChannelInjector {
     }
 
     public boolean isPreViaVersionActivated() {
-        return this.preViaVersionActivated;
+        return this.preViaVersionActivated.get();
     }
 
     public void activatePreViaVersion() {
-        if (!this.preViaVersionActivated) {
-            this.preViaVersionActivated = true;
-            this.injectNetworkManagers(channel -> {
-                User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
-                if (user == null) {
-                    return;
-                }
-                // pre-viaversion has just been activated, initialize pre-via handlers
-                PacketHandlerRelocation.inject(channel, user, Slot.NORMAL, PreViaState.NORMAL);
-                PacketHandlerRelocation.inject(channel, user, Slot.PRE_VIA, PreViaState.PRE_VIA);
-            });
+        if (!this.preViaVersionActivated.compareAndSet(false, true)) {
+            return;
         }
+        this.injectNetworkManagers(channel -> {
+            User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+            if (user == null) {
+                return;
+            }
+            // initialize client states
+            user.setClientDecoderState(user.getDecoderState());
+            user.setClientEncoderState(user.getEncoderState());
+            // pre-viaversion has just been activated, initialize pre-via
+            PacketHandlerRelocation.inject(channel, user, Slot.PRE_VIA, PreViaState.PRE_VIA);
+            PacketHandlerRelocation.inject(channel, user, Slot.NORMAL, PreViaState.NORMAL);
+        });
     }
 
     public void setPreViaFallback() {
         this.injectNetworkManagers(channel -> {
             User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
             if (user != null) {
+                // initialize client states
+                user.setClientDecoderState(user.getDecoderState());
+                user.setClientEncoderState(user.getEncoderState());
                 // ensure normal encoder/decoders know about pre-via state, otherwise packets may be duplicated
                 PacketHandlerRelocation.inject(channel, user, Slot.NORMAL, PreViaState.FALLBACK);
             }

@@ -78,11 +78,11 @@ public final class ServerConnectionInitializer {
                 return;
             }
 
-            PacketHandlerRelocation.inject(channel, user, Slot.NORMAL);
             SpigotChannelInjector injector = (SpigotChannelInjector) packetevents.getInjector();
             if (injector.isPreViaVersionActivated()) {
                 PacketHandlerRelocation.inject(channel, user, Slot.PRE_VIA);
             }
+            PacketHandlerRelocation.inject(channel, user, Slot.NORMAL);
 
             packetevents.getProtocolManager().setUser(channel, user);
             // Register the user before the close listener: if the channel is already closed, the listener runs

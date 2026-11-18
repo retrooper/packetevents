@@ -116,4 +116,14 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
         load();
         return bukkitEncodeHandlerClass;
     }
+
+    @Override
+    public String getEncoderName() {
+        return "via-encoder";
+    }
+
+    @Override
+    public String getDecoderName() {
+        return "via-decoder";
+    }
 }

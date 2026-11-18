@@ -55,8 +55,6 @@ public final class PacketHandlerRelocation {
     private static final String ENCODER_NAME = "encoder";
     private static final String INBOUND_CONFIG_NAME = "inbound_config";
     private static final String OUTBOUND_CONFIG_NAME = "outbound_config";
-    private static final String VIA_DECODER_NAME = "via-decoder";
-    private static final String VIA_ENCODER_NAME = "via-encoder";
 
     public static final @Nullable Object COMPRESSION_ENABLED_EVENT = findCompressionEnabledEvent();
 
@@ -238,14 +236,22 @@ public final class PacketHandlerRelocation {
 
     private static String targetDecoderName(List<String> handlers, Slot slot) {
         if (slot == Slot.PRE_VIA) {
-            return VIA_DECODER_NAME;
+            String viaDecoder = ViaVersionUtil.getDecoderName();
+            if (viaDecoder != null && handlers.contains(viaDecoder)) {
+                return viaDecoder;
+            }
+            return DECODER_NAME;
         }
         return handlers.contains(INBOUND_CONFIG_NAME) ? INBOUND_CONFIG_NAME : DECODER_NAME;
     }
 
     private static String targetEncoderName(List<String> handlers, Slot slot) {
         if (slot == Slot.PRE_VIA) {
-            return VIA_ENCODER_NAME;
+            String viaEncoder = ViaVersionUtil.getEncoderName();
+            if (viaEncoder != null && handlers.contains(viaEncoder)) {
+                return viaEncoder;
+            }
+            return ENCODER_NAME;
         }
         return handlers.contains(OUTBOUND_CONFIG_NAME) ? OUTBOUND_CONFIG_NAME : ENCODER_NAME;
     }
