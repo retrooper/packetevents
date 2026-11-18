@@ -121,7 +121,6 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             this.entityId = this.readInt();
             this.action = InteractAction.VALUES[this.readByte()];
             this.hand = InteractionHand.MAIN_HAND; // compat
-            this.action = InteractAction.INTERACT; // compat
         }
     }
 

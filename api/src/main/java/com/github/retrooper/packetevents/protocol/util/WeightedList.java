@@ -18,11 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.util;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @NullMarked
 public final class WeightedList<T> {
@@ -35,6 +39,10 @@ public final class WeightedList<T> {
 
     public WeightedList(List<Entry<T>> entries) {
         this.entries = entries;
+    }
+
+    public static <T> NbtCodec<WeightedList<T>> codec(NbtCodec<T> valueCodec) {
+        return Entry.codec(valueCodec).applyList().apply(WeightedList::new, WeightedList::getEntries);
     }
 
     public static <T> WeightedList<T> read(PacketWrapper<?> wrapper, PacketWrapper.Reader<T> reader) {
@@ -50,6 +58,18 @@ public final class WeightedList<T> {
         return this.entries;
     }
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof WeightedList)) return false;
+        WeightedList<?> that = (WeightedList<?>) obj;
+        return this.entries.equals(that.entries);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.entries);
+    }
+
     public static final class Entry<T> {
 
         private final int weight;
@@ -60,15 +80,32 @@ public final class WeightedList<T> {
             this.value = value;
         }
 
+        public static <T> NbtCodec<Entry<T>> codec(NbtCodec<T> valueCodec) {
+            return new NbtMapCodec<Entry<T>>() {
+                @Override
+                public Entry<T> decode(NBTCompound tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+                    T value = tag.getOrThrow("data", valueCodec, wrapper);
+                    int weight = tag.getNumberTagValueOrThrow("weight").intValue();
+                    return new Entry<>(weight, value);
+                }
+
+                @Override
+                public void encode(NBTCompound tag, PacketWrapper<?> wrapper, Entry<T> value) throws NbtCodecException {
+                    tag.set("data", value.getValue(), valueCodec, wrapper);
+                    tag.setTag("weight", new NBTInt(value.getWeight()));
+                }
+            }.codec();
+        }
+
         public static <T> Entry<T> read(PacketWrapper<?> wrapper, PacketWrapper.Reader<T> reader) {
-            int weight = wrapper.readVarInt();
             T value = reader.apply(wrapper);
+            int weight = wrapper.readVarInt();
             return new Entry<>(weight, value);
         }
 
         public static <T> void write(PacketWrapper<?> wrapper, Entry<T> entry, PacketWrapper.Writer<T> writer) {
-            wrapper.writeVarInt(entry.weight);
             writer.accept(wrapper, entry.value);
+            wrapper.writeVarInt(entry.weight);
         }
 
         public int getWeight() {
@@ -77,6 +114,19 @@ public final class WeightedList<T> {
 
         public T getValue() {
             return this.value;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof Entry)) return false;
+            Entry<?> entry = (Entry<?>) obj;
+            if (this.weight != entry.weight) return false;
+            return this.value.equals(entry.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.weight, this.value);
         }
     }
 }

@@ -1,0 +1,12 @@
+{
+  "V_26_3": [
+    "constant",
+    "uniform",
+    "biased_to_bottom",
+    "very_biased_to_bottom",
+    "clamped",
+    "weighted_list",
+    "clamped_normal",
+    "trapezoid"
+  ]
+}

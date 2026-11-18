@@ -1,0 +1,174 @@
+{
+  "minecraft:cave_vines_body": {
+    "entries": [
+      {
+        "data": "minecraft:cave_vines_plant",
+        "weight": 4
+      },
+      {
+        "data": {
+          "id": "minecraft:cave_vines_plant",
+          "properties": {
+            "berries": "true"
+          }
+        },
+        "weight": 1
+      }
+    ],
+    "type": "minecraft:weighted"
+  },
+  "minecraft:cave_vines_head": {
+    "property": "age",
+    "source": {
+      "entries": [
+        {
+          "data": "minecraft:cave_vines",
+          "weight": 4
+        },
+        {
+          "data": {
+            "id": "minecraft:cave_vines",
+            "properties": {
+              "age": "0",
+              "berries": "true"
+            }
+          },
+          "weight": 1
+        }
+      ],
+      "type": "minecraft:weighted"
+    },
+    "type": "minecraft:randomized_int",
+    "values": {
+      "max_inclusive": 25,
+      "min_inclusive": 23,
+      "type": "minecraft:uniform"
+    }
+  },
+  "minecraft:flower_flower_forest": {
+    "noise": {
+      "base_amplitude": 0.955388882960065,
+      "base_octave": 0
+    },
+    "scale": 0.020833334,
+    "seed": 2345,
+    "states": [
+      "minecraft:dandelion",
+      "minecraft:poppy",
+      "minecraft:allium",
+      "minecraft:azure_bluet",
+      "minecraft:red_tulip",
+      "minecraft:orange_tulip",
+      "minecraft:white_tulip",
+      "minecraft:pink_tulip",
+      "minecraft:oxeye_daisy",
+      "minecraft:cornflower",
+      "minecraft:lily_of_the_valley"
+    ],
+    "type": "minecraft:noise"
+  },
+  "minecraft:flower_meadow": {
+    "noise": {
+      "base_amplitude": 0.955388882960065,
+      "base_octave": -3
+    },
+    "scale": 1.0,
+    "seed": 2345,
+    "slow_noise": {
+      "base_amplitude": 0.955388882960065,
+      "base_octave": -10
+    },
+    "slow_scale": 1.0,
+    "states": [
+      "minecraft:tall_grass",
+      "minecraft:allium",
+      "minecraft:poppy",
+      "minecraft:azure_bluet",
+      "minecraft:dandelion",
+      "minecraft:cornflower",
+      "minecraft:oxeye_daisy",
+      "minecraft:short_grass"
+    ],
+    "type": "minecraft:dual_noise",
+    "variety": [
+      1,
+      3
+    ]
+  },
+  "minecraft:flower_plain": {
+    "default_state": "minecraft:dandelion",
+    "high_chance": 0.33333334,
+    "high_states": [
+      "minecraft:poppy",
+      "minecraft:azure_bluet",
+      "minecraft:oxeye_daisy",
+      "minecraft:cornflower"
+    ],
+    "low_states": [
+      "minecraft:orange_tulip",
+      "minecraft:red_tulip",
+      "minecraft:pink_tulip",
+      "minecraft:white_tulip"
+    ],
+    "noise": {
+      "base_amplitude": 0.955388882960065,
+      "base_octave": 0
+    },
+    "scale": 0.005,
+    "seed": 2345,
+    "threshold": -0.8,
+    "type": "minecraft:noise_threshold"
+  },
+  "minecraft:mangrove_propagule": {
+    "property": "age",
+    "source": {
+      "id": "minecraft:mangrove_propagule",
+      "properties": {
+        "age": "0",
+        "hanging": "true",
+        "stage": "0",
+        "waterlogged": "false"
+      }
+    },
+    "type": "minecraft:randomized_int",
+    "values": {
+      "max_inclusive": 4,
+      "min_inclusive": 0,
+      "type": "minecraft:uniform"
+    }
+  },
+  "minecraft:podzol_beneath_tree": {
+    "rules": [
+      {
+        "if_true": {
+          "tag": "minecraft:beneath_tree_podzol_replaceable",
+          "type": "minecraft:matching_block_tag"
+        },
+        "then": {
+          "id": "minecraft:podzol",
+          "properties": {
+            "snowy": "false"
+          }
+        }
+      }
+    ],
+    "type": "minecraft:rule_based"
+  },
+  "minecraft:soil_beneath_tree": {
+    "rules": [
+      {
+        "if_true": {
+          "predicate": {
+            "tag": "minecraft:cannot_replace_below_tree_trunk",
+            "type": "minecraft:matching_block_tag"
+          },
+          "type": "minecraft:not"
+        },
+        "then": {
+          "id": "minecraft:dirt"
+        }
+      }
+    ],
+    "type": "minecraft:rule_based"
+  }
+}

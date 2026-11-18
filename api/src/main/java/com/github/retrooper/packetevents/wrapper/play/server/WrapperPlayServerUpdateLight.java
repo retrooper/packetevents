@@ -5,6 +5,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.chunk.LightData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ClientboundLightUpdatePacketData
+ */
 public class WrapperPlayServerUpdateLight extends PacketWrapper<WrapperPlayServerUpdateLight> {
 
     private int x;

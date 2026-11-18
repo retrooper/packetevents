@@ -18,35 +18,47 @@
 
 package com.github.retrooper.packetevents.protocol.world;
 
+import com.github.retrooper.packetevents.protocol.util.CodecNameable;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Axis;
 import com.github.retrooper.packetevents.util.Vector3i;
 
 // From MCProtocolLib
-public enum Direction {
+public enum Direction implements CodecNameable {
 
-    DOWN(-1, Axis.Y, new Vector3i(0, -1, 0)),
-    UP(-1, Axis.Y, new Vector3i(0, 1, 0)),
-    NORTH(0, Axis.Z, new Vector3i(0, 0, -1)),
-    SOUTH(1, Axis.Z, new Vector3i(0, 0, 1)),
-    WEST(2, Axis.X, new Vector3i(-1, 0, 0)),
-    EAST(3, Axis.X, new Vector3i(1, 0, 0));
+    DOWN("down", -1, Axis.Y, new Vector3i(0, -1, 0)),
+    UP("up", -1, Axis.Y, new Vector3i(0, 1, 0)),
+    NORTH("north", 0, Axis.Z, new Vector3i(0, 0, -1)),
+    SOUTH("south", 1, Axis.Z, new Vector3i(0, 0, 1)),
+    WEST("west", 2, Axis.X, new Vector3i(-1, 0, 0)),
+    EAST("east", 3, Axis.X, new Vector3i(1, 0, 0));
 
+    public static final NbtCodec<Direction> CODEC = NbtCodecs.forEnum(values());
+
+    private static final Direction[] HORIZONTAL_VALUES = {NORTH, SOUTH, WEST, EAST};
+    private static final Direction[] VALUES = values(); // Cache the values array
+
+    private final String id;
     private final int horizontalIndex;
     private final Axis axis;
     private final Vector3i vec3i;
 
-    Direction(int horizontalIndex, Axis axis, Vector3i vec3i) {
+    Direction(String id, int horizontalIndex, Axis axis, Vector3i vec3i) {
+        this.id = id;
         this.horizontalIndex = horizontalIndex;
         this.axis = axis;
         this.vec3i = vec3i;
     }
 
+    @Override
+    public String getCodecName() {
+        return this.id;
+    }
+
     public int getHorizontalIndex() {
         return horizontalIndex;
     }
-
-    private static final Direction[] HORIZONTAL_VALUES = {NORTH, SOUTH, WEST, EAST};
-    private static final Direction[] VALUES = values(); // Cache the values array
 
     public static Direction getByHorizontalIndex(int index) {
         return HORIZONTAL_VALUES[index % HORIZONTAL_VALUES.length];

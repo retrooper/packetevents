@@ -26,17 +26,43 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
+import com.github.retrooper.packetevents.protocol.util.NbtMapCodec;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
-
-import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
-
 @NullMarked
 public interface DamageType extends MappedEntity, CopyableEntity<DamageType>, DeepComparableEntity {
+
+    NbtCodec<DamageType> DIRECT_CODEC = new NbtMapCodec<DamageType>() {
+        @Override
+        public DamageType decode(NBTCompound tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+            String messageId = tag.getStringTagValueOrThrow("message_id");
+            DamageScaling scaling = tag.getOrThrow("scaling", DamageScaling.CODEC, wrapper);
+            float exhaustion = tag.getNumberTagValueOrThrow("exhaustion").floatValue();
+            DamageEffects effects = tag.getOr("effects", DamageEffects.CODEC, DamageEffects.HURT, wrapper);
+            DeathMessageType deathMessageType = tag.getOr("death_message_type", DeathMessageType.CODEC, DeathMessageType.DEFAULT, wrapper);
+            return new StaticDamageType(null, messageId, scaling, exhaustion, effects, deathMessageType);
+        }
+
+        @Override
+        public void encode(NBTCompound tag, PacketWrapper<?> wrapper, DamageType value) throws NbtCodecException {
+            tag.setTag("message_id", new NBTString(value.getMessageId()));
+            tag.set("scaling", value.getScaling(), DamageScaling.CODEC, wrapper);
+            tag.setTag("exhaustion", new NBTFloat(value.getExhaustion()));
+            if (value.getEffects() != DamageEffects.HURT) {
+                tag.set("effects", value.getEffects(), DamageEffects.CODEC, wrapper);
+            }
+            if (value.getDeathMessageType() != DeathMessageType.DEFAULT) {
+                tag.set("death_message_type", value.getDeathMessageType(), DeathMessageType.CODEC, wrapper);
+            }
+        }
+    }.codec();
+    NbtCodec<DamageType> CODEC = NbtCodecs.forRegistry(DamageTypes.getRegistry());
 
     String getMessageId();
 
@@ -56,34 +82,13 @@ public interface DamageType extends MappedEntity, CopyableEntity<DamageType>, De
         wrapper.writeMappedEntity(damageType);
     }
 
+    @Deprecated
     static DamageType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
-        NBTCompound compound = (NBTCompound) nbt;
-        String messageId = ((NBTCompound) nbt).getStringTagValueOrThrow("message_id");
-        DamageScaling scaling = indexValueOrThrow(DamageScaling.ID_INDEX,
-                ((NBTCompound) nbt).getStringTagValueOrThrow("scaling"));
-        float exhaustion = ((NBTCompound) nbt).getNumberTagOrThrow("exhaustion").getAsFloat();
-        DamageEffects effects = Optional.ofNullable(compound.getStringTagValueOrNull("effects"))
-                .map(id -> indexValueOrThrow(DamageEffects.ID_INDEX, id)).orElse(DamageEffects.HURT);
-        DeathMessageType deathMessageType = Optional.ofNullable(compound.getStringTagValueOrNull("death_message_type"))
-                .map(id -> indexValueOrThrow(DeathMessageType.ID_INDEX, id)).orElse(DeathMessageType.DEFAULT);
-
-        return new StaticDamageType(data, messageId, scaling, exhaustion, effects, deathMessageType);
+        return CODEC.decode(nbt, PacketWrapper.createDummyWrapper(version)).copy(data);
     }
 
+    @Deprecated
     static NBT encode(DamageType damageType, ClientVersion version) {
-        NBTCompound compound = new NBTCompound();
-        compound.setTag("message_id", new NBTString(damageType.getMessageId()));
-        compound.setTag("scaling", new NBTString(damageType.getScaling().getId()));
-        compound.setTag("exhaustion", new NBTFloat(damageType.getExhaustion()));
-
-        if (damageType.getEffects() != DamageEffects.HURT) {
-            compound.setTag("effects", new NBTString(damageType.getEffects().getId()));
-        }
-
-        if (damageType.getDeathMessageType() != DeathMessageType.DEFAULT) {
-            compound.setTag("death_message_type", new NBTString(damageType.getDeathMessageType().getId()));
-        }
-
-        return compound;
+        return CODEC.encode(PacketWrapper.createDummyWrapper(version), damageType);
     }
 }

@@ -138,9 +138,9 @@ public class Chunk_v1_9 implements BaseChunk {
     public boolean isEmpty() {
         // Pre-1.14 we have to calculate the value
         if (blockCount == Integer.MAX_VALUE) {
-            for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < 16; y++) {
-                    for (int z = 0; z < 16; z++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
                         if (this.dataPalette.get(x, y, z) != AIR) {
                             return false;
                         }
@@ -151,6 +151,10 @@ public class Chunk_v1_9 implements BaseChunk {
         }
         // 1.14+, we can rely on the value
         return this.blockCount == 0;
+    }
+
+    public DataPalette getDataPalette() {
+        return dataPalette;
     }
 
     public @Nullable NibbleArray3d getSkyLight() {
@@ -167,5 +171,13 @@ public class Chunk_v1_9 implements BaseChunk {
 
     public void setBlockLight(@Nullable NibbleArray3d blockLight) {
         this.blockLight = blockLight;
+    }
+
+    public int getBlockCount() {
+        return blockCount;
+    }
+
+    public void setBlockCount(int blockCount) {
+        this.blockCount = blockCount;
     }
 }

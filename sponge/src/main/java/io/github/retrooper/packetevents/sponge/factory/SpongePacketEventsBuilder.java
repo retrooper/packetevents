@@ -43,6 +43,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.plugin.PluginContainer;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 
 public class SpongePacketEventsBuilder {
@@ -133,7 +134,7 @@ public class SpongePacketEventsBuilder {
 
                 if (initialized) return;
 
-                Sponge.eventManager().registerListeners(plugin, new InternalSpongeListener());
+                Sponge.eventManager().registerListeners(plugin, new InternalSpongeListener(), MethodHandles.lookup());
 
                 if (lateBind) {
                     //If late-bind is enabled, we still need to inject (after all plugins enabled).

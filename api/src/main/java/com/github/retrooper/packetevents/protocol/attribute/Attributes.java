@@ -204,6 +204,27 @@ public final class Attributes {
             null, 0d, 0d, 60_000_000d);
 
     /**
+     * @versions 26.2+
+     */
+    public static final Attribute AIR_DRAG_MODIFIER = define("air_drag_modifier", null, 1d, 0d, 2048d);
+    /**
+     * @versions 26.2+
+     */
+    public static final Attribute BELOW_NAME_DISTANCE = define("below_name_distance", null, 10d, 0d, 512d);
+    /**
+     * @versions 26.2+
+     */
+    public static final Attribute BOUNCINESS = define("bounciness", null, 0d, 0d, 1d);
+    /**
+     * @versions 26.2+
+     */
+    public static final Attribute FRICTION_MODIFIER = define("friction_modifier", null, 1d, 0d, 2048d);
+    /**
+     * @versions 26.2+
+     */
+    public static final Attribute NAME_TAG_DISTANCE = define("name_tag_distance", null, 64d, 0d, 512d);
+
+    /**
      * This attribute has been renamed in 1.20.5 to {@link #JUMP_STRENGTH}
      */
     @ApiStatus.Obsolete

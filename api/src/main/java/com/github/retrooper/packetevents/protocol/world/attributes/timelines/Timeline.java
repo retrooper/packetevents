@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRef;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.util.NbtCodec;
@@ -51,10 +52,13 @@ public interface Timeline extends MappedEntity, CopyableEntity<Timeline>, DeepCo
     NbtCodec<Map<ResourceLocation, TimeMarkerInfo>> TIME_MARKER_CODEC = NbtMapCodec.codecOfMap(ResourceLocation.CODEC, TimeMarkerInfo.CODEC).codec();
 
     NbtCodec<Timeline> CODEC = new NbtMapCodec<Timeline>() {
+        private final NbtCodec<MappedEntityRef<WorldClock>> clockCodec = MappedEntityRef.codec(WorldClock.CODEC);
+
         @Override
         public Timeline decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
-            WorldClock clock = wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1) ? WorldClocks.OVERWORLD
-                    : compound.getOrThrow("clock", WorldClock.CODEC, wrapper);
+            MappedEntityRef<WorldClock> clock = wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1)
+                    ? new MappedEntityRef.Static<>(WorldClocks.OVERWORLD)
+                    : compound.getOrThrow("clock", this.clockCodec, wrapper);
             Integer periodTicks = compound.getOrNull("period_ticks", NbtCodecs.INT, wrapper);
             Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks = compound.getOr("tracks", TRACK_CODEC, Collections.emptyMap(), wrapper);
             Map<ResourceLocation, TimeMarkerInfo> timeMarkers = wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1) ? Collections.emptyMap()
@@ -65,7 +69,7 @@ public interface Timeline extends MappedEntity, CopyableEntity<Timeline>, DeepCo
         @Override
         public void encode(NBTCompound compound, PacketWrapper<?> wrapper, Timeline value) throws NbtCodecException {
             if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
-                compound.set("clock", value.getClock(), WorldClock.CODEC, wrapper);
+                compound.set("clock", value.getClockRef(), this.clockCodec, wrapper);
             }
             Integer periodTicks = value.getPeriodTicks();
             if (periodTicks != null) {
@@ -86,6 +90,11 @@ public interface Timeline extends MappedEntity, CopyableEntity<Timeline>, DeepCo
      * @versions 26.1+
      */
     WorldClock getClock();
+
+    /**
+     * @versions 26.1+
+     */
+    MappedEntityRef<WorldClock> getClockRef();
 
     @Nullable Integer getPeriodTicks();
 

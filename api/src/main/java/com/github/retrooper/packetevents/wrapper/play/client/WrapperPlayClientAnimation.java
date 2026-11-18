@@ -24,11 +24,20 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
+ * Mojang name: ServerboundSwingPacket
+ * <p>
  * This packet is sent when the client swings their arm.
+ * <p>
+ * Replaced by ServerboundPunchPacket in 26.3.
+ *
+ * @versions -26.2
  */
+@ApiStatus.Obsolete
 public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientAnimation> {
+
     private InteractionHand interactionHand;
 
     public WrapperPlayClientAnimation(PacketReceiveEvent event) {

@@ -93,7 +93,6 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
             if (action != Action.REMOVE_ITEM) {
                 value = Optional.of(readVarInt());
             } else {
-                objectiveName = "";
                 value = Optional.empty();
             }
         }

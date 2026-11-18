@@ -49,6 +49,7 @@ import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public final class SpigotConversionUtil {
 
@@ -229,6 +230,20 @@ public final class SpigotConversionUtil {
      */
     public static org.bukkit.entity.@Nullable Entity getEntityById(@Nullable World world, int entityId) {
         return SpigotReflectionUtil.getEntityById(world, entityId);
+    }
+
+    /**
+     * <strong>WARNING:</strong> This is not a safe operation, avoid usage
+     * of this method if possible!
+     * <p>
+     * Access the Bukkit Entity associated to the Entity UUID.
+     *
+     * @param world    The world they are in. This field is optional, but is recommended as it could boost performance.
+     * @param entityUUID The associated Entity UUID
+     * @return The Bukkit Entity
+     */
+    public static org.bukkit.entity.@Nullable Entity getEntityByUUID(@Nullable World world, UUID entityUUID) {
+        return SpigotReflectionUtil.getEntityByUUID(world, entityUUID);
     }
 
     public static Pose toBukkitPose(EntityPose pose) {

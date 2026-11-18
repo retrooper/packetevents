@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.recipe.display.slot;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -25,28 +29,59 @@ import java.util.Objects;
 
 public class TagSlotDisplay extends SlotDisplay<TagSlotDisplay> {
 
-    private ResourceLocation itemTag;
+    private MappedEntitySet<ItemType> items;
 
     public TagSlotDisplay(ResourceLocation itemTag) {
+        this(new MappedEntitySet<>(itemTag));
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public TagSlotDisplay(MappedEntitySet<ItemType> items) {
         super(SlotDisplayTypes.TAG);
-        this.itemTag = itemTag;
+        this.items = items;
     }
 
     public static TagSlotDisplay read(PacketWrapper<?> wrapper) {
-        ResourceLocation itemTag = wrapper.readIdentifier();
-        return new TagSlotDisplay(itemTag);
+        MappedEntitySet<ItemType> items = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)
+                ? MappedEntitySet.read(wrapper, ItemTypes.getRegistry())
+                : new MappedEntitySet<>(wrapper.readIdentifier());
+        return new TagSlotDisplay(items);
     }
 
     public static void write(PacketWrapper<?> wrapper, TagSlotDisplay display) {
-        wrapper.writeIdentifier(display.itemTag);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            MappedEntitySet.write(wrapper, display.items);
+        } else {
+            wrapper.writeIdentifier(display.getItemTag());
+        }
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public MappedEntitySet<ItemType> getItems() {
+        return this.items;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public void setItems(MappedEntitySet<ItemType> items) {
+        this.items = items;
     }
 
     public ResourceLocation getItemTag() {
-        return this.itemTag;
+        ResourceLocation tagKey = this.items.getTagKey();
+        if (tagKey == null) {
+            throw new IllegalStateException("No tag key present for " + this);
+        }
+        return tagKey;
     }
 
     public void setItemTag(ResourceLocation itemTag) {
-        this.itemTag = itemTag;
+        this.items = new MappedEntitySet<>(itemTag);
     }
 
     @Override
@@ -54,16 +89,16 @@ public class TagSlotDisplay extends SlotDisplay<TagSlotDisplay> {
         if (this == obj) return true;
         if (!(obj instanceof TagSlotDisplay)) return false;
         TagSlotDisplay that = (TagSlotDisplay) obj;
-        return this.itemTag.equals(that.itemTag);
+        return this.items.equals(that.items);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.itemTag);
+        return Objects.hashCode(this.items);
     }
 
     @Override
     public String toString() {
-        return "TagSlotDisplay{itemTag=" + this.itemTag + '}';
+        return "TagSlotDisplay{items=" + this.items + '}';
     }
 }

@@ -18,10 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.dialog.body;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackCodec;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -50,7 +53,9 @@ public class ItemDialogBody implements DialogBody {
     }
 
     public static ItemDialogBody decode(NBTCompound compound, PacketWrapper<?> wrapper) {
-        ItemStack item = compound.getOrThrow("item", ItemStack::decode, wrapper);
+        NbtCodec<ItemStack> itemCodec = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)
+                ? ItemStackCodec.TEMPLATE_CODEC : ItemStackCodec.CODEC;
+        ItemStack item = compound.getOrThrow("item", itemCodec, wrapper);
         PlainMessage description = compound.getOrNull("description", PlainMessage::decode, wrapper);
         boolean showDecorations = compound.getBooleanOr("show_decorations", true);
         boolean showTooltip = compound.getBooleanOr("show_tooltip", true);
@@ -60,7 +65,9 @@ public class ItemDialogBody implements DialogBody {
     }
 
     public static void encode(NBTCompound compound, PacketWrapper<?> wrapper, ItemDialogBody body) {
-        compound.set("item", body.item, ItemStack::encode, wrapper);
+        NbtCodec<ItemStack> itemCodec = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)
+                ? ItemStackCodec.TEMPLATE_CODEC : ItemStackCodec.CODEC;
+        compound.set("item", body.item, itemCodec, wrapper);
         if (body.description != null) {
             compound.set("description", body.description, PlainMessage::encode, wrapper);
         }

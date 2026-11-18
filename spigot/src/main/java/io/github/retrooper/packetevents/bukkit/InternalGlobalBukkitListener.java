@@ -31,6 +31,9 @@ public class InternalGlobalBukkitListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         PacketEventsAPI<?> api = PacketEvents.getAPI();
         User user = api.getPlayerManager().getUser(event.getPlayer());
-        PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, event.getPlayer()));
+        if (user == null) {
+            return;
+        }
+        api.getEventManager().callEvent(new UserLoginEvent(user, event.getPlayer()));
     }
 }

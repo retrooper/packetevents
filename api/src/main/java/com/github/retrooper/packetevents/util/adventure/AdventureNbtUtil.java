@@ -50,7 +50,7 @@ public final class AdventureNbtUtil {
     static {
         TagStringIO tagStringIo;
         try {
-            tagStringIo = TagStringIO.tagStringIO();
+            tagStringIo = TagStringIO.builder().acceptHeterogeneousLists(true).emitHeterogeneousLists(true).build();
         } catch (Throwable ignored) {
             // pre adventure v4.22.0
             tagStringIo = TagStringIO.get();

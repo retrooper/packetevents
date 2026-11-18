@@ -41,8 +41,11 @@ public class WrapperConfigClientPluginMessage extends WrapperCommonClientPluginM
     @Override
     public void read() {
         this.channelName = this.readString();
-        if (ByteBufHelper.readableBytes(this.buffer) > 32767) {
-            throw new RuntimeException("Payload may not be larger than 32767 bytes");
+        if (MAX_PAYLOAD_BYTES >= 0) {
+            int readable = ByteBufHelper.readableBytes(this.buffer);
+            if (readable > MAX_PAYLOAD_BYTES) {
+                throw new RuntimeException("Payload may not be larger than " + MAX_PAYLOAD_BYTES + " bytes (got " + readable + ")");
+            }
         }
         this.data = this.readRemainingBytes();
     }

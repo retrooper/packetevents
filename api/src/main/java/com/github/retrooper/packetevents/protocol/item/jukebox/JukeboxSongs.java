@@ -82,16 +82,22 @@ public final class JukeboxSongs {
             73, 11);
 
     /**
-     * Added with 1.21.6
+     * @versions 1.21.6+
      */
     public static final IJukeboxSong TEARS = define("tears", Sounds.MUSIC_DISC_TEARS,
             175, 10);
 
     /**
-     * Added with 1.21.7
+     * @versions 1.21.7+
      */
     public static final IJukeboxSong LAVA_CHICKEN = define("lava_chicken", Sounds.MUSIC_DISC_LAVA_CHICKEN,
             134, 9);
+
+    /**
+     * @versions 26.2+
+     */
+    public static final IJukeboxSong BOUNCE = define("bounce", Sounds.MUSIC_DISC_BOUNCE,
+            234, 8);
 
     /**
      * Returns an immutable view of the jukebox songs.

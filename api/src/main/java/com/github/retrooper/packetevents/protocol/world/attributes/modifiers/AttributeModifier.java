@@ -28,6 +28,9 @@ import com.github.retrooper.packetevents.util.MapUtil;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,6 +80,12 @@ public interface AttributeModifier<T, A> {
             new AbstractMap.SimpleEntry<>(Operation.MAXIMUM, IntegerModifier.MAXIMUM)
     );
 
+    static <T> Map<Operation, AttributeModifier<List<T>, ?>> listLibrary() {
+        @SuppressWarnings("unchecked")
+        AttributeModifier<List<T>, List<T>> mod = (AttributeModifier<List<T>, List<T>>) (Object) ListAppendModifier.INSTANCE;
+        return MapUtil.createMap(new AbstractMap.SimpleEntry<>(Operation.APPEND, mod));
+    }
+
     @SuppressWarnings("unchecked") // types don't matter
     static <T> AttributeModifier<T, T> override() {
         return (AttributeModifier<T, T>) OverrideModifier.INSTANCE;
@@ -102,6 +111,8 @@ public interface AttributeModifier<T, A> {
         NOR("nor"),
         XOR("xor"),
         XNOR("xnor"),
+        APPEND("append"),
+        OVERLAY("overlay"),
         ;
 
         public static final NbtCodec<Operation> CODEC = NbtCodecs.forEnum(values());
@@ -129,6 +140,29 @@ public interface AttributeModifier<T, A> {
 
         @Override
         public NbtCodec<T> argumentCodec(EnvironmentAttribute<T> attribute) {
+            return attribute.getType().getValueCodec();
+        }
+    }
+
+    final class ListAppendModifier<T> implements AttributeModifier<List<T>,List<T>> {
+
+        private static final ListAppendModifier<?> INSTANCE = new ListAppendModifier<>();
+
+        @Override
+        public List<T> apply(List<T> value, List<T> arg) {
+            if (arg.isEmpty()) {
+                return value;
+            } else if (value.isEmpty()) {
+                return arg;
+            }
+            List<T> list = new ArrayList<>(value.size() + arg.size());
+            list.addAll(value);
+            list.addAll(arg);
+            return Collections.unmodifiableList(list);
+        }
+
+        @Override
+        public NbtCodec<List<T>> argumentCodec(EnvironmentAttribute<List<T>> attribute) {
             return attribute.getType().getValueCodec();
         }
     }

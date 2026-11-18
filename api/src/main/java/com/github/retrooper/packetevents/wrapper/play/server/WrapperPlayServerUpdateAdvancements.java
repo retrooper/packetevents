@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Mojang name: ClientboundUpdateAdvancementsPacket
+ */
 public class WrapperPlayServerUpdateAdvancements extends PacketWrapper<WrapperPlayServerUpdateAdvancements> {
 
     private boolean reset;
@@ -38,7 +41,7 @@ public class WrapperPlayServerUpdateAdvancements extends PacketWrapper<WrapperPl
     private Set<ResourceLocation> removedAdvancements;
     private Map<ResourceLocation, AdvancementProgress> progress;
     /**
-     * Added with 1.21.5
+     * @versions 1.21.5+
      */
     private boolean showAdvancements;
 
@@ -123,14 +126,14 @@ public class WrapperPlayServerUpdateAdvancements extends PacketWrapper<WrapperPl
     }
 
     /**
-     * Added with 1.21.5
+     * @versions 1.21.5+
      */
     public boolean isShowAdvancements() {
         return this.showAdvancements;
     }
 
     /**
-     * Added with 1.21.5
+     * @versions 1.21.5+
      */
     public void setShowAdvancements(boolean showAdvancements) {
         this.showAdvancements = showAdvancements;

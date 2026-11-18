@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.world.attributes.timelines;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRef;
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttribute;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
@@ -41,7 +42,7 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
     /**
      * @versions 26.1+
      */
-    private final WorldClock clock;
+    private final MappedEntityRef<WorldClock> clock;
     private final @Nullable Integer periodTicks;
     private final Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks;
     /**
@@ -54,7 +55,7 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
      */
     @ApiStatus.Obsolete
     public StaticTimeline(@Nullable Integer periodTicks, Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks) {
-        this(null, WorldClocks.OVERWORLD, periodTicks, tracks, Collections.emptyMap());
+        this(null, new MappedEntityRef.Static<>(WorldClocks.OVERWORLD), periodTicks, tracks, Collections.emptyMap());
     }
 
     /**
@@ -65,13 +66,24 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
             Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks,
             Map<ResourceLocation, TimeMarkerInfo> timeMarkers
     ) {
+        this(null, new MappedEntityRef.Static<>(clock), periodTicks, tracks, timeMarkers);
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public StaticTimeline(
+            MappedEntityRef<WorldClock> clock, @Nullable Integer periodTicks,
+            Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks,
+            Map<ResourceLocation, TimeMarkerInfo> timeMarkers
+    ) {
         this(null, clock, periodTicks, tracks, timeMarkers);
     }
 
     @ApiStatus.Internal
     public StaticTimeline(
             @Nullable TypesBuilderData data,
-            WorldClock clock, @Nullable Integer periodTicks,
+            MappedEntityRef<WorldClock> clock, @Nullable Integer periodTicks,
             Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks,
             Map<ResourceLocation, TimeMarkerInfo> timeMarkers
     ) {
@@ -89,6 +101,11 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
 
     @Override
     public WorldClock getClock() {
+        return this.clock.get();
+    }
+
+    @Override
+    public MappedEntityRef<WorldClock> getClockRef() {
         return this.clock;
     }
 

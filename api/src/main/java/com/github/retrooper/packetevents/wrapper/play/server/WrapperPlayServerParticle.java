@@ -30,21 +30,30 @@ import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
-//Might be worthy to document
-//TODO: Check changelog through out the versions
+/**
+ * Mojang name: ClientboundLevelParticlesPacket
+ */
 public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerParticle> {
 
     private Particle<?> particle;
     private boolean longDistance;
     private Vector3d position;
     private Vector3f offset;
-    private float maxSpeed;
+    /**
+     * 3-dimensional vector starting with 26.3, a singular float before
+     */
+    private Vector3f maxSpeed;
     private int particleCount;
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     private boolean alwaysShow;
+    /**
+     * @versions 26.3+
+     */
+    private RandomizationType randomizationType = RandomizationType.DEFAULT;
 
     public WrapperPlayServerParticle(PacketSendEvent event) {
         super(event);
@@ -57,6 +66,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this(particle, longDistance, position, offset, maxSpeed, particleCount, false);
     }
 
+    /**
+     * @versions 1.21.4+
+     */
     public WrapperPlayServerParticle(
             Particle<?> particle, boolean longDistance, Vector3d position, Vector3f offset,
             float maxSpeed, int particleCount, boolean alwaysShow
@@ -66,17 +78,40 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.longDistance = longDistance;
         this.position = position;
         this.offset = offset;
+        this.maxSpeed = new Vector3f(maxSpeed, maxSpeed, maxSpeed);
+        this.particleCount = particleCount;
+        this.alwaysShow = alwaysShow;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public WrapperPlayServerParticle(
+            Particle<?> particle, boolean longDistance, Vector3d position, Vector3f offset,
+            Vector3f maxSpeed, int particleCount, boolean alwaysShow, RandomizationType randomizationType
+    ) {
+        super(PacketType.Play.Server.PARTICLE);
+        this.particle = particle;
+        this.longDistance = longDistance;
+        this.position = position;
+        this.offset = offset;
         this.maxSpeed = maxSpeed;
         this.particleCount = particleCount;
         this.alwaysShow = alwaysShow;
+        this.randomizationType = randomizationType;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void read() {
+        boolean v263 = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3);
+        boolean v1205 = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5);
+        if (v263) {
+            this.particle = Particle.read(this);
+        }
+
         int particleTypeId = 0;
         ParticleType<?> particleType = null;
-        boolean v1205 = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5);
         if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             String particleName = readString(64);
             particleType = ParticleTypes.getByName("minecraft:" + particleName);
@@ -89,15 +124,22 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             this.alwaysShow = this.readBoolean();
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            position = new Vector3d(readDouble(), readDouble(), readDouble());
+            position = Vector3d.read(this);
         } else {
             position = new Vector3d(readFloat(), readFloat(), readFloat());
         }
-        offset = new Vector3f(readFloat(), readFloat(), readFloat());
-        maxSpeed = readFloat();
-        particleCount = readInt();
+        this.offset = Vector3f.read(this);
+        if (v263) {
+            this.maxSpeed = Vector3f.read(this);
+        } else {
+            float f = this.readFloat();
+            this.maxSpeed = new Vector3f(f, f, f);
+        }
+        this.particleCount = v263 ? this.readVarInt() : this.readInt();
 
-        if (v1205) {
+        if (v263) {
+            this.randomizationType = this.readEnum(RandomizationType.values());
+        } else if (v1205) {
             this.particle = Particle.read(this);
         } else {
             ParticleData data;
@@ -117,6 +159,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     @SuppressWarnings("unchecked")
     @Override
     public void write() {
+        boolean v263 = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3);
         //TODO on 1.7 we get particle type by 64 len string
         if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeString(particle.getType().getName().getKey(), 64);
@@ -128,35 +171,40 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
                 writeInt(id);
             }
         }
+        if (v263) {
+            Particle.write(this, this.particle);
+        }
         writeBoolean(longDistance);
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_4)) {
             this.writeBoolean(this.alwaysShow);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            writeDouble(position.getX());
-            writeDouble(position.getY());
-            writeDouble(position.getZ());
+            Vector3d.write(this, this.position);
         } else {
             writeFloat((float) position.getX());
             writeFloat((float) position.getY());
             writeFloat((float) position.getZ());
         }
-        writeFloat(offset.getX());
-        writeFloat(offset.getY());
-        writeFloat(offset.getZ());
-        writeFloat(maxSpeed);
-        writeInt(particleCount);
+        Vector3f.write(this, this.offset);
+        if (v263) {
+            Vector3f.write(this, this.maxSpeed);
+            this.writeVarInt(this.particleCount);
+            this.writeEnum(this.randomizationType);
+        } else {
+            this.writeFloat(this.maxSpeed.x);
+            this.writeInt(this.particleCount);
 
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            Particle.write(this, this.particle);
-        } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            ((ParticleType<ParticleData>) this.particle.getType()).writeData(this, this.particle.getData());
-        } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            int id = this.particle.getType().getId(this.serverVersion.toClientVersion());
-            LegacyParticleData legacyData = this.particle.getData() instanceof LegacyConvertible
-                    ? ((LegacyConvertible) this.particle.getData()).toLegacy(this.serverVersion.toClientVersion())
-                    : LegacyParticleData.nullValue(id);
-            LegacyParticleData.write(this, id, legacyData);
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                Particle.write(this, this.particle);
+            } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                ((ParticleType<ParticleData>) this.particle.getType()).writeData(this, this.particle.getData());
+            } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+                int id = this.particle.getType().getId(this.serverVersion.toClientVersion());
+                LegacyParticleData legacyData = this.particle.getData() instanceof LegacyConvertible
+                        ? ((LegacyConvertible) this.particle.getData()).toLegacy(this.serverVersion.toClientVersion())
+                        : LegacyParticleData.nullValue(id);
+                LegacyParticleData.write(this, id, legacyData);
+            }
         }
     }
 
@@ -169,6 +217,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.maxSpeed = wrapper.maxSpeed;
         this.particleCount = wrapper.particleCount;
         this.alwaysShow = wrapper.alwaysShow;
+        this.randomizationType = wrapper.randomizationType;
     }
 
     public Particle<?> getParticle() {
@@ -203,11 +252,30 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.offset = offset;
     }
 
+    /**
+     * @versions -26.2
+     */
+    @ApiStatus.Obsolete
     public float getMaxSpeed() {
-        return maxSpeed;
+        // just use the first value of the vector
+        return this.maxSpeed.x;
     }
 
     public void setMaxSpeed(float maxSpeed) {
+        this.maxSpeed = new Vector3f(maxSpeed, maxSpeed, maxSpeed);
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public Vector3f getMaxSpeedVec() {
+        return this.maxSpeed;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public void setMaxSpeed(Vector3f maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
@@ -220,16 +288,52 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     }
 
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public boolean isAlwaysShow() {
         return this.alwaysShow;
     }
 
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public void setAlwaysShow(boolean alwaysShow) {
         this.alwaysShow = alwaysShow;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public RandomizationType getRandomizationType() {
+        return this.randomizationType;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public void setRandomizationType(RandomizationType randomizationType) {
+        this.randomizationType = randomizationType;
+    }
+
+    /**
+     * Changes randomization behavior when <code>particleCount != 0</code>.
+     *
+     * @versions 26.3+
+     */
+    public enum RandomizationType {
+        /**
+         * Default particle randomization (pre 26.3 behavior), uses random Gaussian-distributed numbers
+         * to determine speed/velocity (with <code>maxSpeed</code>) and variance/offset (with <code>offset</code>).
+         */
+        DEFAULT,
+        /**
+         * Uses uniformly distributed random-generated variance/offset (with <code>offset</code> being the exclusive maximum)
+         * and always uses exactly <code>maxSpeed</code> for speed/velocity.
+         */
+        ALTERNATIVE,
+        /**
+         * Same as {@link #ALTERNATIVE}, but also applies a uniformly distributed random-generated factor to the speed/velocity.
+         */
+        ALTERNATIVE_WITH_SPEED,
     }
 }

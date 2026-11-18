@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.protocol.world.states.type;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
@@ -30,6 +32,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class StateType {
+
+    public static final NbtCodec<Mapped> MAPPED_CODEC = NbtCodecs.forRegistry(StateTypes.getRegistry());
+    public static final NbtCodec<StateType> CODEC = MAPPED_CODEC.apply(Mapped::getStateType, StateType::getMapped);
 
     private final Mapped mapped;
 
@@ -149,7 +154,17 @@ public class StateType {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, exceedsCube, materialType);
+        int result = 1;
+        result = 31 * result + Objects.hashCode(getName());
+        result = 31 * result + Float.hashCode(blastResistance);
+        result = 31 * result + Float.hashCode(hardness);
+        result = 31 * result + Boolean.hashCode(isSolid);
+        result = 31 * result + Boolean.hashCode(isBlocking);
+        result = 31 * result + Boolean.hashCode(isAir);
+        result = 31 * result + Boolean.hashCode(requiresCorrectTool);
+        result = 31 * result + Boolean.hashCode(exceedsCube);
+        result = 31 * result + Objects.hashCode(materialType);
+        return result;
     }
 
     public final class Mapped extends AbstractMappedEntity {

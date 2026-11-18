@@ -48,6 +48,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.Queue;
 
 @ApiStatus.Internal
@@ -72,7 +73,8 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public Player player;
     public PreViaState preVia;
 
-    private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
+    public boolean handleCompression;
+    public boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
@@ -86,6 +88,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public PacketEventsEncoder(PacketEventsEncoder encoder) {
         this.user = encoder.user;
         this.player = encoder.player;
+        this.handleCompression = encoder.handleCompression;
         this.handledCompression = encoder.handledCompression;
         this.promise = encoder.promise;
         this.hold = encoder.hold;
@@ -144,10 +147,9 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         this.promise = promise;
 
         if (msg instanceof ByteBuf) {
-            boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
+            boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, (ByteBuf) msg);
             ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? this.user.getPreViaEncoderState() : this.user.getEncoderState();
-            this.handleClientBoundPacket(
-                    ctx.channel(), this.user, this.player, (ByteBuf) msg, this.preVia != PreViaState.PRE_VIA, connectionState, this.promise);
+            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.preVia != PreViaState.PRE_VIA, connectionState, this.promise);
 
             // check if the packet got canceled
             if (!((ByteBuf) msg).isReadable()) {
@@ -258,11 +260,11 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (handledCompression) return false;
-        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        List<String> handlerNames = ctx.pipeline().names();
+        int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf((preVia == PreViaState.PRE_VIA ? "pre-" : "") + PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = handlerNames.indexOf((preVia == PreViaState.PRE_VIA ? "pre-" : "") + PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
 
         if (compressIndex <= peEncoderIndex) return false;

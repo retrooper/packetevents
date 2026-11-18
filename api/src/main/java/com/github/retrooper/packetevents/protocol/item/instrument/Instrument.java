@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.util.MathUtil;
@@ -50,6 +52,13 @@ public interface Instrument extends MappedEntity, CopyableEntity<Instrument>, De
 
     float getRange();
 
+    /**
+     * @versions 26.3+
+     */
+    default int getDurabilityDamage() {
+        return 0;
+    }
+
     Component getDescription();
 
     static Instrument read(PacketWrapper<?> wrapper) {
@@ -61,9 +70,11 @@ public interface Instrument extends MappedEntity, CopyableEntity<Instrument>, De
         float useSeconds = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)
                 ? wrapper.readFloat() : wrapper.readVarInt() * 20f;
         float range = wrapper.readFloat();
+        int durabilityDamage = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)
+                ? wrapper.readVarInt() : 0;
         Component description = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)
                 ? wrapper.readComponent() : Component.empty();
-        return new StaticInstrument(sound, useSeconds, range, description);
+        return new StaticInstrument(sound, useSeconds, range, durabilityDamage, description);
     }
 
     static void write(PacketWrapper<?> wrapper, Instrument instrument) {
@@ -78,6 +89,9 @@ public interface Instrument extends MappedEntity, CopyableEntity<Instrument>, De
             wrapper.writeVarInt(instrument.getUseDuration());
         }
         wrapper.writeFloat(instrument.getRange());
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+            wrapper.writeVarInt(instrument.getDurabilityDamage());
+        }
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
             wrapper.writeComponent(instrument.getDescription());
         }
@@ -93,8 +107,10 @@ public interface Instrument extends MappedEntity, CopyableEntity<Instrument>, De
         Sound sound = compound.getOrThrow("sound_event", Sound.CODEC, wrapper);
         float useSeconds = compound.getNumberTagOrThrow("use_duration").getAsFloat();
         float range = compound.getNumberTagOrThrow("range").getAsFloat();
+        NBTNumber durabilityDamageTag = compound.getNumberTagOrNull("durability_damage");
+        int durabilityDamage = durabilityDamageTag != null ? durabilityDamageTag.getAsInt() : 0;
         Component description = compound.getOrThrow("description", wrapper.getSerializers(), wrapper);
-        return new StaticInstrument(data, sound, useSeconds, range, description);
+        return new StaticInstrument(data, sound, useSeconds, range, durabilityDamage, description);
     }
 
     @Deprecated
@@ -107,6 +123,9 @@ public interface Instrument extends MappedEntity, CopyableEntity<Instrument>, De
         compound.set("sound_event", instrument.getSound(), Sound.CODEC, wrapper);
         compound.setTag("use_duration", new NBTFloat(instrument.getUseSeconds()));
         compound.setTag("range", new NBTFloat(instrument.getRange()));
+        if (instrument.getDurabilityDamage() != 0) {
+            compound.setTag("durability_damage", new NBTInt(instrument.getDurabilityDamage()));
+        }
         compound.set("description", instrument.getDescription(), wrapper.getSerializers(), wrapper);
         return compound;
     }

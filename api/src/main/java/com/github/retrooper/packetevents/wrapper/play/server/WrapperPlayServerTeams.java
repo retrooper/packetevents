@@ -319,20 +319,31 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             }
 
             LegacyComponent displayName = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
-            OptionData optionData = wrapper.readEnum(OptionData.values());
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_2)) {
+                OptionData optionData = wrapper.readEnum(OptionData.values());
 
-            NameTagVisibility nameTagVisibility;
-            CollisionRule collisionRule;
-            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
-                nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
-                collisionRule = wrapper.readEnum(CollisionRule.class);
-            } else {
-                nameTagVisibility = NameTagVisibility.fromID(wrapper.readString(40));
-                collisionRule = CollisionRule.fromID(wrapper.readString(40));
+                NameTagVisibility nameTagVisibility;
+                CollisionRule collisionRule;
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                    nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
+                    collisionRule = wrapper.readEnum(CollisionRule.class);
+                } else {
+                    nameTagVisibility = NameTagVisibility.fromID(wrapper.readString(40));
+                    collisionRule = CollisionRule.fromID(wrapper.readString(40));
+                }
+                NamedTextColor color = ColorUtil.fromId(wrapper.readByte());
+                LegacyComponent prefix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+                LegacyComponent suffix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+
+                return new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule, color, optionData);
             }
-            NamedTextColor color = ColorUtil.fromId(wrapper.readByte());
+
             LegacyComponent prefix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
             LegacyComponent suffix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+            NameTagVisibility nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
+            CollisionRule collisionRule = wrapper.readEnum(CollisionRule.class);
+            NamedTextColor color = wrapper.readOptional(ew -> ColorUtil.fromId(ew.readVarInt()));
+            OptionData optionData = wrapper.readEnum(OptionData.values());
 
             return new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule, color, optionData);
         }
@@ -355,25 +366,35 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                 }
             } else {
                 wrapper.writeComponent(info.displayName.getComponent());
-                wrapper.writeEnum(info.optionData);
-                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_2)) {
+                    wrapper.writeComponent(info.prefix.getComponent());
+                    wrapper.writeComponent(info.suffix.getComponent());
                     wrapper.writeEnum(info.tagVisibility);
                     wrapper.writeEnum(info.collisionRule);
+                    wrapper.writeOptional(info.color, (ew, c) ->
+                            ew.writeVarInt(ColorUtil.getId(c)));
+                    wrapper.writeEnum(info.optionData);
                 } else {
-                    wrapper.writeString(info.tagVisibility.getId());
-                    wrapper.writeString(info.collisionRule.getId());
-                }
-                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
-                    int colorId = ColorUtil.getId(info.color);
-                    if (colorId < 0) {
-                        colorId = 21; // since 1.17, minecraft decides to use writeEnum rather than writing it value, while 21 equals RESET
+                    wrapper.writeEnum(info.optionData);
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                        wrapper.writeEnum(info.tagVisibility);
+                        wrapper.writeEnum(info.collisionRule);
+                    } else {
+                        wrapper.writeString(info.tagVisibility.getId());
+                        wrapper.writeString(info.collisionRule.getId());
                     }
-                    wrapper.writeVarInt(colorId);
-                } else {
-                    wrapper.writeByte(ColorUtil.getId(info.color));
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                        int colorId = ColorUtil.getId(info.color);
+                        if (colorId < 0) {
+                            colorId = 21; // since 1.17, minecraft decides to use writeEnum rather than writing it value, while 21 equals RESET
+                        }
+                        wrapper.writeVarInt(colorId);
+                    } else {
+                        wrapper.writeByte(ColorUtil.getId(info.color));
+                    }
+                    wrapper.writeComponent(info.prefix.getComponent());
+                    wrapper.writeComponent(info.suffix.getComponent());
                 }
-                wrapper.writeComponent(info.prefix.getComponent());
-                wrapper.writeComponent(info.suffix.getComponent());
             }
         }
 

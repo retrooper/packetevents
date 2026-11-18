@@ -1,0 +1,14 @@
+{
+  "V_26_3": [
+    "copy_properties",
+    "dual_noise",
+    "noise",
+    "noise_threshold",
+    "random_block",
+    "randomized_int",
+    "rotated",
+    "rule_based",
+    "simple",
+    "weighted"
+  ]
+}

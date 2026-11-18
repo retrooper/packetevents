@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -49,6 +49,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
     public InternalPacketListener(PacketListenerPriority priority) {
         super(priority);
+    }
+
+    protected void handlePlayEnter(ProtocolPacketEvent event) {
     }
 
     @Override
@@ -84,6 +87,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             } else {
                 user.setEncoderState(ConnectionState.PLAY);
                 user.setDecoderState(ConnectionState.PLAY);
+                this.handlePlayEnter(event);
             }
         }
 
@@ -123,6 +127,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
         } else if (event.getPacketType() == PacketType.Configuration.Server.CONFIGURATION_END) {
             user.setEncoderState(ConnectionState.PLAY);
             user.finalizeRegistries(new WrapperConfigServerConfigurationEnd(event));
+            this.handlePlayEnter(event);
         }
     }
 
