@@ -52,12 +52,19 @@ public final class PacketEventsImplHelper {
             Object channel, User user, Object player, Object buffer,
             boolean autoProtocolTranslation
     ) throws Exception {
-        return handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation, user.getEncoderState());
+        return handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation, user.getEncoderState(), false);
     }
 
     public static @Nullable PacketSendEvent handleClientBoundPacket(
             Object channel, User user, Object player, Object buffer,
             boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws Exception {
+        return handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation, connectionState, false);
+    }
+
+    public static @Nullable PacketSendEvent handleClientBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation, ConnectionState connectionState, boolean clientListeners
     ) throws Exception {
         if (!ByteBufHelper.isReadable(buffer)) {
             return null;
@@ -69,7 +76,7 @@ public final class PacketEventsImplHelper {
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
-        }, !autoProtocolTranslation);
+        }, clientListeners);
         if (!packetSendEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetSendEvent.getLastUsedWrapper() != null) {
@@ -100,12 +107,19 @@ public final class PacketEventsImplHelper {
             Object channel, User user, Object player, Object buffer,
             boolean autoProtocolTranslation
     ) throws Exception {
-        return handleServerBoundPacket(channel, user, player, buffer, autoProtocolTranslation, user.getDecoderState());
+        return handleServerBoundPacket(channel, user, player, buffer, autoProtocolTranslation, user.getDecoderState(), false);
     }
 
     public static @Nullable PacketReceiveEvent handleServerBoundPacket(
             Object channel, User user, Object player, Object buffer,
             boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws Exception {
+        return handleServerBoundPacket(channel, user, player, buffer, autoProtocolTranslation, connectionState, false);
+    }
+
+    public static @Nullable PacketReceiveEvent handleServerBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation, ConnectionState connectionState, boolean clientListeners
     ) throws Exception {
         if (!ByteBufHelper.isReadable(buffer)) {
             return null;
@@ -116,7 +130,7 @@ public final class PacketEventsImplHelper {
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
-        }, !autoProtocolTranslation);
+        }, clientListeners);
         if (!packetReceiveEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetReceiveEvent.getLastUsedWrapper() != null) {

@@ -48,7 +48,7 @@ public class SpigotChannelInjector implements ChannelInjector {
     public final Set<Channel> injectedConnectionChannels = new HashSet<>();
     public List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
-    private boolean preViaVersionActivated = false;
+    private volatile boolean preViaVersionActivated = false;
 
     public void updatePlayer(User user, Object player) {
         Object channel = user.getChannel();

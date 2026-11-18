@@ -112,11 +112,10 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     private @Nullable PacketSendEvent handleClientBoundPacket(
             Channel channel, User user, Object player, ByteBuf buffer, boolean autoProtocolTranslation,
-            @Nullable ConnectionState connectionState, ChannelPromise promise
+            ConnectionState connectionState, boolean clientListeners, ChannelPromise promise
     ) throws Exception {
-        PacketSendEvent packetSendEvent = connectionState == null
-                ? PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation)
-                : PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation, connectionState);
+        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(
+                channel, user, player, buffer, autoProtocolTranslation, connectionState, clientListeners);
         if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
@@ -149,19 +148,27 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, (ByteBuf) msg);
             ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? this.user.getClientEncoderState() : this.user.getEncoderState();
-            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.preVia != PreViaState.PRE_VIA, connectionState, this.promise);
+            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
+                    this.preVia != PreViaState.PRE_VIA, connectionState, this.preVia == PreViaState.PRE_VIA, this.promise);
 
             // check if the packet got canceled
             if (!((ByteBuf) msg).isReadable()) {
                 ReferenceCountUtil.release(msg);
-                promise.trySuccess(); // TODO how to properly handle this?
+                promise.trySuccess();
                 return; // abort handling
             }
 
             // Without ViaVersion we still need to call previa listeners from the normal handler
             if (this.preVia == PreViaState.FALLBACK) {
                 this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
-                        false, this.user.getClientEncoderState(), this.promise);
+                        false, this.user.getClientEncoderState(), true, this.promise);
+
+                // check if the packet got canceled by a client-versioned listener
+                if (!((ByteBuf) msg).isReadable()) {
+                    ReferenceCountUtil.release(msg);
+                    promise.trySuccess();
+                    return;
+                }
             }
 
             if (needsRecompression) {

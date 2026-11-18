@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector.PreViaState;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
@@ -65,12 +66,12 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
             // Without ViaVersion we still need to call previa listeners from the normal handler
             if (this.preVia == PreViaState.FALLBACK) {
                 PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
-                        false, user.getClientDecoderState());
+                        false, user.getClientDecoderState(), true);
             }
 
             ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? user.getClientDecoderState() : user.getDecoderState();
             PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
-                    this.preVia != PreViaState.PRE_VIA, connectionState);
+                    this.preVia != PreViaState.PRE_VIA, connectionState, this.preVia == PreViaState.PRE_VIA);
 
             // don't forward canceled packets
             if (input.isReadable()) {
@@ -148,6 +149,23 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
         // relocate handlers on compression change
         ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, this.preVia == PreViaState.PRE_VIA);
+
+        // schedule later so we do this after via
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+        if (this.preVia != PreViaState.PRE_VIA && injector.isPreViaVersionActivated()) {
+            ctx.channel().eventLoop().execute(() -> {
+                if (!ctx.channel().isActive()) {
+                    return;
+                }
+                try {
+                    ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true);
+                } catch (Exception exception) {
+                    PacketEvents.getAPI().getLogManager().severe(
+                            "PacketEvents failed to relocate the pre-ViaVersion handlers after compression was enabled.", exception);
+                }
+            });
+        }
+
         super.userEventTriggered(ctx, event);
     }
 

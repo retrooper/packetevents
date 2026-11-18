@@ -34,7 +34,7 @@ public class EventManager {
      */
     @ApiStatus.Internal
     public final void callEvent(PacketEvent event) {
-        this.serverListeners.callEvent(event, null);
+        this.callEvent(event, null);
     }
 
     /**
@@ -42,7 +42,9 @@ public class EventManager {
      */
     @ApiStatus.Internal
     public final void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
+        // call in both containers by default
         this.serverListeners.callEvent(event, postCallListenerAction);
+        this.clientListeners.callEvent(event, postCallListenerAction);
     }
 
     /**
