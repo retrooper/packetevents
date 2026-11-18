@@ -30,8 +30,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class BukkitEventManager extends EventManager {
 
-    private final Object listenerLock = new Object();
-
     public BukkitEventManager() {
     }
 
@@ -43,20 +41,20 @@ public class BukkitEventManager extends EventManager {
             return; // don't inject pre-via if this is only our internal listener
         }
 
-        synchronized (this.listenerLock) {
+        synchronized (this) {
             if (!container.isEmpty()) {
                 return; // already activated
             }
 
             // register internal listener first
             this.clientListeners.registerListener(new ClientVersionInternalListener());
+        }
 
-            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (ViaVersionUtil.isAvailable()) {
-                injector.activatePreViaVersion();
-            } else {
-                injector.setPreViaFallback();
-            }
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+        if (ViaVersionUtil.isAvailable()) {
+            injector.activatePreViaVersion();
+        } else {
+            injector.setPreViaFallback();
         }
     }
 }
