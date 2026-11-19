@@ -218,7 +218,13 @@ final class StyleSerializer extends TypeAdapter<Style> {
                     switch (action.toString()) {
                         case "open_url":
                             if (value != null) {
-                                style.clickEvent(ClickEvent.openUrl(value));
+                                try {
+                                    style.clickEvent(ClickEvent.openUrl(value));
+                                } catch (final IllegalArgumentException ignored) {
+                                    // Adventure rejects URLs that java.net.URI can't parse, but servers
+                                    // send them (e.g. auto-linked chat text like "abc.def}"). Keep the
+                                    // component and drop the click event instead of failing to parse.
+                                }
                             }
                             break;
                         case "run_command":
