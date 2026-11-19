@@ -54,6 +54,16 @@ public final class Attributes {
         return REGISTRY.getByName(normedName);
     }
 
+    /** Like getByName, but returns an unregistered attribute for unknown names. */
+    public static Attribute getByNameOrCreate(String name) {
+        Attribute attribute = getByName(name);
+        if (attribute != null) {
+            return attribute;
+        }
+        String normedName = ResourceLocation.normString(name);
+        return new StaticAttribute(new ResourceLocation(normedName), 0d, -Double.MAX_VALUE, Double.MAX_VALUE);
+    }
+
     public static Attribute getById(ClientVersion version, int id) {
         return REGISTRY.getById(version, id);
     }
