@@ -500,7 +500,11 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             ClickEvent value;
             switch (action.toString()) {
                 case "open_url":
-                    value = ClickEvent.openUrl(clickEvent.readUTF(modernEvents ? "url" : "value", Function.identity()));
+                    try {
+                        value = ClickEvent.openUrl(clickEvent.readUTF(modernEvents ? "url" : "value", Function.identity()));
+                    } catch (IllegalArgumentException ignored) {
+                        value = null;
+                    }
                     break;
                 case "open_file":
                     value = ClickEvent.openFile(clickEvent.readUTF(modernEvents ? "path" : "value", Function.identity()));

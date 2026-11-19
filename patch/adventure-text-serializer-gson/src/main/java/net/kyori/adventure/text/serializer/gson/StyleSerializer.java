@@ -218,7 +218,10 @@ final class StyleSerializer extends TypeAdapter<Style> {
                     switch (action.toString()) {
                         case "open_url":
                             if (value != null) {
-                                style.clickEvent(ClickEvent.openUrl(value));
+                                try {
+                                    style.clickEvent(ClickEvent.openUrl(value));
+                                } catch (IllegalArgumentException ignored) {
+                                }
                             }
                             break;
                         case "run_command":
