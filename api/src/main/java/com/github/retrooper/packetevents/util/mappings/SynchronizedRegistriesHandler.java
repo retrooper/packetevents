@@ -95,7 +95,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,11 +107,13 @@ import java.util.stream.Stream;
 public final class SynchronizedRegistriesHandler {
 
     private static final boolean FORCE_PER_USER_REGISTRIES = Boolean.getBoolean("packetevents.force-per-user-registries");
-    private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = new HashMap<>();
+    private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = new LinkedHashMap<>();
 
     static {
         // packetevents ignores a few unimportant registries which aren't used anywhere else in the protocol:
         // test_environment, test_instance
+        //
+        // registries are decoded in this order, so they have to come after the ones they reference
         Stream.of(
                 new RegistryEntry<>(Biomes.getRegistry(), Biome.CODEC),
                 new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
@@ -126,6 +128,8 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(ChickenVariants.getRegistry(), ChickenVariant.CODEC),
                 new RegistryEntry<>(ZombieNautilusVariants.getRegistry(), ZombieNautilusVariant::decode),
                 new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant.CODEC),
+                new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC),
+                new RegistryEntry<>(Timelines.getRegistry(), Timeline.CODEC),
                 new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType.CODEC),
                 new RegistryEntry<>(DamageTypes.getRegistry(), DamageType.DIRECT_CODEC),
                 new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
@@ -133,16 +137,14 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(JukeboxSongs.getRegistry(), (NbtEntryDecoder<IJukeboxSong>) IJukeboxSong::decode),
                 new RegistryEntry<>(Instruments.getRegistry(), (NbtEntryDecoder<Instrument>) Instrument::decode),
                 new RegistryEntry<>(Dialogs.getRegistry(), Dialog::decodeDirect),
-                new RegistryEntry<>(Timelines.getRegistry(), Timeline.CODEC),
                 new RegistryEntry<>(PigSoundVariants.getRegistry(), PigSoundVariant.CODEC),
                 new RegistryEntry<>(CatSoundVariants.getRegistry(), CatSoundVariant.CODEC),
                 new RegistryEntry<>(CowSoundVariants.getRegistry(), CowSoundVariant.CODEC),
                 new RegistryEntry<>(ChickenSoundVariants.getRegistry(), ChickenSoundVariant.CODEC),
-                new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC),
                 new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC),
                 new RegistryEntry<>(DecoratedPotPatterns.getRegistry(), DecoratedPotPattern.CODEC),
-                new RegistryEntry<>(BlockTransformers.getRegistry(), BlockTransformer.DIRECT_CODEC),
-                new RegistryEntry<>(BlockStateProviders.getRegistry(), BlockStateProvider.DIRECT_CODEC)
+                new RegistryEntry<>(BlockStateProviders.getRegistry(), BlockStateProvider.DIRECT_CODEC),
+                new RegistryEntry<>(BlockTransformers.getRegistry(), BlockTransformer.DIRECT_CODEC)
         ).forEach(entry -> REGISTRY_KEYS.put(entry.getRegistryKey(), entry));
     }
 
@@ -160,14 +162,24 @@ public final class SynchronizedRegistriesHandler {
         return REGISTRY_KEYS.get(registryKey);
     }
 
-    public static void handleRegistry(
+    public static void handleRegistries(
             User user, PacketWrapper<?> wrapper,
-            ResourceLocation registryName,
-            List<RegistryElement> elements
+            Map<ResourceLocation, List<RegistryElement>> registries
     ) {
         Object cacheKey = PacketEvents.getAPI().getServerManager().getRegistryCacheKey(
                 user, wrapper.getServerVersion().toClientVersion());
-        handleRegistry(user, wrapper, registryName, elements, cacheKey);
+        for (ResourceLocation registryName : REGISTRY_KEYS.keySet()) {
+            List<RegistryElement> elements = registries.get(registryName);
+            if (elements == null) {
+                continue;
+            }
+            try {
+                handleRegistry(user, wrapper, registryName, elements, cacheKey);
+            } catch (Exception exception) {
+                // one invalid registry shouldn't prevent the player from entering the play phase
+                PacketEvents.getAPI().getLogManager().warn(exception.getMessage(), exception);
+            }
+        }
     }
 
     public static void handleRegistry(

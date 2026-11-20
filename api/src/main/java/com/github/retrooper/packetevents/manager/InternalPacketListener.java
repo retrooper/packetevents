@@ -95,11 +95,11 @@ public class InternalPacketListener extends PacketListenerAbstract {
         else if (event.getPacketType() == PacketType.Configuration.Server.REGISTRY_DATA) {
             WrapperConfigServerRegistryData packet = new WrapperConfigServerRegistryData(event);
 
-            if (packet.getElements() != null) { // 1.20.2 to 1.20.5
-                SynchronizedRegistriesHandler.handleRegistry(user, packet,
-                        packet.getRegistryKey(), packet.getElements());
+            if (packet.getElements() != null) { // since 1.20.5
+                // Registries can reference ones sent after them, so wait for all of them like the client does
+                user.addPendingRegistry(packet.getRegistryKey(), packet.getElements());
             }
-            if (packet.getRegistryData() != null) { // since 1.20.5
+            if (packet.getRegistryData() != null) { // 1.20.2 to 1.20.5
                 SynchronizedRegistriesHandler.handleLegacyRegistries(user, packet, packet.getRegistryData());
             }
         }
