@@ -436,30 +436,20 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
                     ((Skippable) lastRead).skip();
                 }
 
-                if (!hasNext()) return new byte[]{9};
+                try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                     DataOutputStream out = new DataOutputStream(bytes)) {
+                    out.writeByte(9); // list tag
+                    out.writeByte(DefaultNBTSerializer.INSTANCE.typeToId.get(listType));
+                    out.writeInt(remaining);
 
-                byte[] array = null;
-                for (int i = 0; i < remaining; i++) {
-                    byte[] element = TAG_BINARY_READERS.get(listType).read(limiter, stream);
-
-                    if (array == null) {
-                        array = new byte[2 + Integer.BYTES + remaining * element.length]; // all the remaining child tags will be of same size
-                        array[0] = 9; // list tag
-                        array[1] = DefaultNBTSerializer.INSTANCE.typeToId.get(listType).byteValue();
-
-                        // write length
-                        array[2] = (byte) (remaining >>> 24);
-                        array[3] = (byte) (remaining >>> 16);
-                        array[4] = (byte) (remaining >>> 8);
-                        array[5] = (byte) remaining;
+                    for (int i = 0; i < remaining; i++) {
+                        out.write(TAG_BINARY_READERS.get(listType).read(limiter, stream));
                     }
 
-                    System.arraycopy(element, 0, array, 1 + Integer.BYTES + i * element.length, element.length);
+                    remaining = 0;
+                    runCompleted();
+                    return bytes.toByteArray();
                 }
-
-                remaining = 0;
-                runCompleted();
-                return array;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
