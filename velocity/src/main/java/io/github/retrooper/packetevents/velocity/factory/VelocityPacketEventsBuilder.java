@@ -38,6 +38,8 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -50,7 +52,6 @@ import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.Objects;
 
 public class VelocityPacketEventsBuilder {
     private static PacketEventsAPI<PluginContainer> INSTANCE;
@@ -129,23 +130,37 @@ public class VelocityPacketEventsBuilder {
                     return this.version;
                 }
 
-                private @Nullable Object getTargetServer(Player player) {
-                    ServerConnection server = player.getCurrentServer().orElse(null);
-                    if (server != null) {
-                        return server;
-                    }
+                /**
+                 * Returns the backend server whose registries the player is receiving. During a server
+                 * switch, the new server's configuration packets arrive while the old connection is still
+                 * the current one, so the in-flight connection takes precedence.
+                 */
+                private @Nullable ServerInfo getTargetServer(Player player) {
                     try {
                         Object connection = this.connectionInFlight.get(player);
-                        return connection != null ? this.registeredServer.get(connection) : null;
+                        if (connection != null) {
+                            RegisteredServer target = (RegisteredServer) this.registeredServer.get(connection);
+                            if (target != null) {
+                                return target.getServerInfo();
+                            }
+                        }
                     } catch (IllegalAccessException exception) {
                         throw new RuntimeException(exception);
                     }
+                    ServerConnection server = player.getCurrentServer().orElse(null);
+                    return server != null ? server.getServerInfo() : null;
                 }
 
                 @Override
-                public Object getRegistryCacheKey(User user, ClientVersion version) {
+                public @Nullable Object getRegistryCacheKey(User user, ClientVersion version) {
                     Player player = server.getPlayer(user.getUUID()).orElse(null);
-                    return player == null ? null : Objects.hash(this.getTargetServer(player), version);
+                    if (player == null) {
+                        return null;
+                    }
+                    // key by the backend's stable identity: server connection objects are created anew on
+                    // every server switch, and the registry cache only drops keys when told to
+                    ServerInfo target = this.getTargetServer(player);
+                    return target == null ? null : VelocityRegistryCacheKey.of(server, target, version);
                 }
             };
 
@@ -205,6 +220,7 @@ public class VelocityPacketEventsBuilder {
                             UserLoginEvent loginEvent = new UserLoginEvent(user, player);
                             PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
                         });
+                VelocityRegistryCacheKey.registerInvalidation(server, plugin);
                 if (settings.shouldCheckForUpdates()) {
                     getUpdateChecker().handleUpdateCheck();
                 }
