@@ -18,10 +18,36 @@
 
 package com.github.retrooper.packetevents.injector;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public interface ChannelInjector {
+
+    /**
+     * @param channel the player's channel
+     * @return true when both packetevents handlers are present in the channel's pipeline
+     */
+    default boolean isInjected(Object channel) {
+        return ChannelHelper.getPipelineHandler(channel, PacketEvents.DECODER_NAME) != null
+                && ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME) != null;
+    }
+
+    /**
+     * Adds the packetevents handlers back to an open channel that lost them, reusing the
+     * {@link User} still registered for it so its client version, connection state and profile
+     * carry over. Does nothing when the channel is already injected or closed.
+     * <p>
+     * The pipeline is modified on the channel's event loop, so {@link #isInjected(Object)} may
+     * still return false directly after this call.
+     *
+     * @param channel the player's channel
+     * @throws UnsupportedOperationException when the platform does not support re-injection
+     */
+    default void reinject(Object channel) {
+        throw new UnsupportedOperationException("Re-injection is not supported on this platform");
+    }
 
     default boolean isServerBound() {
         return true;
