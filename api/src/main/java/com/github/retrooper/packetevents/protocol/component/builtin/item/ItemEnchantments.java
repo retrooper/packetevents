@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -66,10 +67,15 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
     }
 
     public static ItemEnchantments read(PacketWrapper<?> wrapper) {
+        ClientVersion version = wrapper.getServerVersion().toClientVersion();
+        IRegistry<EnchantmentType> registry = wrapper.replaceRegistry(EnchantmentTypes.getRegistry());
+
         Map<EnchantmentType, Integer> enchantments = wrapper.readMap(
-                ew -> wrapper.readMappedEntity(EnchantmentTypes.getRegistry()),
+                ew -> registry.getById(version, ew.readVarInt()),
                 PacketWrapper::readVarInt
         );
+        enchantments.remove(null);
+
         boolean showInTooltip = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5) || wrapper.readBoolean();
         return new ItemEnchantments(enchantments, showInTooltip);
     }
