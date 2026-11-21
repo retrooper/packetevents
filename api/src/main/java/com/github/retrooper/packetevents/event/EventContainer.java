@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
+import com.github.retrooper.packetevents.util.LogManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class for event managing. Implements both, internal and API methods.
@@ -55,6 +57,14 @@ public class EventContainer {
     //Since reads greatly outnumber writes, create an array for the best possible iteration time
     //Updated as a whole on writes, no index modifications are allowed
     private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
+
+    // how many listener exceptions can be logged in a row, and how long it takes until one more can be
+    private static final int LOG_BURST = 10;
+    private static final long LOG_NANOS = TimeUnit.SECONDS.toNanos(1);
+    private final Object logLock = new Object();
+    private int logsLeft = LOG_BURST;
+    private long lastRegain;
+    private int notLogged;
 
     /**
      * Call the PacketEvent.
@@ -86,7 +96,7 @@ public class EventContainer {
             } catch (Exception t) {
                 // ignore handshake exceptions
                 if (t.getClass() != InvalidHandshakeException.class && (t.getCause() == null || t.getCause().getClass() != InvalidHandshakeException.class)) {
-                    PacketEvents.getAPI().getLogManager().warn("PacketEvents caught an unhandled exception while calling your listener.", t);
+                    this.logException(t, System.nanoTime());
                 }
             }
             if (postCallListenerAction != null) {
@@ -97,6 +107,37 @@ public class EventContainer {
         if (event instanceof ProtocolPacketEvent && !((ProtocolPacketEvent) event).needsReEncode()) {
             ((ProtocolPacketEvent) event).setLastUsedWrapper(null);
         }
+    }
+
+    // a client can make a listener throw with every packet it sends, so after LOG_BURST
+    // exceptions in a row only one a second is logged, the rest are counted
+    void logException(Exception t, long now) {
+        LogManager log = PacketEvents.getAPI().getLogManager();
+        String message = "PacketEvents caught an unhandled exception while calling your listener.";
+        if (!log.isDebug()) {
+            synchronized (this.logLock) {
+                if (this.logsLeft < LOG_BURST) {
+                    long regained = (now - this.lastRegain) / LOG_NANOS;
+                    if (regained > 0) {
+                        this.logsLeft = (int) Math.min(LOG_BURST, this.logsLeft + regained);
+                        this.lastRegain += regained * LOG_NANOS;
+                    }
+                }
+                if (this.logsLeft == LOG_BURST) {
+                    this.lastRegain = now;
+                }
+                if (this.logsLeft == 0) {
+                    this.notLogged++;
+                    return;
+                }
+                this.logsLeft--;
+                if (this.notLogged > 0) {
+                    message += " (" + this.notLogged + " more were not logged)";
+                    this.notLogged = 0;
+                }
+            }
+        }
+        log.warn(message, t);
     }
 
     /**
