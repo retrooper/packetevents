@@ -24,7 +24,10 @@ import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.reader.ChatMessageProcessor;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
 public class ChatMessageProcessorLegacy implements ChatMessageProcessor {
@@ -37,7 +40,14 @@ public class ChatMessageProcessorLegacy implements ChatMessageProcessor {
 
     @Override
     public void writeChatMessage(@NotNull PacketWrapper<?> wrapper, @NotNull ChatMessage data) {
-        wrapper.writeComponent(data.getChatContent());
+        if (data.getType() == ChatTypes.GAME_INFO) {
+            String legacyChatContent = LegacyComponentSerializer.legacySection().serialize(data.getChatContent());
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("text", legacyChatContent);
+            wrapper.writeString(jsonObject.toString(), wrapper.getMaxMessageLength());
+        } else {
+            wrapper.writeComponent(data.getChatContent());
+        }
         wrapper.writeMappedEntity(data.getType());
     }
 }
