@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.java.diff.utils)
     implementation(libs.mod.publish)
     implementation(libs.fabric.loom)
+    implementation(libs.neoforge.moddev)
 
     // downgrade jackson module for publishing plugin to work
     implementation(libs.runtask) {
