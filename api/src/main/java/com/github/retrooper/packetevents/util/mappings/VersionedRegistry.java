@@ -194,6 +194,14 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
         return this.entries.size();
     }
 
+    /**
+     * Returns the number of IDs available in this registry for the given version.
+     */
+    public int size(ClientVersion version) {
+        Map<Integer, T> ids = this.typeIds[this.typesBuilder.getDataIndex(version)];
+        return ids == null ? 0 : ids.size();
+    }
+
     @Override
     public ResourceLocation getRegistryKey() {
         return this.registryKey;

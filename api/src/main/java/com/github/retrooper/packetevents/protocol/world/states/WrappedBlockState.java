@@ -235,6 +235,13 @@ public class WrappedBlockState {
         return BlockStateCodec.CODEC.encode(PacketWrapper.createDummyWrapper(version), state);
     }
 
+    /**
+     * Returns the size of the flattened block state registry for the given version.
+     */
+    public static int getRegistrySize(ClientVersion version) {
+        return BY_ID[loadMappings(version)].size();
+    }
+
     @NotNull
     public static WrappedBlockState getByGlobalId(int globalID) {
         return getByGlobalId(globalID, true);
