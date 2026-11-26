@@ -18,11 +18,21 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInputWrapper;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutputWrapper;
+import com.github.retrooper.packetevents.protocol.world.biome.Biome;
+import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BitStorage;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 public enum PaletteType {
 
@@ -77,16 +87,62 @@ public enum PaletteType {
 
     public DataPalette read(PacketWrapper<?> wrapper) {
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_16)) {
-            return DataPalette.readLegacy(new NetStreamInputWrapper(wrapper));
+            return DataPalette.readLegacy(new NetStreamInputWrapper(wrapper), wrapper.getServerVersion().toClientVersion());
         }
         return DataPalette.read(wrapper, this);
     }
 
     public DataPalette create() {
+        return this.create(null, null);
+    }
+
+    public DataPalette create(ClientVersion version) {
+        return this.create(version, null);
+    }
+
+    /**
+     * Creates a palette for the packet's protocol version and synchronized registries.
+     */
+    public DataPalette create(PacketWrapper<?> wrapper) {
+        return this.create(wrapper.getServerVersion().toClientVersion(), this.getBiomeRegistry(wrapper));
+    }
+
+    private DataPalette create(@Nullable ClientVersion version, @Nullable IRegistry<Biome> biomeRegistry) {
         int bitsPerEntry = this.getMaxBitsPerEntryForList();
         Palette palette = new ListPalette(bitsPerEntry);
         BitStorage storage = new BitStorage(bitsPerEntry, this.getStorageSize());
-        return new DataPalette(palette, storage, this);
+        return new DataPalette(palette, storage, this, version, biomeRegistry);
+    }
+
+    @Nullable IRegistry<Biome> getBiomeRegistry(PacketWrapper<?> wrapper) {
+        return this == BIOME ? wrapper.replaceRegistry(Biomes.getRegistry()) : null;
+    }
+
+    int getDirectBits(@Nullable ClientVersion version, @Nullable IRegistry<Biome> biomeRegistry) {
+        PacketEventsAPI<?> api = PacketEvents.getAPI();
+        if (api == null) {
+            // Mapping resources require an initialized API.
+            return this == BIOME ? 7 : GlobalPalette.BITS_PER_ENTRY;
+        }
+        if (version == null || version == ClientVersion.UNKNOWN) {
+            version = api.getServerManager().getVersion().toClientVersion();
+        }
+
+        int registrySize;
+        if (this == CHUNK) {
+            if (version.isOlderThan(ClientVersion.V_1_13)) {
+                // Pre-flattening block IDs are not dense.
+                return GlobalPalette.BITS_PER_ENTRY;
+            }
+            registrySize = WrappedBlockState.getRegistrySize(version);
+        } else {
+            VersionedRegistry<Biome> vanilla = Biomes.getRegistry();
+            if (biomeRegistry == null) {
+                biomeRegistry = GlobalRegistryHolder.INSTANCE.getRegistryOr(vanilla, version);
+            }
+            registrySize = biomeRegistry == vanilla ? vanilla.size(version) : biomeRegistry.size();
+        }
+        return Integer.SIZE - Integer.numberOfLeadingZeros(registrySize - 1);
     }
 
     public int getMaxBitsPerEntryForList() {

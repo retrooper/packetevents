@@ -20,12 +20,17 @@ package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
+import com.github.retrooper.packetevents.protocol.world.biome.Biome;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BaseStorage;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BitStorage;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.LegacyFlexibleStorage;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 public class DataPalette {
 
@@ -33,10 +38,22 @@ public class DataPalette {
     public Palette palette;
     public BaseStorage storage;
 
+    private final @Nullable ClientVersion version;
+    private final @Nullable IRegistry<Biome> biomeRegistry;
+
     public DataPalette(Palette palette, BaseStorage storage, PaletteType paletteType) {
+        this(palette, storage, paletteType, null, null);
+    }
+
+    DataPalette(
+            Palette palette, @Nullable BaseStorage storage, PaletteType paletteType,
+            @Nullable ClientVersion version, @Nullable IRegistry<Biome> biomeRegistry
+    ) {
         this.palette = palette;
         this.storage = storage;
         this.paletteType = paletteType;
+        this.version = version;
+        this.biomeRegistry = biomeRegistry;
     }
 
     /**
@@ -98,7 +115,8 @@ public class DataPalette {
             storage = null;
         }
 
-        return new DataPalette(palette, storage, paletteType);
+        IRegistry<Biome> biomeRegistry = palette instanceof GlobalPalette ? null : paletteType.getBiomeRegistry(wrapper);
+        return new DataPalette(palette, storage, paletteType, wrapper.getServerVersion().toClientVersion(), biomeRegistry);
     }
 
     /**
@@ -108,6 +126,14 @@ public class DataPalette {
     public static DataPalette read(
             NetStreamInput in, PaletteType paletteType,
             boolean allowSingletonPalette, boolean lengthPrefix
+    ) {
+        return read(in, paletteType, allowSingletonPalette, lengthPrefix, null);
+    }
+
+    @ApiStatus.Internal
+    public static DataPalette read(
+            NetStreamInput in, PaletteType paletteType, boolean allowSingletonPalette,
+            boolean lengthPrefix, @Nullable ClientVersion version
     ) {
         int bitsPerEntry = in.readByte();
         Palette palette = readPalette(paletteType, bitsPerEntry, in, allowSingletonPalette);
@@ -126,7 +152,7 @@ public class DataPalette {
             storage = null;
         }
 
-        return new DataPalette(palette, storage, paletteType);
+        return new DataPalette(palette, storage, paletteType, version, null);
     }
 
     /**
@@ -173,10 +199,15 @@ public class DataPalette {
      */
     @Deprecated
     public static DataPalette readLegacy(NetStreamInput in) {
+        return readLegacy(in, null);
+    }
+
+    @ApiStatus.Internal
+    public static DataPalette readLegacy(NetStreamInput in, @Nullable ClientVersion version) {
         int bitsPerEntry = Math.max(4, in.readByte() & 0xff);
         Palette palette = readPalette(PaletteType.CHUNK, bitsPerEntry, in, false);
         BaseStorage storage = new LegacyFlexibleStorage(bitsPerEntry, in.readLongs(in.readVarInt()));
-        return new DataPalette(palette, storage, PaletteType.CHUNK);
+        return new DataPalette(palette, storage, PaletteType.CHUNK, version, null);
     }
 
     public int get(int x, int y, int z) {
@@ -257,17 +288,23 @@ public class DataPalette {
         BaseStorage oldData = this.storage;
 
         int prevBitsPerEntry = oldData != null ? oldData.getBitsPerEntry() : 0;
-        this.palette = createPalette(prevBitsPerEntry + 1, this.paletteType);
-        this.storage = new BitStorage(this.palette.getBits(), this.paletteType.getStorageSize());
+        Palette newPalette = createPalette(prevBitsPerEntry + 1, this.paletteType);
+        int bits = newPalette instanceof GlobalPalette
+                ? this.paletteType.getDirectBits(this.version, this.biomeRegistry) : newPalette.getBits();
+        int size = this.paletteType.getStorageSize();
+        BaseStorage newData = oldData instanceof LegacyFlexibleStorage
+                ? new LegacyFlexibleStorage(bits, size) : new BitStorage(bits, size);
 
         if (oldData != null) {
-            // copy over storage
-            for (int i = 0, len = this.paletteType.getStorageSize(); i < len; ++i) {
-                this.storage.set(i, this.palette.stateToId(oldPalette.idToState(oldData.get(i))));
+            for (int i = 0; i < size; ++i) {
+                newData.set(i, newPalette.stateToId(oldPalette.idToState(oldData.get(i))));
             }
         } else {
-            this.palette.stateToId(oldPalette.idToState(0));
+            newPalette.stateToId(oldPalette.idToState(0));
         }
+
+        this.palette = newPalette;
+        this.storage = newData;
     }
 
     private static Palette createPalette(int bitsPerEntry, PaletteType paletteType) {

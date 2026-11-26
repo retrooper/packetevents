@@ -76,8 +76,8 @@ public class Chunk_v1_9 implements BaseChunk {
                 ? in.readShort() : Integer.MAX_VALUE;
         // singleton palette got added with 1.18 which isn't supported by this chunk section implementation
         this.dataPalette = version.isNewerThanOrEquals(ServerVersion.V_1_16)
-                ? DataPalette.read(in, PaletteType.CHUNK, false)
-                : DataPalette.readLegacy(in);
+                ? DataPalette.read(in, PaletteType.CHUNK, false, true, version.toClientVersion())
+                : DataPalette.readLegacy(in, version.toClientVersion());
 
         this.blockLight = hasBlockLight ? new NibbleArray3d(in, LIGHT_NIBBLES_SIZE) : null;
         this.skyLight = hasSkyLight ? new NibbleArray3d(in, LIGHT_NIBBLES_SIZE) : null;
