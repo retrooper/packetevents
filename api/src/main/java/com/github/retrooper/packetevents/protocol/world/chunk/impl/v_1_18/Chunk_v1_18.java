@@ -52,8 +52,8 @@ public class Chunk_v1_18 implements BaseChunk {
 
     public Chunk_v1_18(ClientVersion version) {
         this.version = version;
-        this.chunkData = PaletteType.CHUNK.create();
-        this.biomeData = PaletteType.BIOME.create();
+        this.chunkData = PaletteType.CHUNK.create(version);
+        this.biomeData = PaletteType.BIOME.create(version);
     }
 
     /**
@@ -138,10 +138,8 @@ public class Chunk_v1_18 implements BaseChunk {
     public static Chunk_v1_18 read(ClientVersion version, NetStreamInput in, boolean paletteLengthPrefix, boolean hasFluidCount) {
         int blockCount = in.readShort();
         int fluidCount = hasFluidCount ? in.readShort() : 0;
-        DataPalette chunkPalette = DataPalette.read(in, PaletteType.CHUNK,
-                true, paletteLengthPrefix);
-        DataPalette biomePalette = DataPalette.read(in, PaletteType.BIOME,
-                true, paletteLengthPrefix);
+        DataPalette chunkPalette = DataPalette.read(in, PaletteType.CHUNK, true, paletteLengthPrefix, version);
+        DataPalette biomePalette = DataPalette.read(in, PaletteType.BIOME, true, paletteLengthPrefix, version);
         return new Chunk_v1_18(version, blockCount, fluidCount, chunkPalette, biomePalette);
     }
 
