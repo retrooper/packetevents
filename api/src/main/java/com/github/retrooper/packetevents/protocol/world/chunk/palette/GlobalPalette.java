@@ -32,8 +32,7 @@ import org.jetbrains.annotations.ApiStatus;
 //TODO Equals & hashcode
 public class GlobalPalette implements Palette {
 
-    // this is the amount of bits required to store the biggest state id number
-    // TODO this needs to be version-specific, but requires major refactor
+    // Legacy width exposed by getBits(). DataPalette chooses the width of direct storage.
     @ApiStatus.Internal
     public static final int BITS_PER_ENTRY = 16;
 
