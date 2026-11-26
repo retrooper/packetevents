@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.PEVersion;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +42,11 @@ import java.util.function.Consumer;
  */
 @ApiStatus.Internal
 public class UpdateChecker {
+    // plain Gson on purpose: this runs off the main thread, and touching the adventure
+    // serializer here would class-init adventure (JSONOptions etc.) off-thread, which can
+    // race with plugin class loading and permanently break component serialization
+    private static final Gson GSON = new Gson();
+
     @ApiStatus.Internal
     public String checkLatestReleasedVersion() {
         try {
@@ -50,7 +55,7 @@ public class UpdateChecker {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String jsonResponse = reader.readLine();
             reader.close();
-            JsonObject jsonObject = AdventureSerializer.serializer().gson().serializer().fromJson(jsonResponse, JsonObject.class);
+            JsonObject jsonObject = GSON.fromJson(jsonResponse, JsonObject.class);
             return jsonObject.get("name").getAsString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to parse packetevents version!", e);
